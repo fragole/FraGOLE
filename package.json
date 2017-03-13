@@ -1,0 +1,22 @@
+{
+  "name": "gameframe",
+  "version": "1.0.0",
+  "description": "GameFrame Project",
+  "main": "index.js",
+  "dependencies": {
+    "browserify": "^14.1.0",
+    "eureca.io": "^0.7.1",
+    "express": "^4.15.2",
+    "gulp": "^3.9.1",
+    "jade": "^1.11.0",
+    "jquery": "^3.1.1",
+    "pug": "^2.0.0-beta11",
+    "semantic-ui": "^2.2.9"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Michael Bauer",
+  "license": "MIT"
+}

@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "browserify": "^14.1.0",
+    "engine.io": "^2.1.0",
     "eureca.io": "^0.7.1",
     "express": "^4.15.2",
     "gulp": "^3.9.1",

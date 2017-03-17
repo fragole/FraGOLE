@@ -1,4 +1,3 @@
-var GF_WebServer = require('./gf_WebServer.js');
+var GF_Server = require('./gf_Server.js');
 
-
-webServer = new GF_WebServer(80);
+webServer = new GF_Server(81);

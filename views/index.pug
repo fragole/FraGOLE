@@ -9,6 +9,7 @@ html
     script(src="semantic.min.js")
     script(src="js/easeljs.min.js")
     script(src="js/tweenjs.min.js")
+    script(src="/eureca.js")
 
     //- eureca.io => RPC
 
@@ -16,7 +17,7 @@ html
     script(src="js/gf_ClientAPI.js")
 
   body
-    button.ui.button Button
-    canvas#board(style="z-index: -1; width: 100%; height: 100%;")
+    div#board_div
+      canvas#board_canvas(style="z-index: -1; width: 100%; height: 100%;")
     script.
       $( function () {init();});

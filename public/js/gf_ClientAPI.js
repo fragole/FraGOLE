@@ -1,3 +1,5 @@
+// XXX Namespace?
+
 var gameboard;
 
 // TODO: place in module
@@ -12,12 +14,14 @@ var draw_methods = {
 class GF_GameBoard {
   constructor (id) {
     this.id = id;
-    this.board_dom = $('#' + id)[0];
-    this.board_dom.width = document.body.clientWidth;
-    this.board_dom.height = document.body.clientHeight;
-    this.stage = new createjs.Stage(id);
+    this.board_div = $('#' + id + '_div');
+    this.board_canvas = $('#' + id + '_canvas')[0];
+    this.board_canvas.width = document.body.clientWidth;
+    this.board_canvas.height = document.body.clientHeight;
+    this.stage = new createjs.Stage(id + '_canvas');
     this.childs = {};
   }
+
   // Wrapper for easelJS Graphic.drawX methods
   // use type from draw_methods constant
   // parameters beyond pos_y are passed dynamically to account different shape prototypes
@@ -41,19 +45,43 @@ class GF_GameBoard {
     }
     this.stage.addChild(shape);
     this.stage.update();
+    this.childs[name] = shape;
+  }
+
+  // Wrapper for drawing images into the canvas
+  drawImage (name, src, pos_x, pos_y) {
+      var img = new createjs.Bitmap(src);
+      img.x = pos_x;
+      img.y = pos_y;
+      this.stage.addChild(img);
+      this.stage.update();
+
+  }
+
+  // Wrapper for drawing components (Game-Object represented by HTML code)
+  drawComponent(name, src, pos_x, pos_y) {
+     $(src).appendTo(this.board_div).css({position: "absolute",
+                                  left: pos_x,
+                                  top: pos_y});
   }
 }
 
+// Just Testcode ATM
 function init() {
   gameboard = new GF_GameBoard("board");
   gameboard.drawShape('circ', draw_methods.CIRCLE, 'Blue', 0,100,100,50);
   gameboard.drawShape('rect', draw_methods.RECTANGLE, 'Blue','Black',100,200,50,75);
   gameboard.drawShape('rrect', draw_methods.ROUNDED_RECTANGLE, 'Red', 0, 100,400, 50, 100, 15, 0, 15, 0);
   gameboard.drawShape('star', draw_methods.STAR, 'Green', 'Yellow', 100,600, 50, 5, 0.5, 0);
+
+  // shape not supported
   gameboard.drawShape('xxx', 'drawX', 0,0,0,0);
 
+  gameboard.drawComponent('test', '<image src="/assets/Pieces (Black)/pieceBlack_border00.png" />', 150,150);
+  gameboard.drawImage("test_img", "assets/Pieces (Blue)/pieceBlue_border00.png", 100, 300);
   var circle = gameboard.stage.getChildByName('circ');
-  createjs.Tween.get(circle, { loop: true })
+
+  createjs.Tween.get(circle)
   .to({ x: 400 }, 1000, createjs.Ease.getPowInOut(4))
   .to({ alpha: 0, y: 175 }, 500, createjs.Ease.getPowInOut(2))
   .to({ alpha: 0, y: 225 }, 100)
@@ -61,4 +89,6 @@ function init() {
   .to({ x: 100 }, 800, createjs.Ease.getPowInOut(2));
   createjs.Ticker.setFPS(60);
   createjs.Ticker.addEventListener("tick", gameboard.stage);
+
+
 }

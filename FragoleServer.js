@@ -2,6 +2,7 @@
 to the connected clients
 */
 var express = require('express');
+var cookieParser = require('cookie-parser');
 var http = require('http')
 var Eureca = require('eureca.io');
 var pug = require('pug');
@@ -18,9 +19,25 @@ class HTTP {
     app.use(express.static(path.join(__dirname,'public')));
     app.use(express.static(path.join(__dirname,'semantic/dist')));
 
+    app.use(cookieParser());
+
     // display index page
     app.get('/', function(request, response) {
+      var playername;
+      if (playername = request.query['playername']) {
+        response.cookie('fragole' , playername)
+
+      } else if (!request.cookies['fragole'])  {
+          response.render('index_register');
+          return;
+      }
+    
       response.render('index');
+
+    });
+
+    app.get('/:playername', function(request, response) {
+
     });
 
     app.listen(port, function() {

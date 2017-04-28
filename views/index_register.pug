@@ -1,0 +1,28 @@
+html
+
+  head
+    title GameFrame
+
+    //- UI / JS Librarys
+    link(rel='stylesheet', href='semantic.min.css')
+    link(rel='stylesheet', href='css/fragole.css')
+    script(src="js/jquery.min.js")
+    script(src="semantic.min.js")
+    script(src="js/easeljs.min.js")
+    script(src="js/tweenjs.min.js")
+    script(src="http://localhost:81/eureca.js")
+
+    //- eureca.io => RPC
+
+    //- JS APIs
+    script(src="js/Fragole.js")
+
+    body
+      div#centered
+        div(div class="ui attached message")
+          div(class="header") Willkommen
+        form(class="ui form attached segment")
+          div(class="field")
+            label Spielername:
+            input(name="playername" placeholder="Bitte gib deinen Namen ein" type="text")
+          button(class="ui primary button" type="submit") regisitrieren

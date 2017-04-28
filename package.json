@@ -5,6 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "browserify": "^14.1.0",
+    "cookie-parser": "^1.4.3",
+    "cookies": "^0.7.0",
     "engine.io": "^2.1.0",
     "eureca.io": "^0.7.1",
     "express": "^4.15.2",

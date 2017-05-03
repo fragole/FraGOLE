@@ -8,9 +8,12 @@ var Eureca = require('eureca.io');
 var pug = require('pug');
 var path = require('path');
 
+var sessions = new Map();
+
 class HTTP {
   constructor(port) {
     var app = express(app);
+    app.enable('trust proxy')
     app.set('views', './views');
     app.set('view engine', 'pug');
     app.locals.pretty = true;
@@ -26,17 +29,12 @@ class HTTP {
       var playername;
       if (playername = request.query['playername']) {
         response.cookie('fragole' , playername)
-
-      } else if (!request.cookies['fragole'])  {
+      } else if (!(playername=request.cookies['fragole']))  {
           response.render('index_register');
           return;
       }
-    
+      sessions.set(request.ip, [playername, undefined]);
       response.render('index');
-
-    });
-
-    app.get('/:playername', function(request, response) {
 
     });
 
@@ -59,7 +57,13 @@ class RPC {
 
     this.eurecaServer.onConnect ( function (connection) {
          connections[connection.id] = connection.clientProxy;
-         console.log(connections);
+
+         // try to match http-session to rpc sessions
+         var session;
+         var clientIp = connection.eureca.remoteAddress.ip
+         if (session = sessions.get(clientIp)) {
+           sessions.set(clientIp, [session[0], connection.clientProxy]);
+         }
     });
 
     server.listen(port, function() {
@@ -74,3 +78,4 @@ class RPC {
 
 module.exports.HTTP = HTTP;
 module.exports.RPC = RPC;
+module.exports.sessions = sessions;

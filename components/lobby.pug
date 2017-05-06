@@ -1,0 +1,7 @@
+div#lobby(class="lobby")
+  div(div class="ui attached message")
+    div(class="header") Lobby
+  div(class="ui center attached segment")
+    div(class='header') Verbundene Spieler:
+    div#lobby_players(class="ui relaxed divided list")
+    button(class="ui center primary button" type="button" onClick="rpcServer.playerReady('playerReady', '" + id + "');") bereit

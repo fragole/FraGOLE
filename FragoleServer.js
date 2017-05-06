@@ -44,6 +44,8 @@ class HTTP {
   }
 }
 
+var contexts = {};
+
 class RPC {
 
   constructor(port) {
@@ -52,7 +54,7 @@ class RPC {
     this.connections = {}
     var connections = this.connections;
 
-    this.eurecaServer = new Eureca.Server({allow:['setBackgroundColor', 'test']});
+    this.eurecaServer = new Eureca.Server({allow:['setBackgroundColor', 'addDomContent', 'removeDomContent']});
     this.eurecaServer.attach(server);
 
     this.eurecaServer.onConnect ( function (connection) {
@@ -71,8 +73,18 @@ class RPC {
     });
   }
 
-  connect(name, func) {
-    this.eurecaServer.exports[name] = func;
+  connect(name, func, context=null) {
+    if (context) {
+      contexts[name] = context
+    }
+    this.eurecaServer.exports[name] = function(context) {
+                                                    if(contexts[context]) {
+                                                        var args = Array.prototype.slice.call(arguments, 1);
+                                                        contexts[context][context](this, ...args);
+                                                     } else {
+                                                        func(this, ...arguments);
+                                                     }
+                                                };
   }
 }
 

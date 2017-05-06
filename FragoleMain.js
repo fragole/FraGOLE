@@ -15,28 +15,38 @@ var lobby = new Lobby();
 gameController.addPlayer(new Fragole.Player('player1'))
               .addPlayer(new Fragole.Player('player2'));
 
-gameController.on('joinPlayer', function (player) { lobby.joinPlayer(player) });
+var STATE_INIT = new Fragole.GameState('STATE_INIT');
+STATE_INIT.on('enter', function () {
+    var wp = new Fragole.Waypoint('test', 'wegpunkte', 30, 30);
+    wp.template.fill('grey');
+    RPC_ALL(...wp.draw());
+});
 
-lobby.on('allPlayersReady', function () {  lobby.quit();
-                                           console.log('all players ready');});
+gameController.on('joinPlayer', function (player) { lobby.joinPlayer(player);});
+
+lobby.on('allPlayersReady', function () {
+    lobby.quit();
+    console.log('all players ready');
+    gameController.next_state(STATE_INIT);
+});
 
 function ready(rpc) {
-              var player, playerName, clientProxy;
-              var clientIp = rpc.connection.eureca.remoteAddress.ip;
-              try {
-                  [playerName, clientProxy] = sessions.get(clientIp);
+    var player, playerName, clientProxy;
+    var clientIp = rpc.connection.eureca.remoteAddress.ip;
+    try {
+        [playerName, clientProxy] = sessions.get(clientIp);
 
-                  if(player = gameController.joinPlayer(playerName, clientProxy)) {
-                    console.log("Player No.", player.number, " joined:", player.name);
-                  } else {
-                    console.log("Max Players already joined!");
-                  }
-              } catch (e) {
-                console.log(e);
-                console.log("ClientIp: " , clientIp);
-                console.log(sessions);
-              }
-           }
+        if(player = gameController.joinPlayer(playerName, clientProxy)) {
+            console.log('Player No.', player.number, ' joined:', player.name);
+        } else {
+            console.log('Max Players already joined!');
+        }
+    } catch (e) {
+        console.log(e);
+        console.log('ClientIp: ', clientIp);
+        console.log(sessions);
+    }
+}
 
 rpc.connect('ready', ready);
 

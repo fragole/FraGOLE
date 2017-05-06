@@ -49,7 +49,7 @@ class FragoleLobby extends EventEmitter {
     RPC_ALL('removeDomContent', '#lobby_players');
     for (let id in this.playersReady) {
        var p = gameController.players.getItem(id);
-       var locals = {id:p.id, player:p.name, number:p.number}
+       var locals = {id:p.id, player:p.name, number:p.number};
        if (this.playersReady[id]==1) {
          RPC_ALL('addDomContent', this.playerReadyComp(locals), '#lobby_players', '#lobby_' + p.id);
        } else {
@@ -59,12 +59,12 @@ class FragoleLobby extends EventEmitter {
   }
 
   quit() {
-    RPC_ALL('removeDomContent', '#lobby')
+    RPC_ALL('removeDomContent', '#lobby');
   }
-  
+
   // called by client
   playerReady(rpc, playerId) {
-    var player = gameController.players.getItem(playerId)
+    var player = gameController.players.getItem(playerId);
     this.playersReady[player.id] = 1;
     RPC_ALL('addDomContent', this.playerReadyComp({id:player.id, player:player.name, number:player.number}), '#lobby_players', '#lobby_' + player.id);
     console.log(player.name, " ready");

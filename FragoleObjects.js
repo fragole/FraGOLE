@@ -1,3 +1,5 @@
+var templates = require('./FragoleTemplates.js');
+
 const EventEmitter = require('events');
 
 const ID = 0;
@@ -10,6 +12,22 @@ class GameObject extends EventEmitter {
   }
 }
 
+class GameState extends GameObject {
+  constructor (id) {
+    super(id);
+  }
+
+  enter () {
+    console.log(this.id + " ENTER");
+    this.emit("enter");
+  }
+
+  exit () {
+    console.log(this.id + " EXIT");
+    this.emit("exit");
+  }
+}
+exports.GameState = GameState;
 
 var gameControllerInstance = null;
 class GameController extends GameObject {
@@ -23,6 +41,7 @@ class GameController extends GameObject {
     this.minPlayers = minPlayers;
     this.players = new Collection()
     this.activePlayer = undefined;
+    this.currentState = new GameState('NULL');
     this.playersIterator = this.players.iterator();
     gameControllerInstance = this;
   }
@@ -74,6 +93,11 @@ class GameController extends GameObject {
     return undefined;
   }
 
+  next_state(state) {
+    this.currentState.exit();
+    this.currentState=state;
+    state.enter();
+  }
 }
 module.exports.GameController = GameController;
 
@@ -114,37 +138,9 @@ class Collection extends GameObject {
 module.exports.Collection = Collection;
 
 class GameItem extends GameObject {
-  constructor (id, category='', x, y, style={}, drawable=1) {
-    super(id, x, y, style, drawable);
+  constructor (id, category='') {
+    super(id, category);
     this.category=category;
-  }
-
-  moveToWayPoint(waypoint, path=TRUE) {
-
-  }
-
-  moveToXY(x, y) {
-
-  }
-
-  activate() {
-
-  }
-
-  highlight() {
-
-  }
-
-  show() {
-
-  }
-
-  hide() {
-
-  }
-
-  draw() {
-
   }
 }
 module.exports.GameItem = GameItem;
@@ -173,19 +169,49 @@ Player.playerNumber = 0;
 module.exports.Player = Player;
 
 class Token extends GameItem {
-  constructor (id, category='', x, y, style={}, drawable=1) {
-    super(id, category, x, y, style, drawable);
+  constructor (id, category='', x, y, template=templates.TOKEN_DEFAULT, drawable=1) {
+    super(id, category);
+    this.x = x
+    this.y = y
+    this.template = new template().x(x).y(y);
+  }
+
+  moveToWayPoint(waypoint, path=TRUE) { }
+  moveToXY(x, y) {}
+  activate() {}
+  highlight() {}
+  show() {}
+  hide() {}
+  draw() {
+    if (this.template._shape == templates.shapes.CIRCLE) {
+      return ['drawShape',
+               this.id,
+               this.template._shape,
+               this.template._fill,
+               this.template._stroke,
+               this.template._x,
+               this.template._y,
+               this.template._radius];
+    }
   }
 }
 module.exports.Token = Token;
 
 class PlayerToken extends Token {
-  constructor (id, category, x, y, style) {
-    super(id, category, x, y, style);
+  constructor (id, category, x, y, template=tempates.PLAYER_TOKEN_DEFAULT) {
+    super(id, category, x, y, template);
   }
 }
 module.exports.PlayerToken = PlayerToken;
 
+class Waypoint extends Token {
+  constructor (id, category, x, y, template=templates.WAYPOINT_DEFAULT) {
+    super(id, category, x, y, template);
+    this.next = [];
+    this.previous = [];
+  }
+}
+module.exports.Waypoint = Waypoint;
 
 // --------------------- Global Objects ---------------------------------------
 // at The moment only gameController should be Global

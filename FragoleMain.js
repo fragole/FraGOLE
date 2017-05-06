@@ -7,27 +7,48 @@ var rpc = new FragoleServer.RPC(81);
 var sessions = FragoleServer.sessions;
 
 // Game definitionv
-gameController.setName('TestGame')
-              .setMinPlayers(1)
-              .setRpcServer(rpc);
+var gameController = new Fragole.GameController('game_controller1', 1, rpc);
+
+game.setName('TestGame')
+    .setController(gameController);
+
+// STATES
+var STATE_INIT = new Fragole.GameState('STATE_INIT');
+
+var all_game_items = {
+    // Players
+    player1: new Fragole.Player('player1'),
+    player2: new Fragole.Player('player2'),
+    // Waypoints
+    wp1: new Fragole.Waypoint('test', 'wegpunkte', 30, 30),
+    coll1: new Fragole.Collection('collection1'),
+};
+
+game.setItems(all_game_items);
+game.gameController.addPlayer(all_game_items.player1)
+                   .addPlayer(all_game_items.player2);
 
 var lobby = new Lobby();
-gameController.addPlayer(new Fragole.Player('player1'))
-              .addPlayer(new Fragole.Player('player2'));
 
-var STATE_INIT = new Fragole.GameState('STATE_INIT');
+// STATE_INIT event-handlers
 STATE_INIT.on('enter', function () {
-    var wp = new Fragole.Waypoint('test', 'wegpunkte', 30, 30);
-    wp.template.fill('grey');
-    RPC_ALL(...wp.draw());
+    all_game_items.wp1.template.fill('grey'),
+    RPC_ALL(...all_game_items.wp1.draw());
 });
 
-gameController.on('joinPlayer', function (player) { lobby.joinPlayer(player);});
+STATE_INIT.on('addItem', function (src, item) {
+    if (src == 'collection1') {
+        console.log('STATE_INIT addItem ' + item.id + ' from ' + src);
+    }
+});
+
+game.gameController.on('joinPlayer', function (player) { lobby.joinPlayer(player);});
 
 lobby.on('allPlayersReady', function () {
     lobby.quit();
     console.log('all players ready');
-    gameController.next_state(STATE_INIT);
+    game.gameController.next_state(STATE_INIT);
+    all_game_items.coll1.addItem(all_game_items.player1);
 });
 
 function ready(rpc) {
@@ -36,7 +57,7 @@ function ready(rpc) {
     try {
         [playerName, clientProxy] = sessions.get(clientIp);
 
-        if(player = gameController.joinPlayer(playerName, clientProxy)) {
+        if(player = game.gameController.joinPlayer(playerName, clientProxy)) {
             console.log('Player No.', player.number, ' joined:', player.name);
         } else {
             console.log('Max Players already joined!');

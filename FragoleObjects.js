@@ -5,99 +5,103 @@ const EventEmitter = require('events');
 const ID = 0;
 const ITEM = 1;
 
+class Game {
+    constructor () {
+        this.items = {};
+        this.gameController = undefined;
+    }
+
+    setController(gameController) {
+        this.gameController = gameController;
+        return this;
+    }
+
+    setName(name)  {
+        this.name = name;
+        return this;
+    }
+
+    setItems (items) {
+        this.items = items;
+        for (let item in items) {
+            items[item].gameController = this.gameController;
+        }
+    }
+}
+
 class GameObject extends EventEmitter {
-  constructor(id) {
-    super();
-    this.id = id;
-  }
+    constructor(id) {
+        super();
+        this.id = id;
+        this.gameController = undefined;
+    }
 }
 
 class GameState extends GameObject {
-  constructor (id) {
-    super(id);
-  }
+    constructor (id) {
+        super(id);
+    }
 
-  enter () {
-    console.log(this.id + " ENTER");
-    this.emit("enter");
-  }
+    enter () {
+        console.log(this.id + ' ENTER');
+        this.emit('enter');
+    }
 
-  exit () {
-    console.log(this.id + " EXIT");
-    this.emit("exit");
-  }
+    exit () {
+        console.log(this.id + ' EXIT');
+        this.emit('exit');
+    }
 }
 exports.GameState = GameState;
 
-var gameControllerInstance = null;
 class GameController extends GameObject {
-  constructor(id, minPlayers=1, rpcServer=undefined) {
-    if ( gameControllerInstance ) {
-      return gameControllerInstance;
-    }
-    super(id);
-    this.name = '';
-    this.rpcServer = rpcServer;
-    this.minPlayers = minPlayers;
-    this.players = new Collection()
-    this.activePlayer = undefined;
-    this.currentState = new GameState('NULL');
-    this.playersIterator = this.players.iterator();
-    gameControllerInstance = this;
-  }
-
-  setName(name) {
-    this.name = name;
-    return this
-  }
-
-  setRpcServer(rpcServer) {
-    this.rpcServer = rpcServer;
-    return this
-  }
-
-  setMinPlayers(minPlayers) {
-    this.minPlayers = minPlayers
-    return this;
-  }
-
-  addPlayer(player) {
-    this.players.addItem(player);
-    return this
-  }
-
-  joinPlayer(name, clientProxy) {
-    var player;
-
-    // check if this player has already joined XXX check client-ip
-    for (let p of this.players.iterator()) {
-      p = p[ITEM];
-      if (p.name == name) {
-        p.session=clientProxy; // update rpc-session
-        this.emit('joinPlayer', p);
-        return p;
-      }
+    constructor(id, minPlayers=1, rpcServer=undefined) {
+        super(id);
+        this.rpcServer = rpcServer;
+        this.minPlayers = minPlayers;
+        this.players = new Collection();
+        this.activePlayer = undefined;
+        this.currentState = new GameState('NULL');
+        this.playersIterator = this.players.iterator();
     }
 
-    try {
-      player = this.playersIterator.next().value[ITEM];
-    } catch(e) {}
-
-    if (player) {
-      player.name = name;
-      player.session = clientProxy;
-      player.joined = true;
-      this.emit('joinPlayer', player);
-      return player;
+    addPlayer(player) {
+        this.players.addItem(player);
+        return this;
     }
-    return undefined;
-  }
 
-  next_state(state) {
-    this.currentState.exit();
-    this.currentState=state;
-    state.enter();
-  }
+    joinPlayer(name, clientProxy) {
+        var player;
+
+        // check if this player has already joined XXX check client-ip
+        for (let p of this.players.iterator()) {
+            p = p[ITEM];
+            if (p.name == name) {
+                p.session=clientProxy; // update rpc-session
+                this.emit('joinPlayer', p);
+                return p;
+            }
+        }
+
+        try {
+            player = this.playersIterator.next().value[ITEM];
+        } catch(e) {}
+
+        if (player) {
+            player.name = name;
+            player.session = clientProxy;
+            player.joined = true;
+            this.emit('joinPlayer', player);
+            return player;
+        }
+        return undefined;
+    }
+
+    next_state(state) {
+        this.currentState.exit();
+        this.currentState=state;
+        state.enter();
+    }
 }
 module.exports.GameController = GameController;
 
@@ -110,6 +114,9 @@ class Collection extends GameObject {
 
   addItem(item) {
     this.items.set(item.id, item);
+    if (this.gameController) {
+        this.gameController.currentState.emit('addItem', this.id, item);
+    }
     this.emit('addItem', item);
   }
 
@@ -215,4 +222,4 @@ module.exports.Waypoint = Waypoint;
 
 // --------------------- Global Objects ---------------------------------------
 // at The moment only gameController should be Global
-global.gameController = new GameController();
+global.game = new Game();

@@ -25,8 +25,26 @@ class Game {
         this.items = items;
         for (let item in items) {
             items[item].gameController = this.gameController;
+            items[item].setup();
         }
     }
+
+    setupBoard() {
+        for (let i in this.items) {
+            var item = this.items[i];
+            if (item instanceof Waypoint) {
+                RPC_ALL(...item.draw());
+            }
+            if (item instanceof Player && item.joined) {
+                for (let i of item.inventory.iterator()) {
+                    if (i[1] instanceof PlayerToken) {
+                        RPC_ALL(...i[1].draw());
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 class GameObject extends EventEmitter {
@@ -34,6 +52,10 @@ class GameObject extends EventEmitter {
         super();
         this.id = id;
         this.gameController = undefined;
+    }
+
+    setup() {
+
     }
 }
 
@@ -106,106 +128,134 @@ class GameController extends GameObject {
 module.exports.GameController = GameController;
 
 class Collection extends GameObject {
-  constructor(id, items=[]) {
-    super(id);
-    this.items = new Map();
-    items.forEach(function(item){ this.set(item.id, item);}, this.items);
-  }
-
-  addItem(item) {
-    this.items.set(item.id, item);
-    if (this.gameController) {
-        this.gameController.currentState.emit('addItem', this.id, item);
+    constructor(id, items=[]) {
+        super(id);
+        this.items = new Map();
+        items.forEach(function(item){ this.set(item.id, item);}, this.items);
     }
-    this.emit('addItem', item);
-  }
 
-  deleteItem(id) {
-    var item = this.items.get(id);
-    if (item) {
-        this.items.delete(id);
-        this.emit('deleteItem', item);
+    addItem(item) {
+        this.items.set(item.id, item);
+        if (this.gameController) {
+            this.gameController.currentState.emit('addItem', this.id, item);
+        }
+        this.emit('addItem', item);
     }
-  }
 
-  getItem(id) {
-    return this.items.get(id);
-  }
+    deleteItem(id) {
+        var item = this.items.get(id);
+        if (item) {
+            this.items.delete(id);
+            this.emit('deleteItem', item);
+        }
+    }
 
-  filter(filterExpr) {
-    // XXX
-    return 'NYI'
-  }
+    getItem(id) {
+        return this.items.get(id);
+    }
 
-  iterator(){
-    return this.items[Symbol.iterator]();
-  }
+    filter(filterExpr) {
+        // XXX
+        return 'NYI';
+    }
 
+    iterator(){
+        return this.items[Symbol.iterator]();
+    }
 }
 module.exports.Collection = Collection;
 
 class GameItem extends GameObject {
-  constructor (id, category='') {
-    super(id, category);
-    this.category=category;
-  }
+    constructor (id, category='') {
+        super(id, category);
+        this.category=category;
+    }
 }
 module.exports.GameItem = GameItem;
 
 class Player extends GameObject {
 
-  constructor (id) {
-    super(id);
-    this.number = ++Player.playerNumber;
-    this.joined = false;
-    this.session = undefined; // will be set by GameController.joinPlayer
-    this.name = undefined;    // will be set by GameController.joinPlayer
-    this.inventory = new Map();
-  }
+    constructor (id) {
+        super(id);
+        this.number = ++Player.playerNumber;
+        this.joined = false;
+        this.session = undefined; // will be set by GameController.joinPlayer
+        this.name = undefined;    // will be set by GameController.joinPlayer
+        this.inventory = new Collection();
+    }
 
-  addInventory (category, item) {
+    addInventory (item) {
+        this.inventory.addItem(item);
+    }
 
-  }
-
-  removeInventory (category, item) {
-
-  }
+    removeInventory (item) {
+        this.inventor.deleteItem(item);
+    }
 
 }
 Player.playerNumber = 0;
 module.exports.Player = Player;
 
 class Token extends GameItem {
-  constructor (id, category='', x, y, template=templates.TOKEN_DEFAULT, drawable=1) {
-    super(id, category);
-    this.x = x
-    this.y = y
-    this.template = new template().x(x).y(y);
-  }
-
-  moveToWayPoint(waypoint, path=TRUE) { }
-  moveToXY(x, y) {}
-  activate() {}
-  highlight() {}
-  show() {}
-  hide() {}
-  draw() {
-    if (this.template._shape == templates.shapes.CIRCLE) {
-      return ['drawShape',
-               this.id,
-               this.template._shape,
-               this.template._fill,
-               this.template._stroke,
-               this.template._x,
-               this.template._y,
-               this.template._radius];
+    constructor (id, category='', x, y, template=templates.TOKEN_DEFAULT, drawable=1) {
+        super(id, category);
+        this.x = x;
+        this.y = y;
+        this.template = new template().x(x).y(y);
     }
-  }
+
+    moveToWayPoint(waypoint, path=true) { }
+    moveToXY(x, y) {}
+
+    setup() {
+        this.gameController.rpcServer.connect('click_' + this.id, 'click', this);
+    }
+
+    activate() {
+        return ['activateToken', this.id, 'click_' + this.id];
+    }
+
+    click() {
+        if (this.gameController) {
+            this.gameController.currentState.emit('click', this.id, this);
+        }
+        this.emit('click', this);
+    }
+
+    highlight() {}
+    show() {}
+    hide() {}
+    draw() {
+        if (this.template instanceof templates.ShapeTemplate) {
+            if (this.template._shape == templates.shapes.CIRCLE) {
+                return ['drawShape',
+                    this.id,
+                    this.template._shape,
+                    this.template._fill,
+                    this.template._stroke,
+                    this.template._layer,
+                    this.template._x,
+                    this.template._y,
+                    this.template._radius];
+            }
+        }
+
+        if (this.template instanceof templates.ImageTemplate) {
+            return ['drawImage',
+                this.id,
+                this.template._src,
+                this.template._layer,
+                this.template._x,
+                this.template._y,
+            ];
+
+        }
+    }
 }
 module.exports.Token = Token;
 
 class PlayerToken extends Token {
-  constructor (id, category, x, y, template=tempates.PLAYER_TOKEN_DEFAULT) {
+  constructor (id, category, x, y, template=templates.PLAYER_TOKEN_DEFAULT) {
     super(id, category, x, y, template);
   }
 }

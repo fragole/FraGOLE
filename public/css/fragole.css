@@ -17,5 +17,6 @@
   left: 0;
   width: 40em;
   height: 20em;
+  pointer-events:auto;
 
 }

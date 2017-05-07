@@ -15,25 +15,34 @@ game.setName('TestGame')
 // STATES
 var STATE_INIT = new Fragole.GameState('STATE_INIT');
 
+// collection of all game items
 var all_game_items = {
     // Players
     player1: new Fragole.Player('player1'),
     player2: new Fragole.Player('player2'),
     // Waypoints
-    wp1: new Fragole.Waypoint('test', 'wegpunkte', 30, 30),
+    wp1: new Fragole.Waypoint('wp1', 'wegpunkte', 100, 100),
+    wp2: new Fragole.Waypoint('wp2', 'wegpunkte', 200, 100),
     coll1: new Fragole.Collection('collection1'),
+    player_token1: new Fragole.PlayerToken('player_token1', 'spielfiguren', 100, 100),
+    player_token2: new Fragole.PlayerToken('player_token2', 'spielfiguren', 85, 50),
 };
 
 game.setItems(all_game_items);
 game.gameController.addPlayer(all_game_items.player1)
                    .addPlayer(all_game_items.player2);
 
+all_game_items.player1.addInventory(all_game_items.player_token1);
+all_game_items.player2.addInventory(all_game_items.player_token2);
+
 var lobby = new Lobby();
 
 // STATE_INIT event-handlers
 STATE_INIT.on('enter', function () {
-    all_game_items.wp1.template.fill('grey'),
-    RPC_ALL(...all_game_items.wp1.draw());
+    all_game_items.wp1.template.fill('grey');
+    all_game_items.wp2.template.fill('blue').stroke('grey');
+    game.setupBoard();
+    RPC_ONE(all_game_items.player1, ...all_game_items.player_token1.activate());
 });
 
 STATE_INIT.on('addItem', function (src, item) {
@@ -42,6 +51,11 @@ STATE_INIT.on('addItem', function (src, item) {
     }
 });
 
+STATE_INIT.on('click', function(src, item) {
+    console.log('STATE_INIT click ' + src);
+});
+
+// Game-Lobby
 game.gameController.on('joinPlayer', function (player) { lobby.joinPlayer(player);});
 
 lobby.on('allPlayersReady', function () {

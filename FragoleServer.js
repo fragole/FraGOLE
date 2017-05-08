@@ -73,7 +73,7 @@ class RPC {
     }
 
     // dynamically connect server-function to serverProxy.callserver[func]
-    // functions must be connected on startup
+    // available at runtime (EXPERMIMENTAL)
     connect(name, func, context=null) {
         if (context) {
             contexts[name] = context;
@@ -86,6 +86,8 @@ class RPC {
                 func(this, ...arguments);
             }
         };
+        // Publish new functions to all connected clients
+        this.eurecaServer.updateContract(); // !!! EXPERMIMENTAL in eureca.io
     }
 }
 

@@ -25,7 +25,6 @@ class Game {
         this.items = items;
         for (let item in items) {
             items[item].gameController = this.gameController;
-            items[item].setup();
         }
     }
 
@@ -54,9 +53,6 @@ class GameObject extends EventEmitter {
         this.gameController = undefined;
     }
 
-    setup() {
-
-    }
 }
 
 class GameState extends GameObject {
@@ -207,11 +203,8 @@ class Token extends GameItem {
     moveToWayPoint(waypoint, path=true) { }
     moveToXY(x, y) {}
 
-    setup() {
-        this.gameController.rpcServer.connect('click_' + this.id, 'click', this);
-    }
-
     activate() {
+        this.gameController.rpcServer.connect('click_' + this.id, 'click', this);
         return ['activateToken', this.id, 'click_' + this.id];
     }
 

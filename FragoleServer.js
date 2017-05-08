@@ -53,7 +53,7 @@ class RPC {
         this.connections = {};
         var connections = this.connections;
 
-        this.eurecaServer = new Eureca.Server({allow:['setBackgroundColor', 'addDomContent', 'removeDomContent', 'drawShape', 'drawImage', 'activateToken']});
+        this.eurecaServer = new Eureca.Server({allow:['setBackgroundColor', 'addDomContent', 'removeDomContent', 'drawShape', 'drawImage', 'activateToken', 'moveToken']});
         this.eurecaServer.attach(server);
 
         this.eurecaServer.onConnect ( function (connection) {
@@ -72,6 +72,8 @@ class RPC {
         });
     }
 
+    // dynamically connect server-function to serverProxy.callserver[func]
+    // functions must be connected on startup
     connect(name, func, context=null) {
         if (context) {
             contexts[name] = context;

@@ -1,5 +1,5 @@
 var FragoleServer = require('./FragoleServer.js');
-var Fragole = require('./FragoleObjects.js');
+var {GameController, GameState, Player, PlayerToken, Collection, Waypoint} = require('./FragoleObjects.js');
 var Lobby = require('./FragoleLobby.js');
 
 var webServer = new FragoleServer.HTTP(80);
@@ -7,25 +7,26 @@ var rpc = new FragoleServer.RPC(81);
 var sessions = FragoleServer.sessions;
 
 // Game definitionv
-var gameController = new Fragole.GameController('game_controller1', 1, rpc);
+var gameController = new GameController('game_controller1', 1, rpc);
 
 game.setName('TestGame')
     .setController(gameController);
 
 // STATES
-var STATE_INIT = new Fragole.GameState('STATE_INIT');
+var STATE_INIT = new GameState('STATE_INIT');
 
 // collection of all game items
 var all_game_items = {
     // Players
-    player1: new Fragole.Player('player1'),
-    player2: new Fragole.Player('player2'),
+    player1: new Player('player1'),
+    player2: new Player('player2'),
     // Waypoints
-    wp1: new Fragole.Waypoint('wp1', 'wegpunkte', 100, 100),
-    wp2: new Fragole.Waypoint('wp2', 'wegpunkte', 200, 100),
-    coll1: new Fragole.Collection('collection1'),
-    player_token1: new Fragole.PlayerToken('player_token1', 'spielfiguren', 100, 100),
-    player_token2: new Fragole.PlayerToken('player_token2', 'spielfiguren', 85, 50),
+    wp1: new Waypoint('wp1', 'wegpunkte', 100, 100),
+    wp2: new Waypoint('wp2', 'wegpunkte', 200, 100),
+    wp3: new Waypoint('wp3', 'wegpunkte', 200, 200),
+    coll1: new Collection('collection1'),
+    player_token1: new PlayerToken('player_token1', 'spielfiguren', 100, 100),
+    player_token2: new PlayerToken('player_token2', 'spielfiguren', 85, 50),
 };
 
 game.setItems(all_game_items);
@@ -37,10 +38,13 @@ all_game_items.player2.addInventory(all_game_items.player_token2);
 
 var lobby = new Lobby();
 
+
+// *****************************************************************************
 // STATE_INIT event-handlers
 STATE_INIT.on('enter', function () {
     all_game_items.wp1.template.fill('grey');
     all_game_items.wp2.template.fill('blue').stroke('grey');
+    all_game_items.wp3.template.fill('lightgreen').stroke('grey');
     game.setupBoard();
     RPC_ONE(all_game_items.player1, ...all_game_items.player_token1.activate());
 });
@@ -53,7 +57,10 @@ STATE_INIT.on('addItem', function (src, item) {
 
 STATE_INIT.on('click', function(src, item) {
     console.log('STATE_INIT click ' + src);
+    RPC_ALL('moveToken', 'player_token1', [{x:168, y:68}, {x:168, y:168}, {x:68, y:68}]);
 });
+// *****************************************************************************
+
 
 // Game-Lobby
 game.gameController.on('joinPlayer', function (player) { lobby.joinPlayer(player);});
@@ -83,6 +90,5 @@ function ready(rpc) {
     }
 }
 
-rpc.connect('ready', ready);
 
-// xxx rpc disconnect
+rpc.connect('ready', ready);

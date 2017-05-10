@@ -1,6 +1,9 @@
 var templates = require('./FragoleTemplates.js');
-
 const EventEmitter = require('events');
+
+// globals
+var RPC_ALL = global.RPC_ALL;
+var RPC_ONE = global.RPC_ONE;
 
 const ID = 0;
 const ITEM = 1;
@@ -103,7 +106,7 @@ class GameController extends GameObject {
 
         try {
             player = this.playersIterator.next().value[ITEM];
-        } catch(e) {}
+        } catch(e) { player = undefined; }
 
         if (player) {
             player.name = name;
@@ -248,18 +251,18 @@ class Token extends GameItem {
 module.exports.Token = Token;
 
 class PlayerToken extends Token {
-  constructor (id, category, x, y, template=templates.PLAYER_TOKEN_DEFAULT) {
-    super(id, category, x, y, template);
-  }
+    constructor (id, category, x, y, template=templates.PLAYER_TOKEN_DEFAULT) {
+        super(id, category, x, y, template);
+    }
 }
 module.exports.PlayerToken = PlayerToken;
 
 class Waypoint extends Token {
-  constructor (id, category, x, y, template=templates.WAYPOINT_DEFAULT) {
-    super(id, category, x, y, template);
-    this.next = [];
-    this.previous = [];
-  }
+    constructor (id, category, x, y, template=templates.WAYPOINT_DEFAULT) {
+        super(id, category, x, y, template);
+        this.next = [];
+        this.previous = [];
+    }
 }
 module.exports.Waypoint = Waypoint;
 

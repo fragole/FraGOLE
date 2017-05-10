@@ -6,7 +6,13 @@ var webServer = new FragoleServer.HTTP(80);
 var rpc = new FragoleServer.RPC(81);
 var sessions = FragoleServer.sessions;
 
-// Game definitionv
+// glabals
+var game = global.game;
+var RPC_ALL = global.RPC_ALL;
+var RPC_ONE = global.RPC_ONE;
+
+// ****************************************************************************
+// Game definition
 var gameController = new GameController('game_controller1', 1, rpc);
 
 game.setName('TestGame')
@@ -15,6 +21,7 @@ game.setName('TestGame')
 // STATES
 var STATE_INIT = new GameState('STATE_INIT');
 
+// *****************************************************************************
 // collection of all game items
 var all_game_items = {
     // Players
@@ -25,19 +32,21 @@ var all_game_items = {
     wp2: new Waypoint('wp2', 'wegpunkte', 200, 100),
     wp3: new Waypoint('wp3', 'wegpunkte', 200, 200),
     coll1: new Collection('collection1'),
+    // player tokens
     player_token1: new PlayerToken('player_token1', 'spielfiguren', 100, 100),
     player_token2: new PlayerToken('player_token2', 'spielfiguren', 85, 50),
 };
 
+// init game with all items
 game.setItems(all_game_items);
 game.gameController.addPlayer(all_game_items.player1)
                    .addPlayer(all_game_items.player2);
 
+// assign player_tokens to players
 all_game_items.player1.addInventory(all_game_items.player_token1);
 all_game_items.player2.addInventory(all_game_items.player_token2);
 
 var lobby = new Lobby();
-
 
 // *****************************************************************************
 // STATE_INIT event-handlers
@@ -61,7 +70,7 @@ STATE_INIT.on('click', function(src, item) {
 });
 // *****************************************************************************
 
-
+// *****************************************************************************
 // Game-Lobby
 game.gameController.on( 'joinPlayer', function (player) { lobby.joinPlayer(player); } );
 

@@ -4,6 +4,11 @@ const EventEmitter = require('events');
 const ID = 0;
 const ITEM = 1;
 
+// glabals
+var game = global.game;
+var RPC_ALL = global.RPC_ALL;
+var RPC_ONE = global.RPC_ONE;
+
 function callAll(func, args) {
     var _args = Array.prototype.slice.call(arguments, 1);
     for(let player of game.gameController.players.iterator()) {

@@ -63,7 +63,7 @@ STATE_INIT.on('click', function(src, item) {
 
 
 // Game-Lobby
-game.gameController.on('joinPlayer', function (player) { lobby.joinPlayer(player);});
+game.gameController.on( 'joinPlayer', function (player) { lobby.joinPlayer(player); } );
 
 lobby.on('allPlayersReady', function () {
     lobby.quit();
@@ -72,9 +72,9 @@ lobby.on('allPlayersReady', function () {
     all_game_items.coll1.addItem(all_game_items.player1);
 });
 
-function ready(rpc) {
+function ready() {
     var player, playerName, clientProxy;
-    var clientIp = rpc.connection.eureca.remoteAddress.ip;
+    var clientIp = this.connection.eureca.remoteAddress.ip;
     try {
         [playerName, clientProxy] = sessions.get(clientIp);
 

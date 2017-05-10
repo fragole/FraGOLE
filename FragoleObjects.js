@@ -204,7 +204,7 @@ class Token extends GameItem {
     moveToXY(x, y) {}
 
     activate() {
-        this.gameController.rpcServer.connect('click_' + this.id, 'click', this);
+        this.gameController.rpcServer.connect('click_' + this.id, this.click, this);
         return ['activateToken', this.id, 'click_' + this.id];
     }
 

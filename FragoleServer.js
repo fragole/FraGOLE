@@ -11,7 +11,7 @@ var path = require('path');
 var sessions = new Map();
 
 class HTTP {
-    constructor(port) {
+    constructor( port ) {
         var app = express(app);
         app.enable('trust proxy');
         app.set('views', './views');
@@ -25,7 +25,7 @@ class HTTP {
         app.use(cookieParser());
 
         // display index page
-        app.get('/', function(request, response) {
+        app.get('/', function( request, response ) {
             var playername;
             if (playername = request.query['playername']) {
                 response.cookie('fragole' , playername);
@@ -47,7 +47,7 @@ var contexts = {};
 
 class RPC {
 
-    constructor(port) {
+    constructor( port ) {
         var server = http.createServer();
 
         this.connections = {};
@@ -74,21 +74,19 @@ class RPC {
 
     // dynamically connect server-function to serverProxy.callserver[func]
     // available at runtime (EXPERMIMENTAL)
-    connect(name, func, context=null) {
+    connect( name, func, context=null ) {
+        var export_func;
         if (context) {
-            contexts[name] = context;
+            // conserve context
+            export_func = func.bind(context);
+        } else {
+            export_func =func;
         }
-        this.eurecaServer.exports[name] = function(context) {
-            if(contexts[context]) {
-                var args = Array.prototype.slice.call(arguments, 1);
-                contexts[context][func](...args);
-            } else {
-                func(this, ...arguments);
-            }
-        };
+        this.eurecaServer.exports[name] = export_func;
         // Publish new functions to all connected clients
         this.eurecaServer.updateContract(); // !!! EXPERMIMENTAL in eureca.io
     }
+
 }
 
 module.exports.HTTP = HTTP;

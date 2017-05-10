@@ -35,7 +35,7 @@ global.RPC_ALL_EX = callAllBut;
 class FragoleLobby extends EventEmitter {
     constructor () {
         super();
-        game.gameController.rpcServer.connect('playerReady', 'playerReady', this);
+        game.gameController.rpcServer.connect('playerReady', this.playerReady, this);
         this.playersReady = {};
         this.lobbyComp = pug.compileFile('./components/lobby.pug');
         this.playerComp = pug.compileFile('./components/lobby_player.pug');

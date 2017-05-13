@@ -53,7 +53,7 @@ class RPC {
         this.connections = {};
         var connections = this.connections;
 
-        this.eurecaServer = new Eureca.Server({allow:['setBackgroundColor', 'addDomContent', 'removeDomContent', 'drawShape', 'drawImage', 'activateToken', 'moveToken']});
+        this.eurecaServer = new Eureca.Server({allow:['setBackgroundColor', 'addDomContent', 'removeDomContent', 'drawShape', 'drawImage', 'activateToken', 'moveToken', 'highlightToken']});
         this.eurecaServer.attach(server);
 
         this.eurecaServer.onConnect ( function (connection) {

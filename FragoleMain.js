@@ -1,5 +1,6 @@
 var FragoleServer = require('./FragoleServer.js');
-var {GameController, GameState, Player, PlayerToken, Collection, Waypoint} = require('./FragoleObjects.js');
+var Lib = require('./FragoleLib.js');
+var {GameController, GameState, Player, PlayerToken, Collection, Waypoint, Dice} = require('./FragoleObjects.js');
 var Lobby = require('./FragoleLobby.js');
 
 var webServer = new FragoleServer.HTTP(80);
@@ -13,74 +14,116 @@ var RPC_ONE = global.RPC_ONE;
 
 // ****************************************************************************
 // Game definition
-var gameController = new GameController('game_controller1', 1, rpc);
+var controller = new GameController('game_controller1', 1, rpc);
 
 game.setName('TestGame')
-    .setController(gameController);
+    .setController(controller);
 
 // STATES
 var STATE_INIT = new GameState('STATE_INIT');
+var STATE_TURN = new GameState('STATE_TURN');
 
 // *****************************************************************************
 // collection of all game items
-var all_game_items = {
+var items = {
     // Players
     player1: new Player('player1'),
     player2: new Player('player2'),
     // Waypoints
     wp1: new Waypoint('wp1', 'wegpunkte', 100, 100),
     wp2: new Waypoint('wp2', 'wegpunkte', 200, 100),
-    wp3: new Waypoint('wp3', 'wegpunkte', 200, 200),
+    wp3: new Waypoint('wp3', 'wegpunkte', 300, 150),
+    wp4: new Waypoint('wp4', 'wegpunkte', 400, 200),
+    wp5: new Waypoint('wp5', 'wegpunkte', 500, 250),
+    wp6: new Waypoint('wp6', 'wegpunkte', 500, 150),
+    wp7: new Waypoint('wp7', 'wegpunkte', 600, 250),
+    wp8: new Waypoint('wp8', 'wegpunkte', 600, 150),
+    wp9: new Waypoint('wp9', 'wegpunkte', 700, 200),
+    wp10: new Waypoint('w10', 'wegpunkte', 800, 200),
+
     coll1: new Collection('collection1'),
     // player tokens
     player_token1: new PlayerToken('player_token1', 'spielfiguren', 100, 100),
     player_token2: new PlayerToken('player_token2', 'spielfiguren', 85, 50),
+    // dice
+    dice: new Dice('dice', 6),
 };
 
+Lib.connectWaypoints([items.wp1, items.wp2, items.wp3, items.wp4, items.wp5, items.wp7, items.wp9, items.wp10, items.wp1]);
+Lib.connectWaypoints([items.wp4, items.wp6, items.wp8, items.wp9]);
+
 // init game with all items
-game.setItems(all_game_items);
-game.gameController.addPlayer(all_game_items.player1)
-                   .addPlayer(all_game_items.player2);
+game.setItems(items);
+controller.addPlayer(items.player1)
+                   .addPlayer(items.player2);
 
 // assign player_tokens to players
-all_game_items.player1.addInventory(all_game_items.player_token1);
-all_game_items.player2.addInventory(all_game_items.player_token2);
+items.player1.addInventory(items.player_token1);
+items.player2.addInventory(items.player_token2);
 
 var lobby = new Lobby();
 
 // *****************************************************************************
 // STATE_INIT event-handlers
 STATE_INIT.on('enter', function () {
-    all_game_items.wp1.template.fill('grey');
-    all_game_items.wp2.template.fill('blue').stroke('grey');
-    all_game_items.wp3.template.fill('lightgreen').stroke('grey');
-    game.setupBoard();
-    RPC_ONE(all_game_items.player1, ...all_game_items.player_token1.activate());
+    game.setupBoard();  // Setup the gameboard - draw stuff etc.
+    controller.next_player();
+    controller.next_state(STATE_TURN);
+    items.player_token1.waypoint = items.wp1;
 });
 
-STATE_INIT.on('addItem', function (src, item) {
-    if (src == 'collection1') {
-        console.log('STATE_INIT addItem ' + item.id + ' from ' + src);
+STATE_TURN.on('enter', function() {
+    this.set('playertoken', controller.activePlayer.getInventory({category:'spielfiguren'})[0]);
+    this.set('player', controller.activePlayer);
+    RPC_ONE(this.get('player'), items.dice.draw());
+});
+
+// Eventhandler for clientside click on player_token1
+STATE_TURN.on('click', function(src, item) {
+    console.log('STATE_INIT click ' + src);
+});
+
+STATE_TURN.on('roll', function(src, dice) {
+    if(src === 'dice') {
+        this.set('wps', Lib.getWaypointsAtRange(this.get('playertoken').waypoint, dice.result));
+        //console.log(wps);
+        RPC_ONE(this.get('player'), items.dice.rollResult());
+        for (let wp of this.get('wps')) {
+            RPC_ONE(this.get('player'), wp.highlight());
+            RPC_ONE(this.get('player'), wp.activate());
+        }
     }
 });
 
-STATE_INIT.on('click', function(src, item) {
-    console.log('STATE_INIT click ' + src);
-    RPC_ALL('moveToken', 'player_token1', [{x:168, y:68}, {x:168, y:168}, {x:68, y:68}]);
+STATE_TURN.on('click', function(src, item) {
+    if (item instanceof Waypoint) {
+        RPC_ALL(this.get('playertoken').moveToWaypoint(item));
+        for (let wp of this.get('wps')) {
+            //RPC_ONE(this.get('player'), wp.unhighlight());
+            //RPC_ONE(this.get('player'), wp.deactivate());
+        }
+        controller.next_state(STATE_TURN);
+    }
+});
+
+STATE_TURN.on('exit', function() {
+    items.dice.reset();
+
 });
 // *****************************************************************************
 
 // *****************************************************************************
 // Game-Lobby
-game.gameController.on( 'joinPlayer', function (player) { lobby.joinPlayer(player); } );
+controller.on( 'joinPlayer', function (player) { lobby.joinPlayer(player); } );
 
 lobby.on('allPlayersReady', function () {
     lobby.quit();
     console.log('all players ready');
-    game.gameController.next_state(STATE_INIT);
-    all_game_items.coll1.addItem(all_game_items.player1);
+    controller.next_state(STATE_INIT);
+    items.coll1.addItem(items.player1);
 });
 
+// handle rpc-sessions
 function ready() {
     var player, playerName, clientProxy;
     var clientIp = this.connection.eureca.remoteAddress.ip;
@@ -98,6 +141,5 @@ function ready() {
         console.log(sessions);
     }
 }
-
 
 rpc.connect('ready', ready);

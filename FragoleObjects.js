@@ -1,9 +1,6 @@
 var templates = require('./FragoleTemplates.js');
+var {nomalizeCoordinates} = require('./FragoleLib.js');
 const EventEmitter = require('events');
-
-// globals
-var RPC_ALL = global.RPC_ALL;
-var RPC_ONE = global.RPC_ONE;
 
 const ID = 0;
 const ITEM = 1;
@@ -35,12 +32,12 @@ class Game {
         for (let i in this.items) {
             var item = this.items[i];
             if (item instanceof Waypoint) {
-                RPC_ALL(...item.draw());
+                RPC_ALL(item.draw());
             }
             if (item instanceof Player && item.joined) {
                 for (let i of item.inventory.iterator()) {
                     if (i[1] instanceof PlayerToken) {
-                        RPC_ALL(...i[1].draw());
+                        RPC_ALL(i[1].draw());
                     }
                 }
             }
@@ -54,8 +51,21 @@ class GameObject extends EventEmitter {
         super();
         this.id = id;
         this.gameController = undefined;
+        this.custVars = {};
     }
 
+    // assign custom vars
+    set(name, value) {
+        this.custVars[name] = value;
+    }
+
+    get(name) {
+        return this.custVars[name];
+    }
+
+    clearCustVars() {
+        this.custVars = {};
+    }
 }
 
 class GameState extends GameObject {
@@ -81,6 +91,7 @@ class GameController extends GameObject {
         this.rpcServer = rpcServer;
         this.minPlayers = minPlayers;
         this.players = new Collection();
+        this.joinedPlayers = [];
         this.activePlayer = undefined;
         this.currentState = new GameState('NULL');
         this.playersIterator = this.players.iterator();
@@ -112,6 +123,7 @@ class GameController extends GameObject {
             player.name = name;
             player.session = clientProxy;
             player.joined = true;
+            this.joinedPlayers.push(player);
             this.emit('joinPlayer', player);
             return player;
         }
@@ -122,6 +134,23 @@ class GameController extends GameObject {
         this.currentState.exit();
         this.currentState=state;
         state.enter();
+    }
+
+    next_player() {
+        var currentIdx;
+        var playerCount = this.joinedPlayers.length;
+
+        if (!this.activePlayer) {
+            this.activePlayer = this.joinedPlayers[0];
+        } else {
+            currentIdx = this.joinedPlayers.indexOf(this.activePlayer);
+            this.activePlayer = this.joinedPlayers[++currentIdx % playerCount];
+            if (this.activePlayer.skip_turns != 0) {
+                this.activePlayer.skip_turns -= 1;
+                this.next_player();
+            }
+        }
+        return this.activePlayer;
     }
 }
 module.exports.GameController = GameController;
@@ -153,13 +182,22 @@ class Collection extends GameObject {
         return this.items.get(id);
     }
 
-    filter(filterExpr) {
-        // XXX
-        return 'NYI';
+    getCategory(category) {
+        var res = [];
+        for(let item of this.iterator()) {
+            if (item[ITEM].category == category) {
+                res.push(item[ITEM]);
+            }
+        }
+        return res;
     }
 
     iterator(){
         return this.items[Symbol.iterator]();
+    }
+
+    cycle() {
+
     }
 }
 module.exports.Collection = Collection;
@@ -181,10 +219,19 @@ class Player extends GameObject {
         this.session = undefined; // will be set by GameController.joinPlayer
         this.name = undefined;    // will be set by GameController.joinPlayer
         this.inventory = new Collection();
+        this.skip_turns = 0;
     }
 
     addInventory (item) {
         this.inventory.addItem(item);
+    }
+
+    getInventory( {id='', category=''} ) {
+        if (id) {
+            return this.inventory.getItem(id);
+        } else if (category) {
+            return this.inventory.getCategory(category);
+        }
     }
 
     removeInventory (item) {
@@ -196,14 +243,21 @@ Player.playerNumber = 0;
 module.exports.Player = Player;
 
 class Token extends GameItem {
-    constructor (id, category='', x, y, template=templates.TOKEN_DEFAULT, drawable=1) {
+    constructor (id, category='', x, y, template, drawable=1) {
         super(id, category);
         this.x = x;
         this.y = y;
         this.template = new template().x(x).y(y);
+        this.waypoint = undefined;
     }
 
-    moveToWayPoint(waypoint, path=true) { }
+    moveToWaypoint(waypoint, path=true) {
+        var wp_tpl = waypoint.template,
+            to = nomalizeCoordinates(this, wp_tpl._x, wp_tpl._y);
+        this.waypoint = waypoint;
+        return ['moveToken', this.id, [to]];
+    }
+
     moveToXY(x, y) {}
 
     activate() {
@@ -218,7 +272,10 @@ class Token extends GameItem {
         this.emit('click', this);
     }
 
-    highlight() {}
+    highlight() {
+        return ['highlightToken', this.id];
+    }
+
     show() {}
     hide() {}
     draw() {
@@ -261,11 +318,93 @@ class Waypoint extends Token {
     constructor (id, category, x, y, template=templates.WAYPOINT_DEFAULT) {
         super(id, category, x, y, template);
         this.next = [];
-        this.previous = [];
+        this.tokens=[];
     }
 }
 module.exports.Waypoint = Waypoint;
 
+class Component extends GameItem {
+    constructor (id, template) {
+        super(id, '');
+        this.template = new template();
+        this.context = {};
+    }
+
+    draw() {
+        return ['addDomContent',
+            this.template.content(this.context),
+            '#' + this.template.parent,
+            '#' + this.content_id
+        ];
+    }
+}
+
+class Dice extends Component {
+    constructor(id, sides, template=templates.DICE_DEFAULT) {
+        super(id, template);
+        this.sides = sides;
+        this.content_id = 'dice_' + id;
+        this.context = {id: this.id, content_id: this.content_id};
+    }
+
+    draw() {
+        this.gameController.rpcServer.connect('roll_' + this.id, this.roll, this);
+        return super.draw();
+    }
+
+    roll() {
+        this.result = Math.floor(Math.random() * this.sides + 1);
+        this.context = {id: this.id, content_id: this.content_id, result: this.result};
+        if (this.gameController) {
+            this.gameController.currentState.emit('roll', this.id, this);
+        }
+        this.emit('roll', this);
+    }
+
+    rollResult() {
+        return super.draw();
+    }
+
+    reset() {
+        this.context = {id: this.id, content_id: this.content_id};
+    }
+}
+module.exports.Dice = Dice;
+
 // --------------------- Global Objects ---------------------------------------
 // at The moment only gameController should be Global
 global.game = new Game();
+
+// glabals
+var game = global.game;
+
+function callAll(args) {
+    var func = args[0],
+        _args = Array.prototype.slice.call(args, 1);
+    for(let player of game.gameController.players.iterator()) {
+        if(player[ITEM].session) {
+            player[ITEM].session[func](..._args);
+        }
+    }
+}
+
+// call remote function on all clients, except the one specified by player
+function callAllBut(exclude_player, args) {
+    var func = args[0],
+        _args = Array.prototype.slice.call(args, 1);
+    for(let player of game.gameController.players.iterator()) {
+        if(player[ITEM].session && player[ITEM].id != exclude_player.id) {
+            player[ITEM].session[func](..._args);
+        }
+    }
+}
+
+function callOne(player, args) {
+    var func = args[0],
+        _args = Array.prototype.slice.call(args, 1);
+    player.session[func](..._args);
+}
+
+global.RPC_ALL = callAll;
+global.RPC_ONE = callOne;
+global.RPC_ALL_EX = callAllBut;

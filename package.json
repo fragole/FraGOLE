@@ -1,7 +1,7 @@
 {
-  "name": "gameframe",
+  "name": "Fragole",
   "version": "1.0.0",
-  "description": "GameFrame Project",
+  "description": "Fragole - FRAmework for Gamified Online Learning Environments",
   "main": "index.js",
   "dependencies": {
     "browserify": "^14.1.0",

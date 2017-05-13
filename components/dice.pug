@@ -1,0 +1,31 @@
+div(id=content_id class="ui centered basic modal")
+    div(class="ui one column stackable center aligned page grid")
+        div(class="column twelve wide")
+            unless result
+                div(class="ui inverted icon header")
+                    i(class="cube icon")
+                    | Würfeln
+                div(class="content")
+                    p Klicke "Würfeln" um zu würfeln.
+                    br
+                div(class="actions")
+                    div(class="ui green ok inverted button" onClick="rpcServer['roll_" + id + "']('" + id + "');")
+                        i(class="checkmark icon")
+                        | Würfeln
+            else
+                div(class="ui inverted icon header")
+                    i(class="cube icon")
+                    | Würfelergebnis
+                div(class="ui center roundedsquare")
+                    p #{result}
+                br
+                div(class="actions")
+                    div(class="ui green ok inverted button")
+                        i(class="checkmark icon")
+                        | fein
+            script.
+                function afterAddDomContent() {
+                    $('.ui.basic.modal')
+                     // .modal({ blurring: true })
+                      .modal('show');
+                }

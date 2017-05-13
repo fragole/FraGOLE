@@ -1,3 +1,5 @@
+var pug = require('pug');
+
 // shapes
 const CIRCLE = 'dc';
 const RECTANGLE = 'dr';
@@ -12,8 +14,8 @@ const STAR = 'dp';
 class BaseTemplate {
     constructor (layer='front', x=0, y=0, width=0, height=0) {
         this._layer = layer;
-        this._x = x - (width / 2);
-        this._y = y - (height / 2);
+        this._x = x;
+        this._y = y;
         this._width = width;
         this._height = height;
     }
@@ -24,20 +26,12 @@ class BaseTemplate {
     }
 
     x(x) {
-        if (this.radius) {
-            this._x = x;
-        } else {
-            this._x = x - (this._width / 2);
-        }
+        this._x = x;
         return this;
     }
 
     y(y) {
-        if (this.radius) {
-            this._y = y;
-        } else {
-            this._y = y - (this._width / 2);
-        }
+        this._y = y;
         return this;
     }
 
@@ -65,6 +59,8 @@ class ShapeTemplate extends BaseTemplate {
         this._sides = sides;
         this._angle = angle;
         this._pointsize = pointsize;
+        this._x = this.x(x);
+        this._y = this.y(y);
         return this;
     }
 
@@ -72,6 +68,25 @@ class ShapeTemplate extends BaseTemplate {
         this._shape = shape;
         return this;
     }
+
+    x(x) {
+        if (this.shape == CIRCLE || this.shape == STAR) {
+            this._x = x;
+        } else {
+            this._x = x - (this._width / 2);
+        }
+        return this;
+    }
+
+    y(y) {
+        if (this.shape == CIRCLE || this.shape == STAR) {
+            this._y = y;
+        } else {
+            this._y = y - (this._height / 2);
+        }
+        return this;
+    }
+
 
     stroke(stroke) {
         this._stroke = stroke;
@@ -94,6 +109,18 @@ class ImageTemplate extends BaseTemplate {
     constructor({src='', layer='front', x=0, y=0, width=0, height=0}) {
         super(layer, x, y, width, height);
         this._src = src;
+        this._x = this.x(x);
+        this._y = this.y(y);
+        return this;
+    }
+
+    x(x) {
+        this._x = x - (this._width / 2);
+        return this;
+    }
+
+    y(y) {
+        this._y = y - (this._height / 2);
         return this;
     }
 
@@ -126,8 +153,22 @@ class PLAYER_TOKEN_DEFAULT extends ImageTemplate {
 }
 PLAYER_TOKEN_DEFAULT.counter = 0;
 
+class ComponentTemplate {
+    constructor(content, parent) {
+        this.parent = parent;
+        this.content = pug.compileFile(content);
+    }
+}
+
+class DICE_DEFAULT extends ComponentTemplate {
+    constructor () {
+        super('./components/dice.pug', 'board_div');
+    }
+}
+
 module.exports.ShapeTemplate = ShapeTemplate;
 module.exports.ImageTemplate = ImageTemplate;
 module.exports.WAYPOINT_DEFAULT = WAYPOINT_DEFAULT;
 module.exports.PLAYER_TOKEN_DEFAULT = PLAYER_TOKEN_DEFAULT;
+module.exports.DICE_DEFAULT = DICE_DEFAULT;
 module.exports.shapes = {CIRCLE : CIRCLE};

@@ -1,42 +1,6 @@
 var pug = require('pug');
 const EventEmitter = require('events');
 
-const ID = 0;
-const ITEM = 1;
-
-// glabals
-var game = global.game;
-var RPC_ALL = global.RPC_ALL;
-var RPC_ONE = global.RPC_ONE;
-
-function callAll(func, args) {
-    var _args = Array.prototype.slice.call(arguments, 1);
-    for(let player of game.gameController.players.iterator()) {
-        if(player[ITEM].session) {
-            player[ITEM].session[func](..._args);
-        }
-    }
-}
-
-// call remote function on all clients, except the one specified by player
-function callAllBut(exclude_player, func, args) {
-    var _args = Array.prototype.slice.call(arguments, 2);
-    for(let player of game.gameController.players.iterator()) {
-        if(player[ITEM].session && player[ITEM].id != exclude_player.id) {
-            player[ITEM].session[func](..._args);
-        }
-    }
-}
-
-function callOne(player, func, args) {
-    var _args = Array.prototype.slice.call(arguments, 2);
-    player.session[func](..._args);
-}
-
-global.RPC_ALL = callAll;
-global.RPC_ONE = callOne;
-global.RPC_ALL_EX = callAllBut;
-
 class FragoleLobby extends EventEmitter {
     constructor () {
         super();
@@ -49,28 +13,28 @@ class FragoleLobby extends EventEmitter {
 
     joinPlayer(player) {
         this.playersReady[player.id] = 0;
-        RPC_ONE(player, 'addDomContent', this.lobbyComp({id:player.id, player:player.name, }), '#board_div', '#lobby');
-        RPC_ALL('removeDomContent', '#lobby_players');
+        RPC_ONE(player, ['addDomContent', this.lobbyComp({id:player.id, player:player.name, }), '#board_div', '#lobby']);
+        RPC_ALL(['removeDomContent', '#lobby_players']);
         for (let id in this.playersReady) {
             var p = game.gameController.players.getItem(id);
             var locals = {id:p.id, player:p.name, number:p.number};
             if (this.playersReady[id]==1) {
-                RPC_ALL('addDomContent', this.playerReadyComp(locals), '#lobby_players', '#lobby_' + p.id);
+                RPC_ALL(['addDomContent', this.playerReadyComp(locals), '#lobby_players', '#lobby_' + p.id]);
             } else {
-                RPC_ALL('addDomContent', this.playerComp({id:p.id, player:p.name, number:p.number}), '#lobby_players', '#lobby_' + p.id);
+                RPC_ALL(['addDomContent', this.playerComp({id:p.id, player:p.name, number:p.number}), '#lobby_players', '#lobby_' + p.id]);
             }
         }
     }
 
     quit() {
-        RPC_ALL('removeDomContent', '#lobby');
+        RPC_ALL(['removeDomContent', '#lobby']);
     }
 
   // called by client
     playerReady(playerId) {
         var player = game.gameController.players.getItem(playerId);
         this.playersReady[player.id] = 1;
-        RPC_ALL('addDomContent', this.playerReadyComp({id:player.id, player:player.name, number:player.number}), '#lobby_players', '#lobby_' + player.id);
+        RPC_ALL(['addDomContent', this.playerReadyComp({id:player.id, player:player.name, number:player.number}), '#lobby_players', '#lobby_' + player.id]);
         console.log(player.name, ' ready');
 
         var sumReady = 0;

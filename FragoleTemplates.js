@@ -166,9 +166,16 @@ class DICE_DEFAULT extends ComponentTemplate {
     }
 }
 
+class CHAT_DEFAULT extends ComponentTemplate {
+    constructor () {
+        super('./components/chat_msg.pug', 'chat_feed');
+    }
+}
+
 module.exports.ShapeTemplate = ShapeTemplate;
 module.exports.ImageTemplate = ImageTemplate;
 module.exports.WAYPOINT_DEFAULT = WAYPOINT_DEFAULT;
 module.exports.PLAYER_TOKEN_DEFAULT = PLAYER_TOKEN_DEFAULT;
 module.exports.DICE_DEFAULT = DICE_DEFAULT;
+module.exports.CHAT_DEFAULT = CHAT_DEFAULT;
 module.exports.shapes = {CIRCLE : CIRCLE};

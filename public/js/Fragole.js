@@ -139,6 +139,11 @@ Fragole.GameBoard = class GameBoard {
 
     removeDomContent(target) {
         console.log('remove from ' + target);
+        $(target).remove();
+    }
+
+    emptyDomContent(target) {
+        console.log('remove from ' + target);
         $(target).empty();
     }
 
@@ -148,15 +153,20 @@ Fragole.GameBoard = class GameBoard {
     }
 
     activateToken(name, callback) {
-        console.log(arguments);
+        console.log('activateToken', arguments);
         var elem = this.childs[name];
-        elem.on('click', (evt, data) => {console.log(name + ' clicked => ' + callback); this.rpcServer[callback](callback);}, this);
+        elem.on('click', function(evt, data) {console.log(name + ' clicked => ' + callback); rpcServer[callback](callback);});
+    }
+
+    deactivateToken(name) {
+        console.log('deactivateToken', arguments);
+        var elem = this.childs[name];
+        elem.removeAllEventListeners();
     }
 
     highlightToken(name) {
+        console.log('highlight ', arguments);
         var token = this.childs[name];
-        var bounds = token.getBounds();
-        console.log(bounds);
         var tween = createjs.Tween.get(token, {loop:true});
         tween.to({scaleX:1.2, scaleY:1.2, alpha:0.5}, 300,  createjs.Ease.bounceOut)
              //.to({scaleX:0.9, scaleY:0.9, alpha:1}, 500,  createjs.Ease.bounceOut)
@@ -168,6 +178,12 @@ Fragole.GameBoard = class GameBoard {
     }
 
     unhighlightToken(name) {
+        console.log(name);
+        var token = this.childs[name];
+        var tween = createjs.Tween.get(token, {override: true});
+        tween.to({scaleX:1, scaleY:1, alpha:1}, 300);
+        //var tween = createjs.Tween.get(token);
+        //createjs.Tween.removeTweens(token);
 
     }
 
@@ -184,32 +200,6 @@ Fragole.GameBoard = class GameBoard {
     }
 
 
-}
-
-
-// Just Testcode ATM
-function test() {
-    gameboard = new Fragole.GameBoard('board');
-    gameboard.drawShape('circ', draw_methods.CIRCLE, 'Blue', 0,100,100,50);
-    gameboard.drawShape('rect', draw_methods.RECTANGLE, 'Blue','Black',100,200,50,75);
-    gameboard.drawShape('rrect', draw_methods.ROUNDED_RECTANGLE, 'Red', 0, 100,400, 50, 100, 15, 0, 15, 0);
-    gameboard.drawShape('star', draw_methods.STAR, 'Green', 'Yellow', 100,600, 50, 5, 0.5, 0);
-
-    // shape not supported
-    gameboard.drawShape('xxx', 'drawX', 0,0,0,0);
-
-    gameboard.drawComponent('test', '<image src="/assets/Pieces (Black)/pieceBlack_border00.png" />', 150,150);
-    gameboard.drawImage("test_img", "assets/Pieces (Blue)/pieceBlue_border00.png", 100, 300);
-    var circle = gameboard.stage.getChildByName('circ');
-
-    createjs.Tween.get(circle)
-    .to({ x: 400 }, 1000, createjs.Ease.getPowInOut(4))
-    .to({ alpha: 0, y: 175 }, 500, createjs.Ease.getPowInOut(2))
-    .to({ alpha: 0, y: 225 }, 100)
-    .to({ alpha: 1, y: 200 }, 500, createjs.Ease.getPowInOut(2))
-    .to({ x: 100 }, 800, createjs.Ease.getPowInOut(2));
-    createjs.Ticker.setFPS(60);
-    createjs.Ticker.addEventListener("tick", gameboard.stage);
 }
 
 function init() {
@@ -230,10 +220,13 @@ function init() {
         setBackgroundColor : function(color) { gameboard.setBackgroundColor(color); },
         addDomContent :    function(src, target, content_id) { gameboard.addDomContent(src, target, content_id);},
         removeDomContent : function(target) { gameboard.removeDomContent(target);},
+        emptyDomContent : function(target) { gameboard.emptyDomContent(target);},
         drawShape : function(name, type, fill, stroke, layer, pos_x, pos_y) { gameboard.drawShape(...arguments);},
         drawImage : function(name, src, layer, pos_x, pos_y) { gameboard.drawImage(name, src, layer,    pos_x, pos_y);},
         activateToken : function(name, callback) { gameboard.activateToken(name, callback);},
+        deactivateToken : function(name) { gameboard.deactivateToken(name);},
         moveToken : function(name, pos) { gameboard.moveToken(name, pos);},
         highlightToken : function(name) { gameboard.highlightToken(name);},
+        unhighlightToken : function(name) { gameboard.unhighlightToken(name);},
     };
 }

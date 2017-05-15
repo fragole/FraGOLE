@@ -34,7 +34,7 @@ class HTTP {
                 return;
             }
             sessions.set(request.ip, [playername, undefined]);
-            response.render('index');
+            response.render('index', {player: playername});
         });
 
         app.listen(port, function() {
@@ -53,7 +53,9 @@ class RPC {
         this.connections = {};
         var connections = this.connections;
 
-        this.eurecaServer = new Eureca.Server({allow:['setBackgroundColor', 'addDomContent', 'removeDomContent', 'drawShape', 'drawImage', 'activateToken', 'moveToken', 'highlightToken']});
+        this.eurecaServer = new Eureca.Server({allow:['setBackgroundColor', 'addDomContent', 'removeDomContent', 'emptyDomContent',
+            'drawShape', 'drawImage', 'activateToken', 'deactivateToken', 'moveToken', 'highlightToken', 'unhighlightToken']});
+
         this.eurecaServer.attach(server);
 
         this.eurecaServer.onConnect ( function (connection) {
@@ -83,6 +85,12 @@ class RPC {
             export_func =func;
         }
         this.eurecaServer.exports[name] = export_func;
+        // Publish new functions to all connected clients
+        this.eurecaServer.updateContract(); // !!! EXPERMIMENTAL in eureca.io
+    }
+
+    disconnect(name) {
+        delete this.eurecaServer.exports[name];
         // Publish new functions to all connected clients
         this.eurecaServer.updateContract(); // !!! EXPERMIMENTAL in eureca.io
     }

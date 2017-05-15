@@ -1,0 +1,22 @@
+div(id="dashboard" class="ui bottom inverted sidebar segment")
+    div( class="ui grid")
+        div(class="ten wide column")
+            p(class="ui large secondary labeled icon button" onClick="$('.ui.sidebar').sidebar('toggle');")
+                i(class="chevron down icon")
+                |#{player}
+            div(class="ui grid")
+        div(class="six wide column")
+            div(class="ui top inverted attached tabular menu")
+                a(class="item active" data-tab="log")
+                    i(class="history icon")
+                    | Log
+                a(class="item" data-tab="chat")
+                    i(class="comments outline icon")
+                    | Chat
+            div(class="ui bottom inverted attached tab segment active" data-tab="log")
+                div(id="log_feed" class="ui small feed")
+            div(id="chat"  class="ui bottom inverted attached tab segment" data-tab="chat")
+                div(id="chat_feed" class="ui small feed")
+                div(id="chat_btn" class="ui fluid action input")
+                    input(id="chat_input", placeholder="Meldung eingeben" type="text")
+                    div(class="ui button green" onClick="sendChat('"+ player + "');") Senden

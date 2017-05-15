@@ -70,6 +70,7 @@ STATE_INIT.on('enter', function () {
     controller.next_player();
     controller.next_state(STATE_TURN);
     items.player_token1.waypoint = items.wp1;
+    items.player_token2.waypoint = items.wp1;
 });
 
 STATE_TURN.on('enter', function() {
@@ -89,8 +90,8 @@ STATE_TURN.on('roll', function(src, dice) {
         //console.log(wps);
         RPC_ONE(this.get('player'), items.dice.rollResult());
         for (let wp of this.get('wps')) {
-            RPC_ONE(this.get('player'), wp.highlight());
             RPC_ONE(this.get('player'), wp.activate());
+            RPC_ONE(this.get('player'), wp.highlight());
         }
     }
 });
@@ -99,16 +100,16 @@ STATE_TURN.on('click', function(src, item) {
     if (item instanceof Waypoint) {
         RPC_ALL(this.get('playertoken').moveToWaypoint(item));
         for (let wp of this.get('wps')) {
-            //RPC_ONE(this.get('player'), wp.unhighlight());
-            //RPC_ONE(this.get('player'), wp.deactivate());
+            RPC_ONE(this.get('player'), wp.unhighlight());
+            RPC_ONE(this.get('player'), wp.deactivate());
         }
+        controller.next_player();
         controller.next_state(STATE_TURN);
     }
 });
 
 STATE_TURN.on('exit', function() {
     items.dice.reset();
-
 });
 // *****************************************************************************
 

@@ -8,7 +8,7 @@
     margin-left: -15em; /*set to a negative number 1/2 of your width*/
 }
 
-.lobby {
+.middled {
   position: absolute;
   margin: auto;
   top: 0;
@@ -38,4 +38,22 @@
  top: 50%;
  left: 50%;
  transform: translate(-50%, -50%);
+}
+
+#log_feed {
+    height: 20vh;
+}
+
+#chat_feed {
+    height: 8vw;
+    margin-bottom: 0px;
+    overflow-y: scroll;
+}
+
+#chat_btn {
+    margin-top: 0px;
+}
+
+#dashboard {
+    height:  33vh;
 }

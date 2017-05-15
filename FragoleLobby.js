@@ -14,7 +14,7 @@ class FragoleLobby extends EventEmitter {
     joinPlayer(player) {
         this.playersReady[player.id] = 0;
         RPC_ONE(player, ['addDomContent', this.lobbyComp({id:player.id, player:player.name, }), '#board_div', '#lobby']);
-        RPC_ALL(['removeDomContent', '#lobby_players']);
+        RPC_ALL(['emptyDomContent', '#lobby_players']);
         for (let id in this.playersReady) {
             var p = game.gameController.players.getItem(id);
             var locals = {id:p.id, player:p.name, number:p.number};

@@ -95,6 +95,11 @@ class GameController extends GameObject {
         this.activePlayer = undefined;
         this.currentState = new GameState('NULL');
         this.playersIterator = this.players.iterator();
+
+        // connect chat to rpcServer
+        this.rpcServer.connect('send_chat', this.sendChat, this);
+        this.chatMsg = new templates.CHAT_DEFAULT();
+        this.chatCnt = 0;
     }
 
     addPlayer(player) {
@@ -152,6 +157,15 @@ class GameController extends GameObject {
         }
         return this.activePlayer;
     }
+
+    sendChat(player, msg) {
+        var msg_id = '#chat_msg_' + (++this.chatCnt);
+        RPC_ALL(['addDomContent',
+            this.chatMsg.content({player: player, msg: msg, msg_id: msg_id}),
+            '#' + this.chatMsg.parent,
+            msg_id]);
+    }
+
 }
 module.exports.GameController = GameController;
 
@@ -265,6 +279,11 @@ class Token extends GameItem {
         return ['activateToken', this.id, 'click_' + this.id];
     }
 
+    deactivate () {
+        this.gameController.rpcServer.disconnect('click_' + this.id);
+        return ['deactivateToken', this.id];
+    }
+
     click() {
         if (this.gameController) {
             this.gameController.currentState.emit('click', this.id, this);
@@ -274,6 +293,10 @@ class Token extends GameItem {
 
     highlight() {
         return ['highlightToken', this.id];
+    }
+
+    unhighlight() {
+        return ['unhighlightToken', this.id];
     }
 
     show() {}

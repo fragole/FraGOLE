@@ -10,6 +10,13 @@ var path = require('path');
 
 var sessions = new Map();
 
+function localIpHelper(ip) {
+    if(ip=='::ffff:127.0.0.1' || ip=='::1') {
+        return 'localhost';
+    }
+    return ip;
+}
+
 class HTTP {
     constructor( port ) {
         var app = express(app);
@@ -33,7 +40,7 @@ class HTTP {
                 response.render('index_register');
                 return;
             }
-            sessions.set(request.ip, [playername, undefined]);
+            sessions.set(localIpHelper(request.ip), [playername, undefined]);
             response.render('index', {player: playername});
         });
 
@@ -63,7 +70,7 @@ class RPC {
 
             // try to match http-session to rpc sessions
             var session;
-            var clientIp = connection.eureca.remoteAddress.ip;
+            var clientIp = localIpHelper(connection.eureca.remoteAddress.ip);
             if (session = sessions.get(clientIp)) {
                 sessions.set(clientIp, [session[0], connection.clientProxy]);
             }
@@ -99,4 +106,5 @@ class RPC {
 
 module.exports.HTTP = HTTP;
 module.exports.RPC = RPC;
+module.exports.localIpHelper = localIpHelper;
 module.exports.sessions = sessions;

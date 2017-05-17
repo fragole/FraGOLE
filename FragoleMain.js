@@ -1,19 +1,15 @@
 var FragoleServer = require('./FragoleServer.js');
 var Lib = require('./FragoleLib.js');
-var {GameController, GameState, Player, PlayerToken, Collection, Waypoint, Dice} = require('./FragoleObjects.js');
+var {Game, GameController, GameState, Player, PlayerToken, Collection, Waypoint, Dice, Statistic} = require('./FragoleObjects.js');
 var Lobby = require('./FragoleLobby.js');
 
 var webServer = new FragoleServer.HTTP(80);
 var rpc = new FragoleServer.RPC(81);
 var sessions = FragoleServer.sessions;
 
-// glabals
-var game = global.game;
-var RPC_ALL = global.RPC_ALL;
-var RPC_ONE = global.RPC_ONE;
-
 // ****************************************************************************
 // Game definition
+var game = new Game();
 var controller = new GameController('game_controller1', 1, rpc);
 
 game.setName('TestGame')
@@ -47,6 +43,8 @@ var items = {
     player_token2: new PlayerToken('player_token2', 'spielfiguren', 85, 50),
     // dice
     dice: new Dice('dice', 6),
+
+    stat1: new Statistic('stat1', 500, 400, 'Ausrüstung', 10, 'travel'),
 };
 
 Lib.connectWaypoints([items.wp1, items.wp2, items.wp3, items.wp4, items.wp5, items.wp7, items.wp9, items.wp10, items.wp1]);
@@ -61,7 +59,7 @@ controller.addPlayer(items.player1)
 items.player1.addInventory(items.player_token1);
 items.player2.addInventory(items.player_token2);
 
-var lobby = new Lobby();
+var lobby = new Lobby(controller);
 
 // *****************************************************************************
 // STATE_INIT event-handlers
@@ -71,38 +69,36 @@ STATE_INIT.on('enter', function () {
     controller.next_state(STATE_TURN);
     items.player_token1.waypoint = items.wp1;
     items.player_token2.waypoint = items.wp1;
+    items.stat1.draw();
 });
 
 STATE_TURN.on('enter', function() {
     this.set('playertoken', controller.activePlayer.getInventory({category:'spielfiguren'})[0]);
     this.set('player', controller.activePlayer);
-    RPC_ONE(this.get('player'), items.dice.draw());
-});
-
-// Eventhandler for clientside click on player_token1
-STATE_TURN.on('click', function(src, item) {
-    console.log('STATE_INIT click ' + src);
+    items.dice.draw(this.get('player'));
 });
 
 STATE_TURN.on('roll', function(src, dice) {
     if(src === 'dice') {
         this.set('wps', Lib.getWaypointsAtRange(this.get('playertoken').waypoint, dice.result));
         //console.log(wps);
-        RPC_ONE(this.get('player'), items.dice.rollResult());
+        items.dice.rollResult(this.get('player'));
         for (let wp of this.get('wps')) {
-            RPC_ONE(this.get('player'), wp.activate());
-            RPC_ONE(this.get('player'), wp.highlight());
+            wp.activate(this.get('player'));
+            wp.highlight(this.get('player'));
         }
     }
 });
 
 STATE_TURN.on('click', function(src, item) {
     if (item instanceof Waypoint) {
-        RPC_ALL(this.get('playertoken').moveToWaypoint(item));
+        this.get('playertoken').moveToWaypoint(item);
         for (let wp of this.get('wps')) {
-            RPC_ONE(this.get('player'), wp.unhighlight());
-            RPC_ONE(this.get('player'), wp.deactivate());
+            wp.unhighlight(this.get('player'));
+            wp.deactivate(this.get('player'));
         }
+        items.stat1.context.value--;
+        items.stat1.update();
         controller.next_player();
         controller.next_state(STATE_TURN);
     }
@@ -127,7 +123,7 @@ lobby.on('allPlayersReady', function () {
 // handle rpc-sessions
 function ready() {
     var player, playerName, clientProxy;
-    var clientIp = this.connection.eureca.remoteAddress.ip;
+    var clientIp = FragoleServer.localIpHelper(this.connection.eureca.remoteAddress.ip);
     try {
         [playerName, clientProxy] = sessions.get(clientIp);
 

@@ -32,25 +32,26 @@ class Game {
         for (let i in this.items) {
             var item = this.items[i];
             if (item instanceof Waypoint) {
-                RPC_ALL(item.draw());
+                item.draw();
             }
             if (item instanceof Player && item.joined) {
                 for (let i of item.inventory.iterator()) {
-                    if (i[1] instanceof PlayerToken) {
-                        RPC_ALL(i[1].draw());
+                    if (i[ITEM] instanceof PlayerToken) {
+                        i[ITEM].draw();
                     }
                 }
             }
         }
     }
-
 }
+module.exports.Game = Game;
 
 class GameObject extends EventEmitter {
     constructor(id) {
         super();
         this.id = id;
         this.gameController = undefined;
+        this.owner = undefined;
         this.custVars = {};
     }
 
@@ -166,6 +167,46 @@ class GameController extends GameObject {
             msg_id]);
     }
 
+    // return owner(s) of an object
+    // if owner is specified return list of all players
+    getOwner(item) {
+        if(item.owner) {
+            return item.owner;
+        } else {
+            return this.joinedPlayers;
+        }
+    }
+
+    rpcListOrAll(players, cmd) {
+        if (players) {
+            this.rpcCall(players, cmd);
+        } else {
+            this.rpcCall(this.joinedPlayers, cmd);
+        }
+    }
+
+    rpcListOrOwner(players, item, cmd) {
+        if (players) {
+            this.rpcCall(players, cmd);
+        } else {
+            this.rpcCall(this.getOwner(item), cmd);
+        }
+    }
+
+    rpcCall(players, args) {
+        var func = args[0],
+            _args = Array.prototype.slice.call(args, 1);
+
+        if(players instanceof Array) {  // list of players
+            for(let player of players) {
+                if(player.session) {
+                    player.session[func](..._args);
+                }
+            }
+        } else { // single player
+            players.session[func](..._args);
+        }
+    }
 }
 module.exports.GameController = GameController;
 
@@ -238,6 +279,7 @@ class Player extends GameObject {
 
     addInventory (item) {
         this.inventory.addItem(item);
+        item.owner = this;
     }
 
     getInventory( {id='', category=''} ) {
@@ -250,6 +292,7 @@ class Player extends GameObject {
 
     removeInventory (item) {
         this.inventor.deleteItem(item);
+        item.owner = undefined;
     }
 
 }
@@ -265,46 +308,60 @@ class Token extends GameItem {
         this.waypoint = undefined;
     }
 
-    moveToWaypoint(waypoint, path=true) {
+    // move token to a waypoint
+    // standard-target => all players;
+    moveToWaypoint(waypoint, players=undefined) {
         var wp_tpl = waypoint.template,
-            to = nomalizeCoordinates(this, wp_tpl._x, wp_tpl._y);
+            to = nomalizeCoordinates(this, wp_tpl._x, wp_tpl._y),
+            cmd =['moveToken', this.id, [to]];
+
         this.waypoint = waypoint;
-        return ['moveToken', this.id, [to]];
+
+        this.gameController.rpcListOrAll(players, cmd);
     }
 
-    moveToXY(x, y) {}
+    // activate click-handler a Token
+    // standard-target => owner
+    activate(players=undefined) {
+        var cmd = ['activateToken', this.id, 'click_' + this.id];
 
-    activate() {
+        // register callback-function in rpc-server
         this.gameController.rpcServer.connect('click_' + this.id, this.click, this);
-        return ['activateToken', this.id, 'click_' + this.id];
+        this.gameController.rpcListOrOwner(players, this, cmd);
     }
 
-    deactivate () {
+    // deactivate click handler for a token
+    // standard-target => owner
+    deactivate (players=undefined) {
+        var cmd = ['deactivateToken', this.id];
+
         this.gameController.rpcServer.disconnect('click_' + this.id);
-        return ['deactivateToken', this.id];
+        this.gameController.rpcListOrOwner(players, this, cmd);
     }
 
-    click() {
-        if (this.gameController) {
-            this.gameController.currentState.emit('click', this.id, this);
-        }
-        this.emit('click', this);
+    // visually highlight the token on client-side ('form' depends on client implementation)
+    // standard-target => owner
+    highlight(players=undefined) {
+        var cmd = ['highlightToken', this.id];
+        this.gameController.rpcListOrOwner(players, this, cmd);
     }
 
-    highlight() {
-        return ['highlightToken', this.id];
+    // stop highlighting the token on client-side ('form' depends on client implementation)
+    // standard-target => owner
+    unhighlight(players=undefined) {
+        var cmd = ['unhighlightToken', this.id];
+
+        this.gameController.rpcListOrOwner(players, this, cmd);
     }
 
-    unhighlight() {
-        return ['unhighlightToken', this.id];
-    }
+    // draw the token in the client browser
+    // standard-target => all joined players
+    draw(players=undefined) {
+        var cmd;
 
-    show() {}
-    hide() {}
-    draw() {
         if (this.template instanceof templates.ShapeTemplate) {
             if (this.template._shape == templates.shapes.CIRCLE) {
-                return ['drawShape',
+                cmd= ['drawShape',
                     this.id,
                     this.template._shape,
                     this.template._fill,
@@ -314,19 +371,27 @@ class Token extends GameItem {
                     this.template._y,
                     this.template._radius];
             }
-        }
-
-        if (this.template instanceof templates.ImageTemplate) {
-            return ['drawImage',
+        } else if (this.template instanceof templates.ImageTemplate) {
+            cmd = ['drawImage',
                 this.id,
                 this.template._src,
                 this.template._layer,
                 this.template._x,
                 this.template._y,
             ];
-
         }
+
+        this.gameController.rpcListOrAll(players, cmd);
     }
+
+    // EVENTS
+    click() {
+        if (this.gameController) {
+            this.gameController.currentState.emit('click', this.id, this);
+        }
+        this.emit('click', this);
+    }
+
 }
 module.exports.Token = Token;
 
@@ -353,12 +418,17 @@ class Component extends GameItem {
         this.context = {};
     }
 
-    draw() {
-        return ['addDomContent',
+    // draw a Component to the client document
+    // standard-target => all player;
+    draw(players=undefined) {
+        var cmd = ['addDomContent',
             this.template.content(this.context),
             '#' + this.template.parent,
             '#' + this.content_id
         ];
+
+        this.gameController.rpcListOrAll(players, cmd);
+
     }
 }
 
@@ -394,40 +464,31 @@ class Dice extends Component {
 }
 module.exports.Dice = Dice;
 
-// --------------------- Global Objects ---------------------------------------
-// at The moment only gameController should be Global
-global.game = new Game();
+class Statistic extends Component {
+    constructor(id, x, y, label, value, icon=undefined, img=undefined, template=templates.STATISTIC_DEFAULT) {
+        super(id, template);
+        this.context = {};
+        this.context.content_id = 'stat_' + id;
+        this.context.x = x;
+        this.context.y = y;
+        this.context.label = label;
+        this.context.img = img;
+        this.context.icon = icon;
+        this.context.value = value;
+        this.template = new template();
+    }
 
-// glabals
-var game = global.game;
+    draw(players=undefined) {
+        var cmd = ['addDomContent',
+            this.template.content(this.context),
+            '#' + this.template.parent,
+            '#' + this.context.content_id
+        ];
+        this.gameController.rpcListOrAll(players, cmd);
+    }
 
-function callAll(args) {
-    var func = args[0],
-        _args = Array.prototype.slice.call(args, 1);
-    for(let player of game.gameController.players.iterator()) {
-        if(player[ITEM].session) {
-            player[ITEM].session[func](..._args);
-        }
+    update() {
+        return this.draw();
     }
 }
-
-// call remote function on all clients, except the one specified by player
-function callAllBut(exclude_player, args) {
-    var func = args[0],
-        _args = Array.prototype.slice.call(args, 1);
-    for(let player of game.gameController.players.iterator()) {
-        if(player[ITEM].session && player[ITEM].id != exclude_player.id) {
-            player[ITEM].session[func](..._args);
-        }
-    }
-}
-
-function callOne(player, args) {
-    var func = args[0],
-        _args = Array.prototype.slice.call(args, 1);
-    player.session[func](..._args);
-}
-
-global.RPC_ALL = callAll;
-global.RPC_ONE = callOne;
-global.RPC_ALL_EX = callAllBut;
+module.exports.Statistic = Statistic;

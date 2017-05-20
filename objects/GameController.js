@@ -21,6 +21,11 @@ class GameController extends GameObject {
         this.rpcServer.connect('send_chat', this.sendChat, this);
         this.chatMsg = new templates.CHAT_DEFAULT();
         this.chatCnt = 0;
+
+        // dashboard-eventlog
+        this.logMsg = new templates.LOG_DEFAULT();
+        this.logCnt = 0;
+
     }
 
     addPlayer(player) {
@@ -84,6 +89,15 @@ class GameController extends GameObject {
         var cmd = (['addDomContent',
             this.chatMsg.content({player: player, msg: msg, msg_id: msg_id}),
             '#' + this.chatMsg.parent,
+            msg_id]);
+        this.rpcListOrAll(null, cmd);
+    }
+
+    sendLog(src, msg) {
+        var msg_id = '#log_msg_' + (++this.logCnt);
+        var cmd = (['addDomContent',
+            this.logMsg.content({src: src, msg: msg.content, icon:msg.icon, msg_id: msg_id}),
+            '#' + this.logMsg.parent,
             msg_id]);
         this.rpcListOrAll(null, cmd);
     }

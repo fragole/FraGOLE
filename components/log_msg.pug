@@ -1,0 +1,9 @@
+div(id=msg_id, class="event"  style="padding-top: 0px; padding-bottom: 0px;")
+   if icon
+     div(class="label")
+       i(class=icon + " icon")
+   else
+     div(class="label")
+       i(class="inverted green info circle icon")
+   div(class="content"  style="padding-top: 0px; padding-bottom: 0px;")
+     div(class="summary" style="color: white;") #{src}: #{msg}

@@ -1,11 +1,24 @@
-div( id=content_id class="ui modal")
+div( id=content_id class="ui small modal")
   div(class="header") #{header}
   if image
     div(class="image content")
       div(class="ui medium image")
         img(src=image)
-    div(class="description") #{content}
+      div(class="description") !{content}
+  else
+    div(class="content")
+      div(class="description") !{content}
   div(class="actions")
-    div(class="ui black deny button") Option 1
-    div(class="ui positive right labeled icon button") Option 2
-      i(class="checkmark icon")
+    each action, label in actions
+      if action.icon
+        div(class="ui ok labeled icon fluid " + action.color + " button" onClick="rpcServer['prompt_" + id + "']('" + label + "');" )
+          i(class="ui icon " + action.icon)
+          |#{label}
+      else
+        div(class="ui ok fluid " + action.color + " button" onClick="rpcServer['prompt_" + id + "']('" + label + "');") #{label}
+  script.
+    function afterAddDomContent() {
+      $('##{content_id}')
+        .modal('setting', 'closable', false)
+        .modal('show');
+    }

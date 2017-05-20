@@ -42,6 +42,7 @@
 
 #log_feed {
     height: 20vh;
+    overflow-y: scroll;
 }
 
 #chat_feed {
@@ -70,4 +71,8 @@
     color: rgba(0, 0, 0, 0.87);
     text-transform: uppercase;
     text-align: center;
+}
+
+.ui.modal .actions > .button {
+  margin: 0.2em;
 }

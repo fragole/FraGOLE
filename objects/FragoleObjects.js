@@ -16,5 +16,6 @@ module.exports= {
     Statistic:        require('./Statistic.js').Statistic,
     PlayerStatistic:  require('./Statistic.js').PlayerStatistic,
     Token:            require('./Token.js').Token,
-    Waypoint:         require('./Waypoint.js').Waypoint
+    Waypoint:         require('./Waypoint.js').Waypoint,
+    Prompt:           require('./Prompt.js').Prompt
 };

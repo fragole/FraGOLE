@@ -5,6 +5,7 @@ class Component extends GameItem {
         super(id, '');
         this.template = new template();
         this.context = {};
+        this.context.id = id;
     }
 
     // draw a Component to the client document

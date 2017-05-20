@@ -172,6 +172,12 @@ class CHAT_DEFAULT extends ComponentTemplate {
     }
 }
 
+class LOG_DEFAULT extends ComponentTemplate {
+    constructor () {
+        super('./components/log_msg.pug', 'log_feed');
+    }
+}
+
 class STATISTIC_DEFAULT extends ComponentTemplate {
     constructor () {
         super('./components/statistic.pug', 'board_div');
@@ -220,6 +226,7 @@ module.exports.WAYPOINT_DEFAULT = WAYPOINT_DEFAULT;
 module.exports.PLAYER_TOKEN_DEFAULT = PLAYER_TOKEN_DEFAULT;
 module.exports.DICE_DEFAULT = DICE_DEFAULT;
 module.exports.CHAT_DEFAULT = CHAT_DEFAULT;
+module.exports.LOG_DEFAULT = LOG_DEFAULT;
 module.exports.STATISTIC_DEFAULT = STATISTIC_DEFAULT;
 module.exports.PLAYER_STATISTIC_DEFAULT = PLAYER_STATISTIC_DEFAULT;
 module.exports.RATING_DEFAULT = RATING_DEFAULT;

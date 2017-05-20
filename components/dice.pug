@@ -14,10 +14,10 @@ div(id=content_id class="ui centered basic modal")
                         | Würfeln
                 script.
                     function afterAddDomContent() {
-                        $('.ui.basic.modal')
+                        $('##{content_id}')
                             .modal('setting', 'closable', false)
                             .modal('show');
-                        }
+                    }
             else
                 div(class="ui inverted icon header")
                     i(class="cube icon")
@@ -31,6 +31,6 @@ div(id=content_id class="ui centered basic modal")
                         | fein
                 script.
                     function afterAddDomContent() {
-                        $('.ui.basic.modal')
+                        $('##{content_id}')
                             .modal('show');
                     }

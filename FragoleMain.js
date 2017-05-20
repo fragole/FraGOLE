@@ -2,7 +2,8 @@ var FragoleServer = require('./FragoleServer.js');
 var Lib = require('./FragoleLib.js');
 var {Game, GameController, GameState, Player, PlayerToken, Collection,
      Waypoint, Dice, Statistic, PlayerStatistic, Rating, PlayerRating,
-     Progress, PlayerProgress} = require('./objects/FragoleObjects.js');
+     Progress, PlayerProgress, Prompt} = require('./objects/FragoleObjects.js');
+var Prompts = require('./content/Prompts.js');
 var Lobby = require('./FragoleLobby.js');
 
 var webServer = new FragoleServer.HTTP(80);
@@ -52,6 +53,9 @@ var items = {
     player_rating1: new PlayerRating('player_rating1', 'star', 'WERTUNG', 0, 10),
     progress1: new Progress('progress1', 100, 470, 'blue', 'FORTSCHRITT', 0, 10),
     player_progress1: new PlayerProgress('player_progress1', 'red', 'FORTSCHRITT', 0, 10),
+
+    // prompts
+    prompt1: Prompts.prompt1,
 };
 
 Lib.connectWaypoints([items.wp1, items.wp2, items.wp3, items.wp4, items.wp5, items.wp7, items.wp9, items.wp10, items.wp1]);
@@ -77,8 +81,7 @@ var lobby = new Lobby(controller);
 STATE_INIT.on('enter', function () {
     game.setupBoard();  // Setup the gameboard - draw stuff etc.
     controller.next_player();
-    controller.next_state(STATE_TURN);
-
+    controller.sendLog('Spiel', {content:'Herzlich Willkommen!'});
     items.player_token1.waypoint = items.wp1;
     items.player_token2.waypoint = items.wp1;
 
@@ -91,6 +94,14 @@ STATE_INIT.on('enter', function () {
     controller.subscribe('counter', items.rating1);
     controller.subscribe('counter', items.progress1);
     controller.set('counter', 10);
+    items.prompt1.show();
+    //controller.next_state(STATE_TURN);
+});
+
+STATE_INIT.on('prompt', function (src, option, prompt) {
+    console.log('Prompt selected => ', src, option);
+    controller.sendLog(controller.activePlayer.name, {content:'hat ' + option + ' gewählt', icon:'inverted orange check square'});
+    controller.next_state(STATE_TURN);
 });
 
 STATE_TURN.on('enter', function() {
@@ -101,8 +112,8 @@ STATE_TURN.on('enter', function() {
 
 STATE_TURN.on('roll', function(src, dice) {
     if(src === 'dice') {
+        controller.sendLog(controller.activePlayer.name, {content:'hat eine ' + dice.result + ' gewürfelt!', icon:'inverted teal cube'});
         this.set('wps', Lib.getWaypointsAtRange(this.get('playertoken').waypoint, dice.result));
-        //console.log(wps);
         items.dice.rollResult(this.get('player'));
         for (let wp of this.get('wps')) {
             wp.activate(this.get('player'));
@@ -114,6 +125,7 @@ STATE_TURN.on('roll', function(src, dice) {
 STATE_TURN.on('click', function(src, item) {
     if (item instanceof Waypoint) {
         this.get('playertoken').moveToWaypoint(item);
+        controller.sendLog(controller.activePlayer.name, {content:'zieht zu ' + item.id +'!', icon:'inverted yellow location arrow'});
         for (let wp of this.get('wps')) {
             wp.unhighlight(this.get('player'));
             wp.deactivate(this.get('player'));

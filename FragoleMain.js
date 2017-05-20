@@ -2,7 +2,7 @@ var FragoleServer = require('./FragoleServer.js');
 var Lib = require('./FragoleLib.js');
 var {Game, GameController, GameState, Player, PlayerToken, Collection,
      Waypoint, Dice, Statistic, PlayerStatistic, Rating, PlayerRating,
-     Progress, PlayerProgress} = require('./FragoleObjects.js');
+     Progress, PlayerProgress} = require('./objects/FragoleObjects.js');
 var Lobby = require('./FragoleLobby.js');
 
 var webServer = new FragoleServer.HTTP(80);

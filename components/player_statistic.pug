@@ -1,0 +1,10 @@
+div(id=content_id class="two wide column")
+  div( class="ui small inverted statistic")
+    div(class="value")
+      if icon
+        i(class= icon + " icon")
+      if img
+        img(src=img class="ui inline image")
+      |#{value}
+    div(class="label")
+      |#{label}

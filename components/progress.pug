@@ -1,0 +1,10 @@
+div(id=content_id style="position:absolute; top:" + y +"px; left:"+ x +"px; width:200px;")
+    div(id="inner_" + content_id class="ui " + color + " progress" data-value=value data-total=max)
+      div(class="bar")
+        div(class="progress")
+      div(class="label") #{label}
+      script.
+          function afterAddDomContent() {
+                  $('#inner_#{content_id}')
+                    .progress();
+          }

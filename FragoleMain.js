@@ -1,6 +1,8 @@
 var FragoleServer = require('./FragoleServer.js');
 var Lib = require('./FragoleLib.js');
-var {Game, GameController, GameState, Player, PlayerToken, Collection, Waypoint, Dice, Statistic} = require('./FragoleObjects.js');
+var {Game, GameController, GameState, Player, PlayerToken, Collection,
+     Waypoint, Dice, Statistic, PlayerStatistic, Rating, PlayerRating,
+     Progress, PlayerProgress} = require('./FragoleObjects.js');
 var Lobby = require('./FragoleLobby.js');
 
 var webServer = new FragoleServer.HTTP(80);
@@ -43,8 +45,13 @@ var items = {
     player_token2: new PlayerToken('player_token2', 'spielfiguren', 85, 50),
     // dice
     dice: new Dice('dice', 6),
-
-    stat1: new Statistic('stat1', 500, 400, 'Ausrüstung', 10, 'travel'),
+    // statistics
+    stat1: new Statistic('stat1', 100, 300, 'Zähler', 0, 'travel'),
+    player_stat1: new PlayerStatistic('player_stat1', 'Punkte', 0, 'trophy'),
+    rating1: new Rating('rating1', 100, 400, 'heart', 'WERTUNG', 3, 10),
+    player_rating1: new PlayerRating('player_rating1', 'star', 'WERTUNG', 0, 10),
+    progress1: new Progress('progress1', 100, 470, 'blue', 'FORTSCHRITT', 0, 10),
+    player_progress1: new PlayerProgress('player_progress1', 'red', 'FORTSCHRITT', 0, 10),
 };
 
 Lib.connectWaypoints([items.wp1, items.wp2, items.wp3, items.wp4, items.wp5, items.wp7, items.wp9, items.wp10, items.wp1]);
@@ -53,10 +60,14 @@ Lib.connectWaypoints([items.wp4, items.wp6, items.wp8, items.wp9]);
 // init game with all items
 game.setItems(items);
 controller.addPlayer(items.player1)
-                   .addPlayer(items.player2);
+          .addPlayer(items.player2);
 
-// assign player_tokens to players
+// assign player_tokens etc. to players
 items.player1.addInventory(items.player_token1);
+items.player1.addInventory(items.player_stat1);
+items.player1.addInventory(items.player_rating1);
+items.player1.addInventory(items.player_progress1);
+
 items.player2.addInventory(items.player_token2);
 
 var lobby = new Lobby(controller);
@@ -67,9 +78,19 @@ STATE_INIT.on('enter', function () {
     game.setupBoard();  // Setup the gameboard - draw stuff etc.
     controller.next_player();
     controller.next_state(STATE_TURN);
+
     items.player_token1.waypoint = items.wp1;
     items.player_token2.waypoint = items.wp1;
-    items.stat1.draw();
+
+    items.player1.subscribe('points', items.player_stat1);
+    items.player1.subscribe('points', items.player_rating1);
+    items.player1.subscribe('points', items.player_progress1);
+    items.player1.set('points', 0);
+
+    controller.subscribe('counter', items.stat1);
+    controller.subscribe('counter', items.rating1);
+    controller.subscribe('counter', items.progress1);
+    controller.set('counter', 10);
 });
 
 STATE_TURN.on('enter', function() {
@@ -97,8 +118,13 @@ STATE_TURN.on('click', function(src, item) {
             wp.unhighlight(this.get('player'));
             wp.deactivate(this.get('player'));
         }
-        items.stat1.context.value--;
-        items.stat1.update();
+
+        var counter = controller.get('counter');
+        controller.set('counter', --counter);
+
+        var points = this.get('player').get('points');
+        this.get('player').set('points', ++points);
+
         controller.next_player();
         controller.next_state(STATE_TURN);
     }
@@ -117,18 +143,19 @@ lobby.on('allPlayersReady', function () {
     lobby.quit();
     console.log('all players ready');
     controller.next_state(STATE_INIT);
-    items.coll1.addItem(items.player1);
 });
 
 // handle rpc-sessions
 function ready() {
     var player, playerName, clientProxy;
     var clientIp = FragoleServer.localIpHelper(this.connection.eureca.remoteAddress.ip);
+
     try {
         [playerName, clientProxy] = sessions.get(clientIp);
 
         if(player = game.gameController.joinPlayer(playerName, clientProxy)) {
             console.log('Player No.', player.number, ' joined:', player.name);
+            clientProxy.setBackgroundImage('/assets/background.jpg');
         } else {
             console.log('Max Players already joined!');
         }

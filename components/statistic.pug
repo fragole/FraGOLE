@@ -1,0 +1,9 @@
+div(id=content_id class="ui small statistic" style="position:absolute; top:" + y +"px; left:"+ x +"px;")
+  div(class="value")
+    if icon
+      i(class= icon + " icon")
+    if img
+      img(src=img class="ui inline image")
+    |#{value}
+  div(class="label")
+    |#{label}

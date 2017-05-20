@@ -178,6 +178,42 @@ class STATISTIC_DEFAULT extends ComponentTemplate {
     }
 }
 
+class PLAYER_STATISTIC_DEFAULT extends ComponentTemplate {
+    constructor() {
+        super('./components/player_statistic.pug', 'dashboard_content');
+    }
+}
+
+class RATING_DEFAULT extends ComponentTemplate {
+    constructor() {
+        super('./components/rating.pug', 'board_div');
+    }
+}
+
+class PLAYER_RATING_DEFAULT extends ComponentTemplate {
+    constructor() {
+        super('./components/player_rating.pug', 'dashboard_content');
+    }
+}
+
+class PROGRESS_DEFAULT extends ComponentTemplate {
+    constructor() {
+        super('./components/progress.pug', 'board_div');
+    }
+}
+
+class PLAYER_PROGRESS_DEFAULT extends ComponentTemplate {
+    constructor() {
+        super('./components/player_progress.pug', 'dashboard_content');
+    }
+}
+
+class PROMPT_DEFAULT extends ComponentTemplate {
+    constructor() {
+        super('./components/prompt.pug', 'board_div');
+    }
+}
+
 module.exports.ShapeTemplate = ShapeTemplate;
 module.exports.ImageTemplate = ImageTemplate;
 module.exports.WAYPOINT_DEFAULT = WAYPOINT_DEFAULT;
@@ -185,4 +221,10 @@ module.exports.PLAYER_TOKEN_DEFAULT = PLAYER_TOKEN_DEFAULT;
 module.exports.DICE_DEFAULT = DICE_DEFAULT;
 module.exports.CHAT_DEFAULT = CHAT_DEFAULT;
 module.exports.STATISTIC_DEFAULT = STATISTIC_DEFAULT;
+module.exports.PLAYER_STATISTIC_DEFAULT = PLAYER_STATISTIC_DEFAULT;
+module.exports.RATING_DEFAULT = RATING_DEFAULT;
+module.exports.PLAYER_RATING_DEFAULT = PLAYER_RATING_DEFAULT;
+module.exports.PROGRESS_DEFAULT = PROGRESS_DEFAULT;
+module.exports.PLAYER_PROGRESS_DEFAULT = PLAYER_PROGRESS_DEFAULT;
+module.exports.PROMPT_DEFAULT = PROMPT_DEFAULT;
 module.exports.shapes = {CIRCLE : CIRCLE};

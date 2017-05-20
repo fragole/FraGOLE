@@ -1,0 +1,9 @@
+div(id=content_id class="three wide column")
+    div(id="inner_" + content_id class="ui " + type + " rating" data-rating=value data-max-rating=max )
+    br
+    div(class="rating_label" style="vertical-align: bottom; color:white;") #{label}
+    script.
+        function afterAddDomContent() {
+                $('#inner_#{content_id}')
+                  .rating('disable');
+        }

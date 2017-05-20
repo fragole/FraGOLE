@@ -57,3 +57,17 @@
 #dashboard {
     height:  33vh;
 }
+
+#dashboard_content {
+    padding-top: 15px;
+    padding-left: 30px;
+}
+
+.rating_label {
+    font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    font-size: 1em;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.87);
+    text-transform: uppercase;
+    text-align: center;
+}

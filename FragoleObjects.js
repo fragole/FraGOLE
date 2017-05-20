@@ -52,20 +52,39 @@ class GameObject extends EventEmitter {
         this.id = id;
         this.gameController = undefined;
         this.owner = undefined;
-        this.custVars = {};
+        this.vars = {};
+        this.var_subscribers = {};
     }
 
     // assign custom vars
     set(name, value) {
-        this.custVars[name] = value;
+        this.vars[name] = value;
+        if(this.var_subscribers[name] instanceof Array) {
+            for(let item_players of this.var_subscribers[name]) {
+                var item, players;
+                [item, players] = item_players;
+                item.update(value, players);
+            }
+        }
     }
 
     get(name) {
-        return this.custVars[name];
+        return this.vars[name];
+    }
+
+    // subscribe to a var of this object
+    // func will be called when set() for this var is called
+    subscribe(name, item, players=undefined) {
+        if(this.var_subscribers[name] instanceof Array) {
+            this.var_subscribers[name].push([item, players]);
+        } else {
+            this.var_subscribers[name] = [[item, players]];
+        }
     }
 
     clearCustVars() {
         this.custVars = {};
+        this.var_subscribers = {};
     }
 }
 
@@ -161,10 +180,11 @@ class GameController extends GameObject {
 
     sendChat(player, msg) {
         var msg_id = '#chat_msg_' + (++this.chatCnt);
-        RPC_ALL(['addDomContent',
+        var cmd = (['addDomContent',
             this.chatMsg.content({player: player, msg: msg, msg_id: msg_id}),
             '#' + this.chatMsg.parent,
             msg_id]);
+        this.rpcListOrAll(null, cmd);
     }
 
     // return owner(s) of an object
@@ -440,9 +460,9 @@ class Dice extends Component {
         this.context = {id: this.id, content_id: this.content_id};
     }
 
-    draw() {
+    draw(players=undefined) {
         this.gameController.rpcServer.connect('roll_' + this.id, this.roll, this);
-        return super.draw();
+        return super.draw(players);
     }
 
     roll() {
@@ -454,8 +474,8 @@ class Dice extends Component {
         this.emit('roll', this);
     }
 
-    rollResult() {
-        return super.draw();
+    rollResult(players=undefined) {
+        return super.draw(players);
     }
 
     reset() {
@@ -467,7 +487,6 @@ module.exports.Dice = Dice;
 class Statistic extends Component {
     constructor(id, x, y, label, value, icon=undefined, img=undefined, template=templates.STATISTIC_DEFAULT) {
         super(id, template);
-        this.context = {};
         this.context.content_id = 'stat_' + id;
         this.context.x = x;
         this.context.y = y;
@@ -475,7 +494,7 @@ class Statistic extends Component {
         this.context.img = img;
         this.context.icon = icon;
         this.context.value = value;
-        this.template = new template();
+        this.update.bind(this);
     }
 
     draw(players=undefined) {
@@ -487,8 +506,78 @@ class Statistic extends Component {
         this.gameController.rpcListOrAll(players, cmd);
     }
 
-    update() {
-        return this.draw();
+    update(value) {
+        this.context.value = value;
+        this.draw();
     }
 }
 module.exports.Statistic = Statistic;
+
+class PlayerStatistic extends Statistic {
+    constructor(id, label, value, icon=undefined, img=undefined, template=templates.PLAYER_STATISTIC_DEFAULT) {
+        super(id, 0, 0, label, value, icon, img, template);
+    }
+
+    draw(players=undefined) {
+        var cmd = ['addDomContent',
+            this.template.content(this.context),
+            '#' + this.template.parent,
+            '#' + this.context.content_id
+        ];
+        this.gameController.rpcListOrOwner(players, this, cmd);
+    }
+
+}
+module.exports.PlayerStatistic = PlayerStatistic;
+
+class Rating extends Statistic {
+    constructor(id, x, y, type, label, value, max, template=templates.RATING_DEFAULT) {
+        super(id, x, y, label, value, null, null, template);
+        this.context.content_id = 'rating_' + id;
+        this.context.type = type;
+        this.context.max = max;
+    }
+}
+module.exports.Rating = Rating;
+
+class PlayerRating extends Rating {
+    constructor(id, type, label, value, max, template=templates.PLAYER_RATING_DEFAULT) {
+        super(id, 0, 0, type, label, value, max, template);
+    }
+
+    draw(players=undefined) {
+        var cmd = ['addDomContent',
+            this.template.content(this.context),
+            '#' + this.template.parent,
+            '#' + this.context.content_id
+        ];
+        this.gameController.rpcListOrOwner(players, this, cmd);
+    }
+}
+module.exports.PlayerRating = PlayerRating;
+
+class Progress extends Statistic {
+    constructor(id, x, y, color, label, value, max, template=templates.PROGRESS_DEFAULT) {
+        super(id, x, y, label, value, null, null, template);
+        this.context.content_id = 'progress_' + id;
+        this.context.color = color;
+        this.context.max = max;
+    }
+}
+module.exports.Progress = Progress;
+
+class PlayerProgress extends Progress {
+    constructor(id, color, label, value, max, template=templates.PLAYER_PROGRESS_DEFAULT) {
+        super(id, 0,0, color, label, value, max, template);
+    }
+
+    draw(players=undefined) {
+        var cmd = ['addDomContent',
+            this.template.content(this.context),
+            '#' + this.template.parent,
+            '#' + this.context.content_id
+        ];
+        this.gameController.rpcListOrOwner(players, this, cmd);
+    }
+}
+module.exports.PlayerProgress = PlayerProgress;

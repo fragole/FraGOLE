@@ -1,0 +1,9 @@
+div(id=content_id style="position:absolute; top:" + y +"px; left:"+ x +"px;")
+    div(id="inner_" + content_id class="ui " + type + " rating" data-rating=value data-max-rating=max )
+    br
+    div(class="rating_label") #{label}
+    script.
+        function afterAddDomContent() {
+                $('#inner_#{content_id}')
+                  .rating('disable');
+        }

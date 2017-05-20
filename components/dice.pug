@@ -12,6 +12,12 @@ div(id=content_id class="ui centered basic modal")
                     div(class="ui green ok inverted button" onClick="rpcServer['roll_" + id + "']('" + id + "');")
                         i(class="checkmark icon")
                         | Würfeln
+                script.
+                    function afterAddDomContent() {
+                        $('.ui.basic.modal')
+                            .modal('setting', 'closable', false)
+                            .modal('show');
+                        }
             else
                 div(class="ui inverted icon header")
                     i(class="cube icon")
@@ -23,9 +29,8 @@ div(id=content_id class="ui centered basic modal")
                     div(class="ui green ok inverted button")
                         i(class="checkmark icon")
                         | fein
-            script.
-                function afterAddDomContent() {
-                    $('.ui.basic.modal')
-                     // .modal({ blurring: true })
-                      .modal('show');
-                }
+                script.
+                    function afterAddDomContent() {
+                        $('.ui.basic.modal')
+                            .modal('show');
+                    }

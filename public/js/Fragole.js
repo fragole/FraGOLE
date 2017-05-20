@@ -22,14 +22,14 @@ Fragole.GameBoard = class GameBoard {
         this.board_canvas.height = document.body.clientHeight;
         this.stage = new createjs.Stage(id + '_canvas');
 
-        var background = new createjs.Shape();
-        background.name = 'background';
-        background.x = 0;
-        background.y = 0;
-        this.background_fill = background.graphics.beginFill('white').command;
-        background.graphics.drawRect(0,0,this.board_canvas.width,this.board_canvas.height);
-        this.stage.addChild(background);
-        this.stage.setChildIndex(background, 0);
+        this.background = new createjs.Shape();
+        this.background.name = 'background';
+        this.background.x = 0;
+        this.background.y = 0;
+        this.background_fill = this.background.graphics.beginFill('white').command;
+        this.background.graphics.drawRect(0,0,this.board_canvas.width,this.board_canvas.height);
+        this.stage.addChild(this.background);
+        this.stage.setChildIndex(this.background, 0);
         this.childs = {};
     }
 
@@ -152,6 +152,19 @@ Fragole.GameBoard = class GameBoard {
         this.stage.update();
     }
 
+    setBackgroundImage(img_src) {
+        var img = new Image();
+        var that = this;
+        img.src = img_src;
+        img.onload = function () {
+            console.log(that.background);
+            that.background.graphics.clear()
+              .beginBitmapFill(img)
+              .drawRect(0,0,that.board_canvas.width,that.board_canvas.height);
+            that.stage.update();
+        };
+    }
+
     activateToken(name, callback) {
         console.log('activateToken', arguments);
         var elem = this.childs[name];
@@ -218,6 +231,7 @@ function init() {
 
     rpc.exports = {
         setBackgroundColor : function(color) { gameboard.setBackgroundColor(color); },
+        setBackgroundImage : function(img_src) { gameboard.setBackgroundImage(img_src)},
         addDomContent :    function(src, target, content_id) { gameboard.addDomContent(src, target, content_id);},
         removeDomContent : function(target) { gameboard.removeDomContent(target);},
         emptyDomContent : function(target) { gameboard.emptyDomContent(target);},

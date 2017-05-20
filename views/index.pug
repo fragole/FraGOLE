@@ -11,7 +11,7 @@ html
     script(src="js/easeljs.min.js")
     script(src="js/tweenjs.min.js")
     //script(src="http://michel-laptop:81/eureca.js")
-    script(src="http://localhost:81/eureca.js")
+    script(src="http://192.168.178.62:81/eureca.js")
     //- eureca.io => RPC
 
     //- JS APIs
@@ -20,8 +20,8 @@ html
   body
     include ./dashboard.pug
     div(class="pusher")
-      canvas#board_canvas(style="z-index:0; top: 0; left: 0; position:fixed; width: 100vw; height: 95vh;")
-      div#board_div(style="z-index: 1; top:0; left:0; width: 100vw; height: 95vh;")
+      canvas#board_canvas(style="z-index:0; top: 0; left: 0; position:fixed; width: 100vw; height: 100vh;")
+      div#board_div(style="z-index: 1; top:0; left:0; width: 100vw; height: 100vh;")
       div(class="large ui black top attached labeled icon button" style="position:absolute; bottom:0px; left:10px" onClick="$('.ui.sidebar').sidebar('toggle');")
             i(class="chevron up icon")
             |#{player}
@@ -38,5 +38,5 @@ html
           init();
           $('.menu .item').tab();
           $('.ui.sidebar').sidebar('setting', 'dimPage', false)
-                          .sidebar('setting', 'closable', false);                                  
+                          .sidebar('setting', 'closable', false);
       });

@@ -1,0 +1,11 @@
+div( id=content_id class="ui modal")
+  div(class="header") #{header}
+  if image
+    div(class="image content")
+      div(class="ui medium image")
+        img(src=image)
+    div(class="description") #{content}
+  div(class="actions")
+    div(class="ui black deny button") Option 1
+    div(class="ui positive right labeled icon button") Option 2
+      i(class="checkmark icon")

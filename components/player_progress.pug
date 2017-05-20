@@ -1,0 +1,10 @@
+div(id=content_id class="five wide column")
+    div(id="inner_" + content_id class="ui " + color + " inverted progress" data-value=value data-total=max)
+      div(class="bar")
+        div(class="progress")
+      div(class="label") #{label}
+      script.
+          function afterAddDomContent() {
+                  $('#inner_#{content_id}')
+                    .progress();
+          }

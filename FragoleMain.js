@@ -87,57 +87,60 @@ var lobby = new Lobby(controller);
 
 // *****************************************************************************
 // STATE_INIT event-handlers
-STATE_INIT.on('enter', function () {
-    game.setupBoard();  // Setup the gameboard - draw stuff etc.
-    controller.next_player();
-    controller.sendLog('Spiel', {content:'Herzlich Willkommen!'});
-    items.player_token1.waypoint = items.wp1;
-    items.player_token2.waypoint = items.wp1;
+STATE_INIT.setHandlers({
+    'enter': function () {
+        game.setupBoard();  // Setup the gameboard - draw stuff etc.
+        controller.next_player();
+        controller.sendLog('Spiel', {content:'Herzlich Willkommen!'});
+        items.player_token1.waypoint = items.wp1;
+        items.player_token2.waypoint = items.wp1;
 
-    items.player1.subscribe('points', items.player_stat1);
-    items.player1.subscribe('points', items.player_rating1);
-    items.player1.subscribe('points', items.player_progress1);
-    items.player1.set('points', 0);
+        items.player1.subscribe('points', items.player_stat1);
+        items.player1.subscribe('points', items.player_rating1);
+        items.player1.subscribe('points', items.player_progress1);
+        items.player1.set('points', 0);
 
-    controller.subscribe('counter', items.stat1);
-    controller.subscribe('counter', items.rating1);
-    controller.subscribe('counter', items.progress1);
-    controller.set('counter', 10);
-    items.prompt1.show(controller.activePlayer);
+        controller.subscribe('counter', items.stat1);
+        controller.subscribe('counter', items.rating1);
+        controller.subscribe('counter', items.progress1);
+        controller.set('counter', 10);
+        items.prompt1.show(controller.activePlayer);
 
-    items.card_stack.draw();
-    items.card_stack.activate(controller.activePlayer);
-    items.card_stack.highlight(controller.activePlayer);
-});
+        items.card_stack.draw();
+        items.card_stack.activate(controller.activePlayer);
+        items.card_stack.highlight(controller.activePlayer);
+    },
 
-STATE_INIT.on('prompt', function (src, option, prompt) {
-    console.log('Prompt selected => ', src, option);
-    controller.sendLog(controller.activePlayer.name, {content:'hat ' + option + ' gewählt', icon:'inverted orange check square'});
-    controller.next_state(STATE_TURN);
-});
-
-// ****************************************************************************
-// STATE_TURN event-handlers
-STATE_TURN.on('enter', function() {
-    this.set('playertoken', controller.activePlayer.getInventory({category:'spielfiguren'})[0]);
-    this.set('player', controller.activePlayer);
-    items.dice.draw(this.get('player'));
-});
-
-STATE_TURN.on('roll', function(src, dice) {
-    if(src === 'dice') {
-        controller.sendLog(controller.activePlayer.name, {content:'hat eine ' + dice.result + ' gewürfelt!', icon:'inverted teal cube'});
-        this.set('wps', Lib.getWaypointsAtRange(this.get('playertoken').waypoint, dice.result));
-        items.dice.rollResult(this.get('player'));
-        for (let wp of this.get('wps')) {
-            wp.activate(this.get('player'));
-            wp.highlight(this.get('player'));
-        }
+    'prompt': function (src, option, prompt) {
+        console.log('Prompt selected => ', src, option);
+        controller.sendLog(controller.activePlayer.name, {content:'hat ' + option + ' gewählt', icon:'inverted orange check square'});
+        controller.next_state(STATE_TURN);
     }
 });
 
-STATE_TURN.on('click', function(src, item) {
-    if (item instanceof Waypoint) {
+
+// ****************************************************************************
+// STATE_TURN event-handlers
+STATE_TURN.setHandlers({
+    'enter': function() {
+        this.set('playertoken', controller.activePlayer.getInventory({category:'spielfiguren'})[0]);
+        this.set('player', controller.activePlayer);
+        items.dice.draw(this.get('player'));
+    },
+
+    'roll': function(src, dice) {
+        if(src === 'dice') {
+            controller.sendLog(controller.activePlayer.name, {content:'hat eine ' + dice.result + ' gewürfelt!', icon:'inverted teal cube'});
+            this.set('wps', Lib.getWaypointsAtRange(this.get('playertoken').waypoint, dice.result));
+            items.dice.rollResult(this.get('player'));
+            for (let wp of this.get('wps')) {
+                wp.activate(this.get('player'));
+                wp.highlight(this.get('player'));
+            }
+        }
+    },
+
+    'selectWaypoint': function(src, item) {
         this.get('playertoken').moveToWaypoint(item);
         items.dice.reset(controller.activePlayer);
         controller.sendLog(controller.activePlayer.name, {content:'zieht zu ' + item.id +'!', icon:'inverted yellow location arrow'});
@@ -151,20 +154,21 @@ STATE_TURN.on('click', function(src, item) {
 
         var points = this.get('player').get('points');
         this.get('player').set('points', ++points);
+    },
+
+    'drawCard': function(src, item) {
+        console.log('STATE_TURN drawCard');
+    },
+
+    'moveComplete': function(src, item) {
+        controller.next_state(STATE_TURN);
+    },
+
+    'exit': function() {
+        controller.next_player();
     }
 });
 
-STATE_TURN.on('drawCard', function(src, item) {
-    console.log('STATE_TURN drawCard');
-});
-
-STATE_TURN.on('moveComplete', function(src, item) {
-    controller.next_state(STATE_TURN);
-});
-
-STATE_TURN.on('exit', function() {
-    controller.next_player();
-});
 // *****************************************************************************
 
 // *****************************************************************************

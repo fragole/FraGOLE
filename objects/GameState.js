@@ -5,6 +5,13 @@ class GameState extends GameObject {
         super(id);
     }
 
+    setHandlers(handlers = {}) {
+        for (let handler in handlers) {
+            var func = handlers[handler];
+            this.on(handler, func);
+        }
+    }
+
     enter () {
         console.log(this.id + ' ENTER');
         this.emit('enter');

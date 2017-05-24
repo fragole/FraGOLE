@@ -7,5 +7,11 @@ class Waypoint extends Token {
         this.next = [];
         this.tokens=[];
     }
+
+    click() {
+        if (this.gameController) {
+            this.gameController.emit('selectWaypoint', this.id, this);
+        }
+    }
 }
 module.exports.Waypoint = Waypoint;

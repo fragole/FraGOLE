@@ -131,7 +131,6 @@ class GameController extends GameObject {
     rpcCall(players, args) {
         var func = args[0],
             _args = Array.prototype.slice.call(args, 1);
-
         if(players instanceof Array) {  // list of players
             for(let player of players) {
                 if(player.session) {
@@ -141,6 +140,11 @@ class GameController extends GameObject {
         } else { // single player
             players.session[func](..._args);
         }
+    }
+
+    emit() {
+        this.currentState.emit(...arguments);
+        super.emit(...arguments);
     }
 }
 module.exports.GameController = GameController;

@@ -2,9 +2,10 @@ var FragoleServer = require('./FragoleServer.js');
 var Lib = require('./FragoleLib.js');
 var {Game, GameController, GameState, Player, PlayerToken, Collection,
      Waypoint, Dice, Statistic, PlayerStatistic, Rating, PlayerRating,
-     Progress, PlayerProgress, Prompt} = require('./objects/FragoleObjects.js');
+     Progress, PlayerProgress, Prompt, Card, CardStack, CardHand} = require('./objects/FragoleObjects.js');
 var Prompts = require('./content/Prompts.js');
 var Lobby = require('./FragoleLobby.js');
+var Templates = require('./FragoleTemplates.js');
 
 var webServer = new FragoleServer.HTTP(80);
 var rpc = new FragoleServer.RPC(81);
@@ -45,7 +46,7 @@ var items = {
     player_token1: new PlayerToken('player_token1', 'spielfiguren', 100, 100),
     player_token2: new PlayerToken('player_token2', 'spielfiguren', 85, 50),
     // dice
-    dice: new Dice('dice', 6),
+    dice: new Dice('dice', 6, Templates.DICE_ALTERNATIVE),
     // statistics
     stat1: new Statistic('stat1', 100, 300, 'Zähler', 0, 'travel'),
     player_stat1: new PlayerStatistic('player_stat1', 'Punkte', 0, 'trophy'),
@@ -56,13 +57,21 @@ var items = {
 
     // prompts
     prompt1: Prompts.prompt1,
+
+    card_stack: new CardStack('card_stack', 500, 400, 'Karten'),
 };
 
+// connect waypoints - setup paths
 Lib.connectWaypoints([items.wp1, items.wp2, items.wp3, items.wp4, items.wp5, items.wp7, items.wp9, items.wp10, items.wp1]);
 Lib.connectWaypoints([items.wp4, items.wp6, items.wp8, items.wp9]);
 
+// Set position for dice-roll result
+items.dice.template.result_x(25).result_y(25);
+
 // init game with all items
 game.setItems(items);
+
+// add (potential) players to the gameController
 controller.addPlayer(items.player1)
           .addPlayer(items.player2);
 
@@ -94,8 +103,11 @@ STATE_INIT.on('enter', function () {
     controller.subscribe('counter', items.rating1);
     controller.subscribe('counter', items.progress1);
     controller.set('counter', 10);
-    items.prompt1.show();
-    //controller.next_state(STATE_TURN);
+    items.prompt1.show(controller.activePlayer);
+
+    items.card_stack.draw();
+    items.card_stack.activate(controller.activePlayer);
+    items.card_stack.highlight(controller.activePlayer);
 });
 
 STATE_INIT.on('prompt', function (src, option, prompt) {
@@ -104,6 +116,8 @@ STATE_INIT.on('prompt', function (src, option, prompt) {
     controller.next_state(STATE_TURN);
 });
 
+// ****************************************************************************
+// STATE_TURN event-handlers
 STATE_TURN.on('enter', function() {
     this.set('playertoken', controller.activePlayer.getInventory({category:'spielfiguren'})[0]);
     this.set('player', controller.activePlayer);
@@ -125,6 +139,7 @@ STATE_TURN.on('roll', function(src, dice) {
 STATE_TURN.on('click', function(src, item) {
     if (item instanceof Waypoint) {
         this.get('playertoken').moveToWaypoint(item);
+        items.dice.reset(controller.activePlayer);
         controller.sendLog(controller.activePlayer.name, {content:'zieht zu ' + item.id +'!', icon:'inverted yellow location arrow'});
         for (let wp of this.get('wps')) {
             wp.unhighlight(this.get('player'));
@@ -136,14 +151,19 @@ STATE_TURN.on('click', function(src, item) {
 
         var points = this.get('player').get('points');
         this.get('player').set('points', ++points);
-
-        controller.next_player();
-        controller.next_state(STATE_TURN);
     }
 });
 
+STATE_TURN.on('drawCard', function(src, item) {
+    console.log('STATE_TURN drawCard');
+});
+
+STATE_TURN.on('moveComplete', function(src, item) {
+    controller.next_state(STATE_TURN);
+});
+
 STATE_TURN.on('exit', function() {
-    items.dice.reset();
+    controller.next_player();
 });
 // *****************************************************************************
 

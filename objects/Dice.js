@@ -16,7 +16,7 @@ class Dice extends Component {
 
     roll() {
         this.result = Math.floor(Math.random() * this.sides + 1);
-        this.context = {id: this.id, content_id: this.content_id, result: this.result};
+        this.context = {id: this.id, content_id: this.content_id + '_result', result: this.result};
         if (this.gameController) {
             this.gameController.currentState.emit('roll', this.id, this);
         }
@@ -27,8 +27,10 @@ class Dice extends Component {
         return super.draw(players);
     }
 
-    reset() {
+    reset(players=undefined) {
         this.context = {id: this.id, content_id: this.content_id};
+        this.remove(players);
+        this.remove(players, this.context.content_id + '_result');
     }
 }
 module.exports.Dice = Dice;

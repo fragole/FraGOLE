@@ -31,6 +31,9 @@ Fragole.GameBoard = class GameBoard {
         this.stage.addChild(this.background);
         this.stage.setChildIndex(this.background, 0);
         this.childs = {};
+
+        createjs.Ticker.setFPS(60);
+        createjs.Ticker.addEventListener("tick", this.stage);
     }
 
     connectRpc(rpcServer) {
@@ -137,13 +140,17 @@ Fragole.GameBoard = class GameBoard {
         } catch (e)  {}
     }
 
-    removeDomContent(target) {
+    removeDomContent(target, fade = 0) {
         console.log('remove from ' + target);
-        $(target).remove();
+        if (fade) {
+            $(target).fadeOut(fade, function() { $(target).remove(); });
+        } else {
+            $(target).remove();
+        }
     }
 
     emptyDomContent(target) {
-        console.log('remove from ' + target);
+        console.log('empty ' + target);
         $(target).empty();
     }
 
@@ -161,6 +168,7 @@ Fragole.GameBoard = class GameBoard {
             that.background.graphics.clear()
               .beginBitmapFill(img)
               .drawRect(0,0,that.board_canvas.width,that.board_canvas.height);
+            that.background.cache(0,0,that.board_canvas.width,that.board_canvas.height);
             that.stage.update();
         };
     }
@@ -185,9 +193,7 @@ Fragole.GameBoard = class GameBoard {
              //.to({scaleX:0.9, scaleY:0.9, alpha:1}, 500,  createjs.Ease.bounceOut)
              .to({scaleX:1, scaleY:1, alpha:1}, 1000,  createjs.Ease.bounceOut);
              //.to({scaleX:0.9, scaleY:0.9}, 1000)
-             //.to({scaleX:1, scaleY:1}, 1000);
-        createjs.Ticker.setFPS(60);
-        createjs.Ticker.addEventListener("tick", this.stage);
+             //.to({scaleX:1, scaleY:1}, 1000)
     }
 
     unhighlightToken(name) {
@@ -202,14 +208,14 @@ Fragole.GameBoard = class GameBoard {
 
     moveToken(name, path) {
         console.log(arguments);
+        var callback = 'move_complete_' + name;
         var token = this.childs[name];
         var tween = createjs.Tween.get(token);
         for (let i in path) {
             console.log(path[i]);
             tween = tween.to(path[i], 1000);
         }
-        createjs.Ticker.setFPS(60);
-        createjs.Ticker.addEventListener("tick", this.stage);
+        tween.call(function(name) { rpcServer[callback](); });
     }
 
 
@@ -233,7 +239,7 @@ function init() {
         setBackgroundColor : function(color) { gameboard.setBackgroundColor(color); },
         setBackgroundImage : function(img_src) { gameboard.setBackgroundImage(img_src)},
         addDomContent :    function(src, target, content_id) { gameboard.addDomContent(src, target, content_id);},
-        removeDomContent : function(target) { gameboard.removeDomContent(target);},
+        removeDomContent : function(target, fade) { gameboard.removeDomContent(target, fade);},
         emptyDomContent : function(target) { gameboard.emptyDomContent(target);},
         drawShape : function(name, type, fill, stroke, layer, pos_x, pos_y) { gameboard.drawShape(...arguments);},
         drawImage : function(name, src, layer, pos_x, pos_y) { gameboard.drawImage(name, src, layer,    pos_x, pos_y);},

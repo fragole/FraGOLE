@@ -7,14 +7,14 @@ class GameObject extends EventEmitter {
         this.gameController = undefined;
         this.owner = undefined;
         this.vars = {};
-        this.var_subscribers = {};
+        this.subscribers = {};
     }
 
     // assign custom vars
     set(name, value) {
         this.vars[name] = value;
-        if(this.var_subscribers[name] instanceof Array) {
-            for(let item_players of this.var_subscribers[name]) {
+        if(this.subscribers[name] instanceof Array) {
+            for(let item_players of this.subscribers[name]) {
                 var item, players;
                 [item, players] = item_players;
                 item.update(value, players);
@@ -29,16 +29,16 @@ class GameObject extends EventEmitter {
     // subscribe to a var of this object
     // func will be called when set() for this var is called
     subscribe(name, item, players=undefined) {
-        if(this.var_subscribers[name] instanceof Array) {
-            this.var_subscribers[name].push([item, players]);
+        if(this.subscribers[name] instanceof Array) {
+            this.subscribers[name].push([item, players]);
         } else {
-            this.var_subscribers[name] = [[item, players]];
+            this.subscribers[name] = [[item, players]];
         }
     }
 
     clearCustVars() {
         this.custVars = {};
-        this.var_subscribers = {};
+        this.subscribers = {};
     }
 }
 

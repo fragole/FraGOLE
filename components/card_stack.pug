@@ -1,0 +1,19 @@
+figure(id=content_id class="stack stack-spread" style="position:absolute; top:" + y +"px; left:"+ x +"px;")
+  img(src=image)
+  img(src=image)
+  img(src=image)
+  img(src=image)
+  img(src=image)
+  script
+    |function afterAddDomContent() {
+    if (highlight == 'on')
+        |    $('##{content_id}')
+        |        .transition('set looping')
+        |        .transition('jiggle', '2000ms');
+    if (highlight == 'off')
+        |    $('##{content_id}').transition('remove looping');
+    if (activate == 'on')
+        |    $('##{content_id}').on('click', function() {rpcServer['click_#{id}']()});
+    if (activate == 'off')
+        |    $('##{content_id}').off('click');
+    |}

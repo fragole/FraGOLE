@@ -19,7 +19,7 @@ class Token extends GameItem {
             cmd =['moveToken', this.id, [to]];
 
         this.waypoint = waypoint;
-
+        this.gameController.rpcServer.connect('move_complete_' + this.id, this.moveComplete, this);
         this.gameController.rpcListOrAll(players, cmd);
     }
 
@@ -90,9 +90,15 @@ class Token extends GameItem {
     // EVENTS
     click() {
         if (this.gameController) {
-            this.gameController.currentState.emit('click', this.id, this);
+            this.gameController.emit('click', this.id, this);
         }
-        this.emit('click', this);
+    }
+
+    moveComplete() {
+        this.gameController.rpcServer.disconnect('move_complete_' + this.id);
+        if (this.gameController) {
+            this.gameController.emit('moveComplete', this.id, this);
+        }
     }
 
 }

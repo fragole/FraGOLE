@@ -8,6 +8,7 @@ class Collection extends GameObject {
         super(id);
         this.items = new Map();
         items.forEach(function(item){ this.set(item.id, item);}, this.items);
+        this.subscribers = []; // override standard behaviour of GameObject
     }
 
     addItem(item) {
@@ -15,15 +16,23 @@ class Collection extends GameObject {
         if (this.gameController) {
             this.gameController.currentState.emit('addItem', this.id, item);
         }
-        this.emit('addItem', item);
+        for (let subscriber of this.subscribers) {
+            subscriber.update('addItem', item);
+        }
     }
 
     deleteItem(id) {
         var item = this.items.get(id);
         if (item) {
             this.items.delete(id);
-            this.emit('deleteItem', item);
+            if (this.gameController) {
+                this.gameController.currentState.emit('deleteItem', this.id, item);
+            }
+            for (let subscriber of this.subscribers) {
+                subscriber.update('deleteItem', item);
+            }
         }
+
     }
 
     getItem(id) {
@@ -40,12 +49,29 @@ class Collection extends GameObject {
         return res;
     }
 
+    getType(type) {
+        var res = [];
+        for(let item of this.iterator()) {
+            if (item[ITEM] instanceof type) {
+                res.push(item[ITEM]);
+            }
+        }
+        return res;
+    }
+
     iterator(){
         return this.items[Symbol.iterator]();
     }
 
-    cycle() {
+    subscribe(subscriber) {
+        this.subscribers.push(subscriber);
+    }
 
+    unsubscribe(subscriber) {
+        var item_idx = this.subscribers.indexOf(subscriber);
+        if (item_idx > -1) {
+            this.subscribers.splice(item_idx, 1);
+        }
     }
 }
 module.exports.Collection = Collection;

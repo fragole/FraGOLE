@@ -132,7 +132,7 @@ class ImageTemplate extends BaseTemplate {
 
 class WAYPOINT_DEFAULT extends ShapeTemplate {
     constructor () {
-        super({shape:CIRCLE, fill:'white', stroke:'black', layer:'back', radius:20});
+        super({shape:CIRCLE, fill:'white', stroke:'black', layer:'back', radius:16});
     }
 }
 
@@ -156,6 +156,7 @@ PLAYER_TOKEN_DEFAULT.counter = 0;
 class ComponentTemplate {
     constructor(content, parent) {
         this.parent = parent;
+        this.context={};
         this.content = pug.compileFile(content);
     }
 }
@@ -164,6 +165,25 @@ class DICE_DEFAULT extends ComponentTemplate {
     constructor () {
         super('./components/dice.pug', 'board_div');
     }
+}
+
+class DICE_ALTERNATIVE extends ComponentTemplate {
+    constructor () {
+        super('./components/dice_alternative.pug', 'board_div');
+        this.context.x = 0;
+        this.context.y = 0;
+    }
+
+    result_x(x) {
+        this.context.x = x;
+        return this;
+    }
+
+    result_y(y) {
+        this.context.y = y;
+        return this;
+    }
+
 }
 
 class CHAT_DEFAULT extends ComponentTemplate {
@@ -220,11 +240,19 @@ class PROMPT_DEFAULT extends ComponentTemplate {
     }
 }
 
+class CARD_STACK_DEFAULT extends ComponentTemplate {
+    constructor() {
+        super('./components/card_stack.pug', 'board_div');
+        this.context.image = 'assets/Cards/cardBackBlue.png';
+    }
+}
+
 module.exports.ShapeTemplate = ShapeTemplate;
 module.exports.ImageTemplate = ImageTemplate;
 module.exports.WAYPOINT_DEFAULT = WAYPOINT_DEFAULT;
 module.exports.PLAYER_TOKEN_DEFAULT = PLAYER_TOKEN_DEFAULT;
 module.exports.DICE_DEFAULT = DICE_DEFAULT;
+module.exports.DICE_ALTERNATIVE = DICE_ALTERNATIVE;
 module.exports.CHAT_DEFAULT = CHAT_DEFAULT;
 module.exports.LOG_DEFAULT = LOG_DEFAULT;
 module.exports.STATISTIC_DEFAULT = STATISTIC_DEFAULT;
@@ -234,4 +262,5 @@ module.exports.PLAYER_RATING_DEFAULT = PLAYER_RATING_DEFAULT;
 module.exports.PROGRESS_DEFAULT = PROGRESS_DEFAULT;
 module.exports.PLAYER_PROGRESS_DEFAULT = PLAYER_PROGRESS_DEFAULT;
 module.exports.PROMPT_DEFAULT = PROMPT_DEFAULT;
+module.exports.CARD_STACK_DEFAULT = CARD_STACK_DEFAULT;
 module.exports.shapes = {CIRCLE : CIRCLE};

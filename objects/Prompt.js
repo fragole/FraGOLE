@@ -11,9 +11,9 @@ class Prompt extends Component {
         this.context.actions = actions;
     }
 
-    show() {
+    show(players=undefined) {
         this.gameController.rpcServer.connect('prompt_' + this.id, this.select, this);
-        this.draw();
+        this.draw(players);
     }
 
     // EVENTS

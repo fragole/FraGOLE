@@ -17,5 +17,8 @@ module.exports= {
     PlayerStatistic:  require('./Statistic.js').PlayerStatistic,
     Token:            require('./Token.js').Token,
     Waypoint:         require('./Waypoint.js').Waypoint,
-    Prompt:           require('./Prompt.js').Prompt
+    Prompt:           require('./Prompt.js').Prompt,
+    Card:             require('./Cards.js').Card,
+    CardStack:        require('./Cards.js').CardStack,
+    CardHand:         require('./Cards.js').CardHand,
 };

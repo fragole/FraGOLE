@@ -1,0 +1,14 @@
+div(id=content_id class="ui centered basic modal")
+  div(class="ui one column stackable center aligned page grid")
+    div(class="column twelve wide")
+      include ./card_content.pug
+      div(class="actions")
+        div(class="ui green basic ok inverted button")
+          i(class="checkmark icon")
+          |super
+  script.
+    function afterAddDomContent() {
+      $('##{content_id}')
+        .modal('setting', 'transition', 'horizontal flip')
+        .modal('show');
+    }

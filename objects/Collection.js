@@ -31,8 +31,8 @@ class Collection extends GameObject {
             for (let subscriber of this.subscribers) {
                 subscriber.update('deleteItem', item);
             }
+            return item;
         }
-
     }
 
     getItem(id) {

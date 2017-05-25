@@ -1,0 +1,21 @@
+div(id=content_id class="three wide column")
+  figure(id=content_id class="hand hand-spread")
+    img(src=image)
+    img(src=image)
+    img(src=image)
+    img(src=image)
+    img(src=image)
+    script.
+      function afterAddDomContent() {
+          $('##{content_id}').on('click', function() {
+            $('#modal_#{content_id}')
+              .modal({allowMultiple: true})
+              .modal('setting', 'transition', 'horizontal flip')
+              .modal('show');
+          });
+      }
+  div(id="modal_" + content_id class="ui centered basic modal")
+    div(class="actions")
+      div(class="ui green basic ok inverted button")
+        i(class="checkmark icon")
+        |super

@@ -59,6 +59,11 @@ var items = {
     prompt1: Prompts.prompt1,
 
     card_stack: new CardStack('card_stack', 500, 400, 'Karten'),
+    card1: new Card('card1', 'Karte 1', 'dies ist eine erste Testkarte', 'assets/card1.jpg'),
+    card2: new Card('card2', 'Karte 2', 'dies ist eine zweite Testkarte', 'assets/card2.jpg'),
+    card3: new Card('card3', 'Karte 3', 'dies ist eine dritte Testkarte', 'assets/card3.jpg'),
+
+    card_hand1: new CardHand('card_hand1'),
 };
 
 // connect waypoints - setup paths
@@ -80,14 +85,19 @@ items.player1.addInventory(items.player_token1);
 items.player1.addInventory(items.player_stat1);
 items.player1.addInventory(items.player_rating1);
 items.player1.addInventory(items.player_progress1);
+items.card_hand1.init(items.player1.inventory);
 
 items.player2.addInventory(items.player_token2);
+
+items.card_stack.addCards([items.card1, items.card2, items.card3]);
+items.card_stack.shuffle();
 
 var lobby = new Lobby(controller);
 
 // *****************************************************************************
 // STATE_INIT event-handlers
 STATE_INIT.setHandlers({
+
     'enter': function () {
         game.setupBoard();  // Setup the gameboard - draw stuff etc.
         controller.next_player();
@@ -109,6 +119,8 @@ STATE_INIT.setHandlers({
         items.card_stack.draw();
         items.card_stack.activate(controller.activePlayer);
         items.card_stack.highlight(controller.activePlayer);
+
+        items.card_hand1.draw(items.player1);
     },
 
     'prompt': function (src, option, prompt) {
@@ -116,12 +128,14 @@ STATE_INIT.setHandlers({
         controller.sendLog(controller.activePlayer.name, {content:'hat ' + option + ' gewählt', icon:'inverted orange check square'});
         controller.next_state(STATE_TURN);
     }
+
 });
 
 
 // ****************************************************************************
 // STATE_TURN event-handlers
 STATE_TURN.setHandlers({
+
     'enter': function() {
         this.set('playertoken', controller.activePlayer.getInventory({category:'spielfiguren'})[0]);
         this.set('player', controller.activePlayer);
@@ -156,8 +170,9 @@ STATE_TURN.setHandlers({
         this.get('player').set('points', ++points);
     },
 
-    'drawCard': function(src, item) {
-        console.log('STATE_TURN drawCard');
+    'drawCard': function(src, item, card) {
+        console.log('STATE_TURN drawCard', card.id);
+        card.draw(controller.activePlayer);
     },
 
     'moveComplete': function(src, item) {
@@ -167,6 +182,7 @@ STATE_TURN.setHandlers({
     'exit': function() {
         controller.next_player();
     }
+
 });
 
 // *****************************************************************************

@@ -1,0 +1,16 @@
+div(class="ui centered card")
+  div(class="content")
+    p(class="header") #{label}
+  div(class="image")
+    img(src=image)
+  div(class="content")
+    div(class="description") #{text}
+  div(class="extra content")
+    if active
+      button(class="ui right green labeled icon fluid button")
+        i(class="lone icon")
+        |spielen
+    else
+      button(class="ui right grey labeled icon fluid button")
+        i(class="clone icon")
+        |spielen

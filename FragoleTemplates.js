@@ -247,6 +247,19 @@ class CARD_STACK_DEFAULT extends ComponentTemplate {
     }
 }
 
+class CARD_DEFAULT extends ComponentTemplate {
+    constructor() {
+        super('./components/card.pug', 'board_div');
+    }
+}
+
+class CARD_HAND_DEFAULT extends ComponentTemplate {
+    constructor() {
+        super('./components/card_hand.pug', 'dashboard_content');
+        this.context.image = 'assets/Cards/cardBackBlue.png';
+    }
+}
+
 module.exports.ShapeTemplate = ShapeTemplate;
 module.exports.ImageTemplate = ImageTemplate;
 module.exports.WAYPOINT_DEFAULT = WAYPOINT_DEFAULT;
@@ -263,4 +276,6 @@ module.exports.PROGRESS_DEFAULT = PROGRESS_DEFAULT;
 module.exports.PLAYER_PROGRESS_DEFAULT = PLAYER_PROGRESS_DEFAULT;
 module.exports.PROMPT_DEFAULT = PROMPT_DEFAULT;
 module.exports.CARD_STACK_DEFAULT = CARD_STACK_DEFAULT;
+module.exports.CARD_DEFAULT = CARD_DEFAULT;
+module.exports.CARD_HAND_DEFAULT = CARD_HAND_DEFAULT;
 module.exports.shapes = {CIRCLE : CIRCLE};

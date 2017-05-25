@@ -142,6 +142,47 @@
 	transform: translate(20px,-20px);
 }
 
+
+.hand {
+    margin-left: 50px;
+    margin-right: 50px;
+	width: 400px;
+	padding: 0;
+	position: relative;
+	max-width: 100%;
+}
+
+.hand img {
+	max-width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	transition: all 0.3s;
+}
+
+.hand img:last-child {
+	position: relative;
+}
+
+.hand-spread img:nth-child(1) {
+    -webkit-transform: rotate(-10deg) translateX(-25%) ;
+	transform: rotate(-10deg) translateX(-25%);
+}
+
+.hand-spread img:nth-child(2) {
+    -webkit-transform: rotate(-5deg) translateX(-10%) ;
+	transform: rotate(-5deg) translateX(-10%);}
+
+.hand-spread img:nth-child(4) {
+    -webkit-transform: rotate(5deg) translateX(10%) ;
+	transform: rotate(5deg) translateX(10%);}
+
+.hand-spread img:nth-child(5) {
+    -webkit-transform: rotate(10deg) translateX(25%) ;
+	transform: rotate(10deg) translateX(25%);
+}
+
+
 /* Rubberband */
 /* Override Semantic Jiggle-Transition => more decent jiggling */
 @keyframes jiggle {

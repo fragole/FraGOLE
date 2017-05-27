@@ -1,0 +1,16 @@
+div(class="ui centered card")
+  div(class="content")
+    p(class="header") #{card.context.label}
+  div(class="image")
+    img(src=card.context.image)
+  div(class="content")
+    div(class="description") #{card.context.text}
+  div(class="extra content")
+    if card.context.active
+      button(class="ui right green labeled icon fluid button" onClick="rpcServer['play_card_"+ card.context.id +"'](); $('#modal_"+ content_id + "').modal('hide');")
+        i(class="clone icon")
+        |spielen
+    else
+      button(class="ui right grey labeled icon fluid button")
+        i(class="clone icon")
+        |spielen

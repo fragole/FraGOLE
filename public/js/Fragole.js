@@ -125,7 +125,6 @@ Fragole.GameBoard = class GameBoard {
 
 
     addDomContent(src, target, content_id) {
-        console.log(src);
         if ($(content_id).length) { // update existing content
             console.log('update ' + content_id + ' in ' + target);
             $(content_id).replaceWith(src);

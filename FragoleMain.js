@@ -7,14 +7,13 @@ var Prompts = require('./content/Prompts.js');
 var Lobby = require('./FragoleLobby.js');
 var Templates = require('./FragoleTemplates.js');
 
-var webServer = new FragoleServer.HTTP(80);
-var rpc = new FragoleServer.RPC(81);
+var server = new FragoleServer.SERVER(80);
 var sessions = FragoleServer.sessions;
 
 // ****************************************************************************
 // Game definition
 var game = new Game();
-var controller = new GameController('game_controller1', 1, rpc);
+var controller = new GameController('game_controller1', 1, server);
 
 game.setName('TestGame')
     .setController(controller);
@@ -239,4 +238,4 @@ function ready() {
     }
 }
 
-rpc.connect('ready', ready);
+server.connect('ready', ready);

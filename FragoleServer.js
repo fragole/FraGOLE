@@ -17,9 +17,11 @@ function localIpHelper(ip) {
     return ip;
 }
 
-class HTTP {
+class SERVER {
     constructor( port ) {
         var app = express(app);
+        var server = http.createServer(app);
+
         app.enable('trust proxy');
         app.set('views', './views');
         app.set('view engine', 'pug');
@@ -44,19 +46,7 @@ class HTTP {
             response.render('index', {player: playername});
         });
 
-        app.listen(port, function() {
-            console.log('WebServer listening at port ' + port);
-        });
-    }
-}
-
-var contexts = {};
-
-class RPC {
-
-    constructor( port ) {
-        var server = http.createServer();
-
+        // rpcServer
         this.connections = {};
         var connections = this.connections;
 
@@ -77,7 +67,7 @@ class RPC {
         });
 
         server.listen(port, function() {
-            console.log('RPC listening at port ' + port);
+            console.log('WebServer listening at port ' + port);
         });
     }
 
@@ -104,7 +94,7 @@ class RPC {
 
 }
 
-module.exports.HTTP = HTTP;
-module.exports.RPC = RPC;
+
+module.exports.SERVER = SERVER;
 module.exports.localIpHelper = localIpHelper;
 module.exports.sessions = sessions;

@@ -22,6 +22,16 @@ class GameObject extends EventEmitter {
         }
     }
 
+    inc(name, offset=1) {
+        var value = this.vars[name] + offset;
+        this.set(name, value);
+    }
+
+    dec(name, offset=1) {
+        var value = this.vars[name] - offset;
+        this.set(name, value);
+    }
+
     get(name) {
         return this.vars[name];
     }

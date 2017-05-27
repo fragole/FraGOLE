@@ -1,6 +1,7 @@
 var GameItem = require('./GameObject.js').GameItem;
 var nomalizeCoordinates = require('../FragoleLib.js').nomalizeCoordinates;
 var templates = require('../FragoleTemplates.js');
+var Lib = require('../FragoleLib.js');
 
 class Token extends GameItem {
     constructor (id, category='', x, y, template, drawable=1) {
@@ -13,10 +14,22 @@ class Token extends GameItem {
 
     // move token to a waypoint
     // standard-target => all players;
-    moveToWaypoint(waypoint, players=undefined) {
+    moveToWaypoint(waypoint, use_path=true, players=undefined) {
         var wp_tpl = waypoint.template,
-            to = nomalizeCoordinates(this, wp_tpl._x, wp_tpl._y),
-            cmd =['moveToken', this.id, [to]];
+            path = [];
+
+        if (use_path) {
+            var paths = Lib.getPath(this.waypoint, waypoint, 0);
+            for (let wp of paths) {
+                var p_tpl = wp.template;
+                path.push(nomalizeCoordinates(this, p_tpl._x, p_tpl._y));
+            }
+        } else {
+            path.push(nomalizeCoordinates(this, wp_tpl._x, wp_tpl._y));
+        }
+
+
+        var cmd =['moveToken', this.id, path];
 
         this.waypoint = waypoint;
         this.gameController.rpcServer.connect('move_complete_' + this.id, this.moveComplete, this);

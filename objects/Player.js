@@ -9,6 +9,7 @@ class Player extends GameObject {
         this.session = undefined; // will be set by GameController.joinPlayer
         this.name = undefined;    // will be set by GameController.joinPlayer
         this.inventory = new Collection();
+        this.inventory.owner = this;
         this.skip_turns = 0;
     }
 
@@ -26,7 +27,7 @@ class Player extends GameObject {
     }
 
     removeInventory (item) {
-        this.inventor.deleteItem(item);
+        this.inventory.deleteItem(item.id);
         item.owner = undefined;
     }
 

@@ -13,9 +13,6 @@ class Collection extends GameObject {
 
     addItem(item) {
         this.items.set(item.id, item);
-        if (this.gameController) {
-            this.gameController.currentState.emit('addItem', this.id, item);
-        }
         for (let subscriber of this.subscribers) {
             subscriber.update('addItem', item);
         }
@@ -25,9 +22,6 @@ class Collection extends GameObject {
         var item = this.items.get(id);
         if (item) {
             this.items.delete(id);
-            if (this.gameController) {
-                this.gameController.currentState.emit('deleteItem', this.id, item);
-            }
             for (let subscriber of this.subscribers) {
                 subscriber.update('deleteItem', item);
             }

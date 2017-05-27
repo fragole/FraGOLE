@@ -59,9 +59,18 @@ var items = {
     prompt1: Prompts.prompt1,
 
     card_stack: new CardStack('card_stack', 500, 400, 'Karten'),
-    card1: new Card('card1', 'Karte 1', 'dies ist eine erste Testkarte', 'assets/card1.jpg'),
+    card1: new Card('card1', 'Karte 1', 'dies ist eine erste Testkarte', 'assets/card1.jpg', function(context) {
+        context.gameController.activePlayer.inc('points');
+    }),
     card2: new Card('card2', 'Karte 2', 'dies ist eine zweite Testkarte', 'assets/card2.jpg'),
     card3: new Card('card3', 'Karte 3', 'dies ist eine dritte Testkarte', 'assets/card3.jpg'),
+    card4: new Card('card4', 'Karte 4', 'dies ist eine vierte Testkarte', 'assets/card3.jpg'),
+    card5: new Card('card5', 'Karte 5', 'dies ist eine fünfte Testkarte', 'assets/card3.jpg'),
+    card6: new Card('card6', 'Karte 6', 'dies ist eine sechste Testkarte', 'assets/card3.jpg'),
+    card7: new Card('card7', 'Karte 7', 'dies ist eine siebte Testkarte', 'assets/card3.jpg'),
+    card8: new Card('card8', 'Karte 8', 'dies ist eine achte Testkarte', 'assets/card3.jpg'),
+    card9: new Card('card9', 'Karte 9', 'dies ist eine neunte Testkarte', 'assets/card3.jpg'),
+    card10: new Card('card10', 'Karte 10', 'dies ist eine zehnte Testkarte', 'assets/card3.jpg'),
 
     card_hand1: new CardHand('card_hand1'),
 };
@@ -89,7 +98,11 @@ items.card_hand1.init(items.player1.inventory);
 
 items.player2.addInventory(items.player_token2);
 
-items.card_stack.addCards([items.card1, items.card2, items.card3]);
+items.card_stack.addCards([
+    items.card1, items.card2, items.card3,
+    items.card4, items.card5, items.card6,
+    items.card7, items.card8, items.card9,
+    items.card10]);
 items.card_stack.shuffle();
 
 var lobby = new Lobby(controller);
@@ -170,9 +183,17 @@ STATE_TURN.setHandlers({
         this.get('player').set('points', ++points);
     },
 
-    'drawCard': function(src, item, card) {
+    'drawCard': function(src, stack, card) {
         console.log('STATE_TURN drawCard', card.id);
         card.draw(controller.activePlayer);
+        controller.activePlayer.addInventory(card);
+        items.card_hand1.activate();
+    },
+
+    'playCard': function(src, card) {
+        console.log('playCard', card.id);
+        card.action(game);
+        card.owner.removeInventory(card);
     },
 
     'moveComplete': function(src, item) {

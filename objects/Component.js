@@ -10,7 +10,7 @@ class Component extends GameItem {
 
     // draw a Component to the client document
     // standard-target => all player;
-    draw(players=undefined) {
+    draw(players=undefined, item=undefined) {
         // if context-vars are defined by the template => add them to the 'local' context
         for(let add_context in this.template.context) {
             if(!this.context[add_context]) {
@@ -22,7 +22,11 @@ class Component extends GameItem {
             '#' + this.template.parent,
             '#' + this.context.content_id
         ];
-        this.gameController.rpcListOrAll(players, cmd);
+        if (item) {
+            this.gameController.rpcListOrOwner(players, item, cmd);
+        } else {
+            this.gameController.rpcListOrAll(players, cmd);
+        }
     }
 
     remove(players=undefined, id=undefined) {

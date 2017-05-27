@@ -7,15 +7,23 @@ div(id=content_id class="three wide column")
     img(src=image)
     script.
       function afterAddDomContent() {
+          $('#modal_#{content_id}')
+            .modal('setting', 'transition', 'horizontal flip')
+            .modal('setting', 'detachable', 'false');
           $('##{content_id}').on('click', function() {
             $('#modal_#{content_id}')
-              .modal({allowMultiple: true})
-              .modal('setting', 'transition', 'horizontal flip')
+              .modal('refresh')
               .modal('show');
           });
       }
   div(id="modal_" + content_id class="ui centered basic modal")
+    div(class="ui cards")
+      each card in cards
+        if (cards.length <= 3)
+          include ./card_hand_content.pug
+        else
+          include ./card_hand_content_mini.pug
     div(class="actions")
-      div(class="ui green basic ok inverted button")
-        i(class="checkmark icon")
-        |super
+      div(class="ui green red ok inverted button")
+        i(class="remove icon")
+        |schliessen

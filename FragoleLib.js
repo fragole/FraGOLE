@@ -54,11 +54,6 @@ function getWaypointsAtRange(root, depth) {
                 } else {
                     res[dist] = [next];
                 }
-
-            //    if (dist == depth+1) {
-            //        console.log(distance);
-            //        return res[depth-1];
-            //    }
             }
         }
     }
@@ -66,17 +61,40 @@ function getWaypointsAtRange(root, depth) {
 }
 module.exports.getWaypointsAtRange = getWaypointsAtRange;
 
+function getPath(wpStart, wpEnd, length) {
+    var path= [wpStart],
+        queue = [],
+        res = [];
+
+    queue.push(path);
+    while(queue.length) {
+        var curr_path = queue.pop();
+        var last_node = curr_path[curr_path.length-1];
+        if (last_node == wpEnd) { //&& curr_path.length == length) {
+            return curr_path;
+        }
+        for (let next of last_node.next) {
+            if(curr_path.indexOf(next) < 0) {
+                queue.push(curr_path.concat([next]));
+            }
+        }
+    }
+    return res;
+}
+module.exports.getPath = getPath;
+
 /*
 // move to unit tests
-var wp1 = new Fragole.Waypoint('wp1', 'wp', 0, 0),
-    wp2 = new Fragole.Waypoint('wp2', 'wp', 0, 0),
-    wp3 = new Fragole.Waypoint('wp3', 'wp', 0, 0),
-    wp4 = new Fragole.Waypoint('wp4', 'wp', 0, 0),
-    wp5 = new Fragole.Waypoint('wp5', 'wp', 0, 0),
-    wp6 = new Fragole.Waypoint('wp6', 'wp', 0, 0),
-    wp7 = new Fragole.Waypoint('wp7', 'wp', 0, 0),
-    wp8 = new Fragole.Waypoint('wp8', 'wp', 0, 0),
-    wp9 = new Fragole.Waypoint('wp9', 'wp', 0, 0);
+var Waypoint = require('./objects/Waypoint.js').Waypoint;
+var wp1 = new Waypoint('wp1', 'wp', 0, 0),
+    wp2 = new Waypoint('wp2', 'wp', 0, 0),
+    wp3 = new Waypoint('wp3', 'wp', 0, 0),
+    wp4 = new Waypoint('wp4', 'wp', 0, 0),
+    wp5 = new Waypoint('wp5', 'wp', 0, 0),
+    wp6 = new Waypoint('wp6', 'wp', 0, 0),
+    wp7 = new Waypoint('wp7', 'wp', 0, 0),
+    wp8 = new Waypoint('wp8', 'wp', 0, 0),
+    wp9 = new Waypoint('wp9', 'wp', 0, 0);
 
 connectWaypoints([wp1, wp2, wp3, wp6, wp7, wp8, wp9, wp1]);
 connectWaypoints([wp2, wp4, wp6]);
@@ -84,5 +102,14 @@ connectWaypoints([wp7, wp5, wp1]);
 connectWaypoints([wp2, wp5]);
 connectWaypoints([wp9, wp5]);
 
-console.log(getWaypointsAtRange(wp1, 2));
+//for (let wp of getWaypointsAtRange(wp1, 2)) {
+//    console.log(wp.id);
+//}
+
+for (let pth of getPath(wp1, wp3, 3)) {
+    console.log('next');
+    for (let wp of pth) {
+        console.log(wp.id);
+    }
+}
 */

@@ -125,6 +125,7 @@ Fragole.GameBoard = class GameBoard {
 
 
     addDomContent(src, target, content_id) {
+        console.log(src);
         if ($(content_id).length) { // update existing content
             console.log('update ' + content_id + ' in ' + target);
             $(content_id).replaceWith(src);
@@ -141,11 +142,12 @@ Fragole.GameBoard = class GameBoard {
     }
 
     removeDomContent(target, fade = 0) {
-        console.log('remove from ' + target);
+        console.log('remove ' + target);
         if (fade) {
             $(target).fadeOut(fade, function() { $(target).remove(); });
         } else {
-            $(target).remove();
+          $(target).remove();
+          $(target).remove();
         }
     }
 

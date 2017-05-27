@@ -66,7 +66,7 @@ class SERVER {
             }
         });
 
-        server.listen(port, function() {
+        server.listen(process.env.PORT || port, function() {
             console.log('WebServer listening at port ' + port);
         });
     }

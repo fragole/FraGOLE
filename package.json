@@ -2,7 +2,7 @@
   "name": "Fragole",
   "version": "1.0.0",
   "description": "Fragole - FRAmework for Gamified Online Learning Environments",
-  "main": "index.js",
+  "main": "FragoleMain.js",
   "dependencies": {
     "browserify": "^14.1.0",
     "cookie-parser": "^1.4.3",

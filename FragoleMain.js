@@ -107,6 +107,7 @@ items.card_stack.shuffle();
 var lobby = new Lobby(controller);
 
 // *****************************************************************************
+
 // STATE_INIT event-handlers
 STATE_INIT.setHandlers({
 
@@ -152,6 +153,7 @@ STATE_TURN.setHandlers({
         this.set('playertoken', controller.activePlayer.getInventory({category:'spielfiguren'})[0]);
         this.set('player', controller.activePlayer);
         items.dice.draw(this.get('player'));
+        controller.setWatchdog(10);
     },
 
     'roll': function(src, dice) {
@@ -196,6 +198,16 @@ STATE_TURN.setHandlers({
     },
 
     'moveComplete': function(src, item) {
+        controller.next_state(STATE_TURN);
+    },
+
+    'watchdog': function() {
+        console.log('WATCHDOG FIRED => next player');
+        items.dice.reset(controller.activePlayer);
+        for (let wp of this.get('wps')) {
+            wp.unhighlight(this.get('player'));
+            wp.deactivate(this.get('player'));
+        }
         controller.next_state(STATE_TURN);
     },
 

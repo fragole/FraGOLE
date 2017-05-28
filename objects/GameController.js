@@ -26,6 +26,12 @@ class GameController extends GameObject {
         this.logMsg = new templates.LOG_DEFAULT();
         this.logCnt = 0;
 
+        // popup msg
+        // XXX
+
+        // Watchdog Timer (default 60 sec)
+        this.watchdogSecs = 60;
+        this.watchdogTimer = null;
     }
 
     addPlayer(player) {
@@ -102,6 +108,10 @@ class GameController extends GameObject {
         this.rpcListOrAll(null, cmd);
     }
 
+    sendPopup(src, msg) {
+        // XXX
+    }
+
     // return owner(s) of an object
     // if owner is specified return list of all players
     getOwner(item) {
@@ -143,8 +153,23 @@ class GameController extends GameObject {
     }
 
     emit() {
+        this.setWatchdog(); // any event passed through here resets wd
         this.currentState.emit(...arguments);
         super.emit(...arguments);
+    }
+
+    // set or reset the watchdog-timer
+    setWatchdog(time=undefined) {
+        if (time) {
+            this.watchdogSecs = time;
+        }
+        clearTimeout(this.watchdogTimer);
+        this.watchdogTimer = setTimeout(this.watchdog, this.watchdogSecs * 1000, this);
+    }
+
+    // called when the watchdog-timer fires
+    watchdog(context) {
+        context.emit('watchdog');
     }
 }
 module.exports.GameController = GameController;

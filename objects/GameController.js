@@ -27,7 +27,8 @@ class GameController extends GameObject {
         this.logCnt = 0;
 
         // popup msg
-        // XXX
+        this.popupMsg = new templates.POPUP_DEFAULT();
+        this.popupContext = {};
 
         // Watchdog Timer (default 60 sec)
         this.watchdogSecs = 60;
@@ -108,8 +109,18 @@ class GameController extends GameObject {
         this.rpcListOrAll(null, cmd);
     }
 
-    sendPopup(src, msg) {
-        // XXX
+    sendPopup(msg) {
+        this.popupContext= {header: msg.header, msg: msg.msg, color:msg.color, icon:msg.icon, x: msg.x, y:msg.y};
+        for(let add_context in this.popupMsg.context) {
+            if(!this.popupContext[add_context]) {
+                this.popupContext[add_context] = this.popupMsg.context[add_context];
+            }
+        }
+        var cmd = (['addDomContent',
+            this.popupMsg.content(this.popupContext),
+            '#' + this.popupMsg.parent,
+            '#popup_msg']);
+        this.rpcListOrAll(msg.players, cmd);
     }
 
     // return owner(s) of an object

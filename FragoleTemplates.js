@@ -198,6 +198,16 @@ class LOG_DEFAULT extends ComponentTemplate {
     }
 }
 
+class POPUP_DEFAULT extends ComponentTemplate {
+    constructor () {
+        super('./components/popup.pug', 'board_div');
+        this.context.x = 0;
+        this.context.y = 0;
+        this.context.trans_in = 'fly left in';
+        this.context.trans_out = 'fly left out'; 
+    }
+}
+
 class STATISTIC_DEFAULT extends ComponentTemplate {
     constructor () {
         super('./components/statistic.pug', 'board_div');
@@ -268,6 +278,7 @@ module.exports.DICE_DEFAULT = DICE_DEFAULT;
 module.exports.DICE_ALTERNATIVE = DICE_ALTERNATIVE;
 module.exports.CHAT_DEFAULT = CHAT_DEFAULT;
 module.exports.LOG_DEFAULT = LOG_DEFAULT;
+module.exports.POPUP_DEFAULT = POPUP_DEFAULT;
 module.exports.STATISTIC_DEFAULT = STATISTIC_DEFAULT;
 module.exports.PLAYER_STATISTIC_DEFAULT = PLAYER_STATISTIC_DEFAULT;
 module.exports.RATING_DEFAULT = RATING_DEFAULT;

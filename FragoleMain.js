@@ -169,6 +169,7 @@ STATE_TURN.setHandlers({
     },
 
     'selectWaypoint': function(src, item) {
+        controller.sendPopup({header:'test', msg:'Dies ist ein Test-Popup', icon:'cube', players:controller.activePlayer, x:700, y:500, color:'blue'});
         this.get('playertoken').moveToWaypoint(item);
         items.dice.reset(controller.activePlayer);
         controller.sendLog(controller.activePlayer.name, {content:'zieht zu ' + item.id +'!', icon:'inverted yellow location arrow'});

@@ -1,0 +1,13 @@
+div(id="popup_msg" class="ui " + color + " floating icon message" style="position:absolute; top:" + y + "; left:" + x + "; height:5em; width:20em;")
+  if icon
+    i(class=icon + " icon")
+  div(class="content")
+    if header
+      div(class="header") #{header}
+    p #{msg}
+script.
+  function afterAddDomContent() {
+    $('#popup_msg').transition('#{trans_in}');
+    $('#popup_msg').on('click', function() { $('#popup_msg').transition('#{trans_out}'); });
+    setTimeout(function() {$('#popup_msg').transition('#{trans_out}');}, 5000);
+  }

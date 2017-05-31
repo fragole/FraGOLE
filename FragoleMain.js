@@ -198,6 +198,10 @@ STATE_TURN.setHandlers({
         card.owner.removeInventory(card);
     },
 
+    'enterWaypoint': function(src, item, wp) {
+        console.log('enterWaypoint');
+    },
+
     'moveComplete': function(src, item) {
         controller.next_state(STATE_TURN);
     },
@@ -238,7 +242,7 @@ function ready() {
     try {
         [playerName, clientProxy] = sessions.get(clientIp);
 
-        if(player = game.gameController.joinPlayer(playerName, clientProxy)) {
+        if(player = controller.joinPlayer(playerName, clientProxy)) {
             console.log('Player No.', player.number, ' joined:', player.name);
             clientProxy.setBackgroundImage('/assets/background.jpg');
         } else {

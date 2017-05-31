@@ -61,7 +61,9 @@ function getWaypointsAtRange(root, depth) {
 }
 module.exports.getWaypointsAtRange = getWaypointsAtRange;
 
-function getPath(wpStart, wpEnd, length) {
+// get the shortest path between to waypoints
+// unoptimized -> only gets first found path when multiple paths are possible
+function getPath(wpStart, wpEnd) { // length) {
     var path= [wpStart],
         queue = [],
         res = [];
@@ -82,6 +84,18 @@ function getPath(wpStart, wpEnd, length) {
     return res;
 }
 module.exports.getPath = getPath;
+
+// marge key/value pairs from addDict into targetDict if not present
+// in targetDict
+function mergeDicts(targetDict, addDict) {
+    for(let addKey in addDict) {
+        if(!targetDict[addKey]) {
+            targetDict[addKey] = addDict[addKey];
+        }
+    }
+    return targetDict;
+}
+module.exports.mergeDicts = mergeDicts;
 
 /*
 // move to unit tests

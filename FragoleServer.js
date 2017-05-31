@@ -91,10 +91,7 @@ class SERVER {
         // Publish new functions to all connected clients
         this.eurecaServer.updateContract(); // !!! EXPERMIMENTAL in eureca.io
     }
-
 }
-
-
 module.exports.SERVER = SERVER;
 module.exports.localIpHelper = localIpHelper;
 module.exports.sessions = sessions;

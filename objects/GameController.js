@@ -2,6 +2,7 @@ var GameObject = require('./GameObject.js').GameObject;
 var Collection = require('./Collection.js').Collection;
 var GameState = require('./GameState.js').GameState;
 var templates = require('../FragoleTemplates.js');
+var Lib = require('../FragoleLib.js');
 
 const ID = 0;
 const ITEM = 1;
@@ -110,12 +111,14 @@ class GameController extends GameObject {
     }
 
     sendPopup(msg) {
-        this.popupContext= {header: msg.header, msg: msg.msg, color:msg.color, icon:msg.icon, x: msg.x, y:msg.y};
-        for(let add_context in this.popupMsg.context) {
-            if(!this.popupContext[add_context]) {
-                this.popupContext[add_context] = this.popupMsg.context[add_context];
-            }
-        }
+        this.popupContext= Lib.mergeDicts({header: msg.header,
+            msg: msg.msg,
+            color:msg.color,
+            icon:msg.icon,
+            x: msg.x,
+            y:msg.y},
+             this.popupMsg.context);
+
         var cmd = (['addDomContent',
             this.popupMsg.content(this.popupContext),
             '#' + this.popupMsg.parent,

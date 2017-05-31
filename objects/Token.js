@@ -19,9 +19,16 @@ class Token extends GameItem {
             path = [];
 
         if (use_path) {
-            var paths = Lib.getPath(this.waypoint, waypoint, 0);
-            for (let wp of paths) {
+            var s_path = Lib.getPath(this.waypoint, waypoint);
+            var step = 0;
+            for (let wp of s_path) {
                 var p_tpl = wp.template;
+                if (step == 0) {
+                    this.gameController.emit('leaveWaypoint', this.id, this, wp);
+                } else if (step < s_path.length-1) {
+                    this.gameController.emit('passWaypoint', this.id, this, wp);
+                }
+                step++;
                 path.push(nomalizeCoordinates(this, p_tpl._x, p_tpl._y));
             }
         } else {
@@ -66,7 +73,6 @@ class Token extends GameItem {
     // standard-target => owner
     unhighlight(players=undefined) {
         var cmd = ['unhighlightToken', this.id];
-
         this.gameController.rpcListOrOwner(players, this, cmd);
     }
 
@@ -96,22 +102,18 @@ class Token extends GameItem {
                 this.template._y,
             ];
         }
-
         this.gameController.rpcListOrAll(players, cmd);
     }
 
     // EVENTS
     click() {
-        if (this.gameController) {
-            this.gameController.emit('click', this.id, this);
-        }
+        this.gameController.emit('click', this.id, this);
     }
 
     moveComplete() {
         this.gameController.rpcServer.disconnect('move_complete_' + this.id);
-        if (this.gameController) {
-            this.gameController.emit('moveComplete', this.id, this);
-        }
+        this.gameController.emit('moveComplete', this.id, this);
+        this.gameController.emit('enterWaypoint', this.id, this, this.waypoint);
     }
 
 }

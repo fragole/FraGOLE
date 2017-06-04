@@ -4,13 +4,14 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T10:51:45+02:00
+ * @Last modified time: 2017-06-04T11:37:26+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
 var GameItem = require('./GameObject.js').GameItem;
 
+// Components is the base-class for all HTML-Based (client-side) items
 class Component extends GameItem {
     constructor (id, template) {
         super(id, '');
@@ -20,7 +21,7 @@ class Component extends GameItem {
     }
 
     // draw a Component to the client document
-    // standard-target => all player;
+    // standard-target => all players
     draw(players=undefined, item=undefined) {
         // if context-vars are defined by the template => add them to the 'local' context
         for(let add_context in this.template.context) {
@@ -40,6 +41,7 @@ class Component extends GameItem {
         }
     }
 
+    // remove a Component from the Client-DOM
     remove(players=undefined, id=undefined) {
         var remove_id = this.context.content_id;
         if (id) {
@@ -47,17 +49,21 @@ class Component extends GameItem {
         }
         var cmd = ['removeDomContent',
             '#' + remove_id,
-            400
+            400   // this is for easing on the client side
         ];
         this.gameController.rpcListOrAll(players, cmd);
     }
 
+    // connects a click-handler to the Component
+    // registers a corresponding function in the RPC-Server
     activate(players=undefined) {
         this.gameController.rpcServer.connect('click_' + this.id, this.click, this);
         this.context.activate = 'on';
         this.draw(players);
     }
 
+    // removes the click-handler from the component
+    // disconnects the click-function in the RPC-Server
     deactivate(players=undefined) {
         this.context.activate = 'off';
         this.draw(players);
@@ -65,22 +71,25 @@ class Component extends GameItem {
         this.gameController.rpcServer.disconnect('click_' + this.id);
     }
 
+    // sets highlighting of the compontent on
+    // how the highlighting is done is dertermined by the template
     highlight(players=undefined) {
         this.context.highlight = 'on';
         this.draw(players);
     }
 
+    // sets highlighting of the componte off
     unhighlight(players=undefined) {
         this.context.highlight = 'off';
         this.draw(players);
         this.context.highlight = null;
     }
 
-    // EVENTS
+    // EVENTS - these are normaly triggerd by the client
+
+    // component was clicked => send event
     click() {
-        if (this.gameController) {
-            this.gameController.emit('click', this.id, this);
-        }
+        this.gameController.emit('click', this.id, this);
     }
 
 

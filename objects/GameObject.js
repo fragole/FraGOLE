@@ -4,13 +4,14 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T10:51:39+02:00
+ * @Last modified time: 2017-06-04T12:07:41+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
 const EventEmitter = require('events');
 
+// Base-Class for all GameObject
 class GameObject extends EventEmitter {
     constructor(id) {
         super();
@@ -33,16 +34,24 @@ class GameObject extends EventEmitter {
         }
     }
 
+    // increment a custom-var
+    // name: name of the var
+    // offset: amount to increment
     inc(name, offset=1) {
         var value = this.vars[name] + offset;
         this.set(name, value);
     }
 
+    // decrement a custom-var
+    // name: name of the var
+    // offset: amount to decrement
     dec(name, offset=1) {
         var value = this.vars[name] - offset;
         this.set(name, value);
     }
 
+    // get the value of a custom-var
+    // name: name of the var
     get(name) {
         return this.vars[name];
     }
@@ -57,6 +66,7 @@ class GameObject extends EventEmitter {
         }
     }
 
+    // clear all custom-vars of ths object
     clearCustVars() {
         this.custVars = {};
         this.subscribers = {};

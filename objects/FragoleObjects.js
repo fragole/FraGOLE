@@ -4,11 +4,13 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T10:53:44+02:00
+ * @Last modified time: 2017-06-04T11:41:24+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
+
+// this is a glue module, to make importing the various GameObjects easier
 module.exports= {
     Collection:       require('./Collection.js').Collection,
     Component:        require('./Component.js').Component,

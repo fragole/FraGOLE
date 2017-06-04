@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T10:51:49+02:00
+ * @Last modified time: 2017-06-04T12:04:53+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -18,6 +18,15 @@ var Lib = require('../FragoleLib.js');
 const ID = 0;
 const ITEM = 1;
 
+// GameController
+// * handles the Games State-Machine
+// * emits events (to it self and to the current GameState)
+// * handles RPC-Calls to the clients
+// * Provides client-chat, messaging and logging
+// * Watchdog-Timer may be used to handle client inactivity
+// args:
+// minPlayers: minimum players to start the game
+// rpcServer: an FragoleServer-Instance
 class GameController extends GameObject {
     constructor(id, minPlayers=1, rpcServer=undefined) {
         super(id);
@@ -47,11 +56,13 @@ class GameController extends GameObject {
         this.watchdogTimer = null;
     }
 
+    // add a Player to the Game
     addPlayer(player) {
         this.players.addItem(player);
         return this;
     }
 
+    // called when a new Player joins
     joinPlayer(name, clientProxy) {
         var player;
 
@@ -80,12 +91,19 @@ class GameController extends GameObject {
         return undefined;
     }
 
+    // advance the FSM to state:
+    // exit() of old state is called
+    // state is changed
+    // enter() of new state is called
     next_state(state) {
         this.currentState.exit();
         this.currentState=state;
         state.enter();
     }
 
+    // pass the turn to the next player
+    // you may set Player.skip_turns to a positiv number => this player will be
+    // skipped until Player.skip_turns <= 0;
     next_player() {
         var currentIdx;
         var playerCount = this.joinedPlayers.length;
@@ -103,6 +121,8 @@ class GameController extends GameObject {
         return this.activePlayer;
     }
 
+    // send a chat msg to all players
+    // XXX: add msg.players like in sendPopup
     sendChat(player, msg) {
         var msg_id = '#chat_msg_' + (++this.chatCnt);
         var cmd = (['addDomContent',
@@ -112,6 +132,8 @@ class GameController extends GameObject {
         this.rpcListOrAll(null, cmd);
     }
 
+    // send a log msg to all players
+    // XXX: add msg.players like in sendPopup
     sendLog(src, msg) {
         var msg_id = '#log_msg_' + (++this.logCnt);
         var cmd = (['addDomContent',
@@ -121,6 +143,7 @@ class GameController extends GameObject {
         this.rpcListOrAll(null, cmd);
     }
 
+    // send a popup-msgs to msg.players
     sendPopup(msg) {
         this.popupContext= Lib.mergeDicts({header: msg.header,
             msg: msg.msg,
@@ -139,6 +162,7 @@ class GameController extends GameObject {
 
     // return owner(s) of an object
     // if owner is specified return list of all players
+    // item: GameObject
     getOwner(item) {
         if(item.owner) {
             return item.owner;
@@ -147,6 +171,10 @@ class GameController extends GameObject {
         }
     }
 
+    // send a RPC-Call to clients specified by 'players' or to all connected
+    // clients
+    // players: Player-Instance or Array of Players
+    // cmd: a valid RPC-Cmd (see client-API)
     rpcListOrAll(players, cmd) {
         if (players) {
             this.rpcCall(players, cmd);
@@ -155,6 +183,10 @@ class GameController extends GameObject {
         }
     }
 
+    // send a RPC-Call to clients specified by 'players' or to the ovner of 'item'
+    // players: Player-Instance or Array of Players
+    // item: GameObject
+    // cmd: a valid RPC-Cmd (see client-API)
     rpcListOrOwner(players, item, cmd) {
         if (players) {
             this.rpcCall(players, cmd);
@@ -177,6 +209,9 @@ class GameController extends GameObject {
         }
     }
 
+    // emit an event to the GameController itself
+    // and to the current GameState
+    // reset the Watchdog-Timer
     emit() {
         this.setWatchdog(); // any event passed through here resets wd
         this.currentState.emit(...arguments);
@@ -193,6 +228,7 @@ class GameController extends GameObject {
     }
 
     // called when the watchdog-timer fires
+    // context == this
     watchdog(context) {
         context.emit('watchdog');
     }

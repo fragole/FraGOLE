@@ -1,3 +1,14 @@
+/**
+ * @Author: Michael Bauer
+ * @Date:   2017-06-04T10:48:10+02:00
+ * @Email:  mb@bauercloud.de
+ * @Project: Fragole - FrAmework for Gamified Online Learning Environments
+ * @Last modified by:   Michael Bauer
+ * @Last modified time: 2017-06-04T10:50:48+02:00
+ * @License: MIT
+ * @Copyright: Michael Bauer
+ */
+
 var Statistic = require('./Statistic.js').Statistic;
 var templates = require('../FragoleTemplates.js');
 

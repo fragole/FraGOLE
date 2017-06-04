@@ -1,6 +1,17 @@
-/* Implements a simple Webserver for delivering the Contents of the Framework
-to the connected clients
-*/
+/**
+ * @Author: Michael Bauer
+ * @Date:   2017-06-04T10:48:10+02:00
+ * @Email:  mb@bauercloud.de
+ * @Project: Fragole - FrAmework for Gamified Online Learning Environments
+ * @Last modified by:   Michael Bauer
+ * @Last modified time: 2017-06-04T10:55:06+02:00
+ * @License: MIT
+ * @Copyright: Michael Bauer
+ */
+
+// Implements a simple Webserver for delivering the Contents of the Framework
+// to the connected clients
+// and an RPC-Server based on Eureca.io (see http://eureca.io)
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var http = require('http');
@@ -9,6 +20,7 @@ var pug = require('pug');
 var path = require('path');
 
 var sessions = new Map();
+var globalGame;
 
 function localIpHelper(ip) {
     if(ip=='::ffff:127.0.0.1' || ip=='::1') {
@@ -20,7 +32,7 @@ function localIpHelper(ip) {
 class SERVER {
     constructor( port ) {
         var app = express(app);
-        var server = http.createServer(app);
+        this.server = http.createServer(app);
 
         app.enable('trust proxy');
         app.set('views', './views');
@@ -53,7 +65,7 @@ class SERVER {
         this.eurecaServer = new Eureca.Server({allow:['setBackgroundColor', 'setBackgroundImage', 'addDomContent', 'removeDomContent', 'emptyDomContent',
             'drawShape', 'drawImage', 'activateToken', 'deactivateToken', 'moveToken', 'highlightToken', 'unhighlightToken']});
 
-        this.eurecaServer.attach(server);
+        this.eurecaServer.attach(this.server);
 
         this.eurecaServer.onConnect ( function (connection) {
             connections[connection.id] = connection.clientProxy;
@@ -66,7 +78,11 @@ class SERVER {
             }
         });
 
-        server.listen(process.env.PORT || port, function() {
+        this.connect('ready', ready);
+    }
+
+    start(port) {
+        this.server.listen(process.env.PORT || port, function() {
             console.log('WebServer listening at port ' + port);
         });
     }
@@ -91,7 +107,34 @@ class SERVER {
         // Publish new functions to all connected clients
         this.eurecaServer.updateContract(); // !!! EXPERMIMENTAL in eureca.io
     }
+
+    setGame(game) {
+        globalGame = game;
+    }
 }
+
+
+// handle rpc-sessions
+function ready() {
+    var player, playerName, clientProxy;
+    var clientIp = localIpHelper(this.connection.eureca.remoteAddress.ip);
+
+    try {
+        [playerName, clientProxy] = sessions.get(clientIp);
+
+        if(player = globalGame.gameController.joinPlayer(playerName, clientProxy)) {
+            console.log('Player No.', player.number, ' joined:', player.name);
+            clientProxy.setBackgroundImage('/assets/background.jpg');
+        } else {
+            console.log('Max Players already joined!');
+        }
+    } catch (e) {
+        console.log(e);
+        console.log('ClientIp: ', clientIp);
+        console.log(sessions);
+    }
+}
+
+
 module.exports.SERVER = SERVER;
-module.exports.localIpHelper = localIpHelper;
-module.exports.sessions = sessions;
+module.exports.ready = ready;

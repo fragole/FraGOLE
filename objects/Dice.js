@@ -1,3 +1,14 @@
+/**
+ * @Author: Michael Bauer
+ * @Date:   2017-06-04T10:48:10+02:00
+ * @Email:  mb@bauercloud.de
+ * @Project: Fragole - FrAmework for Gamified Online Learning Environments
+ * @Last modified by:   Michael Bauer
+ * @Last modified time: 2017-06-04T10:49:26+02:00
+ * @License: MIT
+ * @Copyright: Michael Bauer
+ */
+
 var Component = require('./Component.js').Component;
 var templates = require('../FragoleTemplates.js');
 
@@ -11,20 +22,20 @@ class Dice extends Component {
 
     draw(players=undefined) {
         this.gameController.rpcServer.connect('roll_' + this.id, this.roll, this);
-        return super.draw(players);
+        super.draw(players);
     }
 
     roll() {
         this.result = Math.floor(Math.random() * this.sides + 1);
         this.context = {id: this.id, content_id: this.content_id + '_result', result: this.result};
-        if (this.gameController) {
-            this.gameController.currentState.emit('roll', this.id, this);
-        }
-        this.emit('roll', this);
+        this.gameController.emit('roll', this.id, this);
     }
 
-    rollResult(players=undefined) {
-        return super.draw(players);
+    rollResult(players=undefined, reset=false) {
+        super.draw(players);
+        if (reset) {
+            this.reset(players);
+        }
     }
 
     reset(players=undefined) {

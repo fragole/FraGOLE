@@ -1,3 +1,14 @@
+/**
+ * @Author: Michael Bauer
+ * @Date:   2017-06-04T10:48:10+02:00
+ * @Email:  mb@bauercloud.de
+ * @Project: Fragole - FrAmework for Gamified Online Learning Environments
+ * @Last modified by:   Michael Bauer
+ * @Last modified time: 2017-06-04T10:54:01+02:00
+ * @License: MIT
+ * @Copyright: Michael Bauer
+ */
+
 var pug = require('pug');
 
 // shapes
@@ -204,7 +215,7 @@ class POPUP_DEFAULT extends ComponentTemplate {
         this.context.x = 0;
         this.context.y = 0;
         this.context.trans_in = 'fly left in';
-        this.context.trans_out = 'fly left out'; 
+        this.context.trans_out = 'fly left out';
     }
 }
 
@@ -250,6 +261,12 @@ class PROMPT_DEFAULT extends ComponentTemplate {
     }
 }
 
+class QUESTION_DEFAULT extends ComponentTemplate {
+    constructor() {
+        super('./components/question.pug', 'board_div');
+    }
+}
+
 class CARD_STACK_DEFAULT extends ComponentTemplate {
     constructor() {
         super('./components/card_stack.pug', 'board_div');
@@ -286,6 +303,7 @@ module.exports.PLAYER_RATING_DEFAULT = PLAYER_RATING_DEFAULT;
 module.exports.PROGRESS_DEFAULT = PROGRESS_DEFAULT;
 module.exports.PLAYER_PROGRESS_DEFAULT = PLAYER_PROGRESS_DEFAULT;
 module.exports.PROMPT_DEFAULT = PROMPT_DEFAULT;
+module.exports.QUESTION_DEFAULT = QUESTION_DEFAULT;
 module.exports.CARD_STACK_DEFAULT = CARD_STACK_DEFAULT;
 module.exports.CARD_DEFAULT = CARD_DEFAULT;
 module.exports.CARD_HAND_DEFAULT = CARD_HAND_DEFAULT;

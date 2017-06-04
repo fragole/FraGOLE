@@ -1,5 +1,15 @@
+/**
+ * @Author: Michael Bauer
+ * @Date:   2017-06-04T10:48:10+02:00
+ * @Email:  mb@bauercloud.de
+ * @Project: Fragole - FrAmework for Gamified Online Learning Environments
+ * @Last modified by:   Michael Bauer
+ * @Last modified time: 2017-06-04T10:53:26+02:00
+ * @License: MIT
+ * @Copyright: Michael Bauer
+ */
 
-// nomalize the target coordinates when moving a token
+// normalize the target coordinates when moving a token
 // this helps centering tokens upon each other
 function nomalizeCoordinates(token, targ_x, targ_y) {
     var tpl = token.template,
@@ -96,6 +106,17 @@ function mergeDicts(targetDict, addDict) {
     return targetDict;
 }
 module.exports.mergeDicts = mergeDicts;
+
+// execute func_a with prob probability, else execute func b
+function probably(prob, func_a, func_b) {
+    var rand = Math.floor(Math.random() * 100 + 1);
+    if (rand >= 100 - prob) {
+        func_a();
+    } else {
+        func_b();
+    }
+}
+module.exports.probably = probably;
 
 /*
 // move to unit tests

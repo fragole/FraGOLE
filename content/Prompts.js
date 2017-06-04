@@ -1,4 +1,5 @@
 var Prompt = require('../objects/FragoleObjects.js').Prompt;
+var Question = require('../objects/FragoleObjects.js').Question;
 
 module.exports = {
 
@@ -10,6 +11,14 @@ module.exports = {
             'Option 2':{color:'green', icon:''},
             'Option 3':{color:'teal',  icon:''},
             'Option 4':{color:'blue',  icon:''}
+        }),
+
+    question1: new Question('guestion1', 'Frage',
+        '<p>Was ist richtig?',
+        '',
+        {
+            '1 + 1 = 2':{correct:true, value:10},
+            '1 + 1 = 3':{correct:false, value:0},
         }),
 
 };

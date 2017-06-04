@@ -1,3 +1,14 @@
+/**
+ * @Author: Michael Bauer
+ * @Date:   2017-06-04T10:48:10+02:00
+ * @Email:  mb@bauercloud.de
+ * @Project: Fragole - FrAmework for Gamified Online Learning Environments
+ * @Last modified by:   Michael Bauer
+ * @Last modified time: 2017-06-04T11:26:42+02:00
+ * @License: MIT
+ * @Copyright: Michael Bauer
+ */
+
 var FragoleServer = require('./FragoleServer.js');
 var Lib = require('./FragoleLib.js');
 var {Game, GameController, GameState, Player, PlayerToken, Collection,
@@ -7,7 +18,7 @@ var Prompts = require('./content/Prompts.js');
 var Lobby = require('./FragoleLobby.js');
 var Templates = require('./FragoleTemplates.js');
 
-var server = new FragoleServer.SERVER(80);
+var server = new FragoleServer.SERVER();
 var sessions = FragoleServer.sessions;
 
 // ****************************************************************************
@@ -15,8 +26,11 @@ var sessions = FragoleServer.sessions;
 var game = new Game();
 var controller = new GameController('game_controller1', 1, server);
 
+
 game.setName('TestGame')
     .setController(controller);
+server.setGame(game);
+server.start(80);
 
 // STATES
 var STATE_INIT = new GameState('STATE_INIT');
@@ -56,6 +70,7 @@ var items = {
 
     // prompts
     prompt1: Prompts.prompt1,
+    question1: Prompts.question1,
 
     card_stack: new CardStack('card_stack', 500, 400, 'Karten'),
     card1: new Card('card1', 'Karte 1', 'dies ist eine erste Testkarte', 'assets/card1.jpg', function(context) {
@@ -139,6 +154,22 @@ STATE_INIT.setHandlers({
     'prompt': function (src, option, prompt) {
         console.log('Prompt selected => ', src, option);
         controller.sendLog(controller.activePlayer.name, {content:'hat ' + option + ' gewählt', icon:'inverted orange check square'});
+        items.question1.show(controller.activePlayer);
+
+    },
+
+    'questionCorrect' : function(src, answer, score, item) {
+        console.log('correct');
+        items.question1.showResult(controller.activePlayer);
+    },
+
+    'questionWrong' : function(src, answer, score, item) {
+        console.log('wrong');
+        items.question1.showResult(controller.activePlayer);
+
+    },
+
+    'questionFinished': function(src, item) {
         controller.next_state(STATE_TURN);
     }
 
@@ -153,7 +184,7 @@ STATE_TURN.setHandlers({
         this.set('playertoken', controller.activePlayer.getInventory({category:'spielfiguren'})[0]);
         this.set('player', controller.activePlayer);
         items.dice.draw(this.get('player'));
-        controller.setWatchdog(10);
+        controller.setWatchdog(60);
     },
 
     'roll': function(src, dice) {
@@ -185,7 +216,7 @@ STATE_TURN.setHandlers({
         this.get('player').set('points', ++points);
     },
 
-    'drawCard': function(src, stack, card) {
+    'drawCard': function(src, card, stack) {
         console.log('STATE_TURN drawCard', card.id);
         card.draw(controller.activePlayer);
         controller.activePlayer.addInventory(card);
@@ -199,7 +230,8 @@ STATE_TURN.setHandlers({
     },
 
     'enterWaypoint': function(src, item, wp) {
-        console.log('enterWaypoint');
+        Lib.probably(80, () => controller.sendPopup({header:'test', msg:'Zufall => A', icon:'cube', players:controller.activePlayer, x:700, y:500, color:'green'}),
+                         () => controller.sendPopup({header:'test', msg:'Zufall => B', icon:'cube', players:controller.activePlayer, x:700, y:500, color:'red'}));
     },
 
     'moveComplete': function(src, item) {
@@ -233,26 +265,3 @@ lobby.on('allPlayersReady', function () {
     console.log('all players ready');
     controller.next_state(STATE_INIT);
 });
-
-// handle rpc-sessions
-function ready() {
-    var player, playerName, clientProxy;
-    var clientIp = FragoleServer.localIpHelper(this.connection.eureca.remoteAddress.ip);
-
-    try {
-        [playerName, clientProxy] = sessions.get(clientIp);
-
-        if(player = controller.joinPlayer(playerName, clientProxy)) {
-            console.log('Player No.', player.number, ' joined:', player.name);
-            clientProxy.setBackgroundImage('/assets/background.jpg');
-        } else {
-            console.log('Max Players already joined!');
-        }
-    } catch (e) {
-        console.log(e);
-        console.log('ClientIp: ', clientIp);
-        console.log(sessions);
-    }
-}
-
-server.connect('ready', ready);

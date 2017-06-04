@@ -1,0 +1,48 @@
+unless selection
+  div( id=content_id class="ui small modal")
+    div(class="header") #{header}
+    if image
+      div(class="image content")
+        div(class="ui medium image")
+          img(src=image)
+        div(class="description") !{content}
+    else
+      div(class="content")
+        div(class="description") !{content}
+    div(class="actions")
+      each action, label in actions
+        if action.icon
+          div(class="ui ok labeled icon fluid " + action.color + " button" onClick="rpcServer['question_" + id + "']('" + label + "');" )
+            i(class="ui icon " + action.icon)
+            |#{label}
+        else
+          div(class="ui ok fluid " + action.color + " button" onClick="rpcServer['question_" + id + "']('" + label + "');") #{label}
+    script.
+      function afterAddDomContent() {
+        $('##{content_id}')
+          .modal('setting', 'closable', false)
+          .modal('show');
+      }
+else
+  div( id=content_id class="ui small modal")
+    if correct
+      div(class="header") Richtig!
+      div(class="content")
+        div(class="description") #{selection} ist korrekt!
+    else
+      div(class="header") Leider falsch!
+      div(class="content")
+        div(class="description") richtig wäre gewesen:
+        ul
+        each answer in correct_answers
+          li #{answer}
+    div(class="actions")
+      div(class="ui ok labeled icon green button" onClick="rpcServer['question_" + id + "_finished']();" )
+          i(class="ui icon checkmark")
+          |OK
+    script.
+      function afterAddDomContent() {
+        $('##{content_id}')
+          .modal('setting', 'closable', false)
+          .modal('show');
+      }

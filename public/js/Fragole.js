@@ -4,10 +4,13 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T10:52:21+02:00
+ * @Last modified time: 2017-06-04T19:42:34+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
+
+// This module is the client API for the FragoleServer
+// Functions within this module are called by the Server via RPC
 
 var Fragole = Fragole || {};
 
@@ -18,10 +21,12 @@ var draw_methods = {
     STAR : 'dp',
 };
 
-var rpc;
-var rpcServer;
-var gameboard;
+var rpc, rpcServer, gameboard;
 
+// The GameBoard
+// consists of two Layers
+// Layer1: Canvas => Tokens, etc. are displayed here
+// Layer2 (above Layer1): Div => Components are displayed here
 Fragole.GameBoard = class GameBoard {
     constructor (id) {
         this.id = id;
@@ -127,13 +132,20 @@ Fragole.GameBoard = class GameBoard {
     }
 
     // Wrapper for drawing components (Game-Object represented by HTML code)
+    // XXX: check if this is actually used, if not remove
     drawComponent(name, src, pos_x, pos_y) {
         $(src).appendTo(this.board_div).css({position: 'absolute',
             left: pos_x,
             top: pos_y});
     }
 
-
+    // add a Component to the DOM
+    // checks if an object with the given id already exists. If so it replaces
+    // the existing content
+    //
+    // src: html-code of the object that should be added
+    // target: parent object => src will be appended to this
+    // content_id: id of the new DOM object
     addDomContent(src, target, content_id) {
         if ($(content_id).length) { // update existing content
             console.log('update ' + content_id + ' in ' + target);
@@ -150,6 +162,9 @@ Fragole.GameBoard = class GameBoard {
         } catch (e)  {}
     }
 
+    // remove an object from the DOM
+    // target: id of the object that should be remove
+    // fade: 0/1 fade the object out
     removeDomContent(target, fade = 0) {
         console.log('remove ' + target);
         if (fade) {
@@ -160,16 +175,19 @@ Fragole.GameBoard = class GameBoard {
         }
     }
 
+    // removes the content from the specified DOM-Object
     emptyDomContent(target) {
         console.log('empty ' + target);
         $(target).empty();
     }
 
+    // set the background color of the gameboard canvas
     setBackgroundColor(color) {
         this.background_fill.style = color;
         this.stage.update();
     }
 
+    // dispaly a background image on the canvas
     setBackgroundImage(img_src) {
         var img = new Image();
         var that = this;
@@ -184,39 +202,38 @@ Fragole.GameBoard = class GameBoard {
         };
     }
 
+    // activate a Token => add click-handler
     activateToken(name, callback) {
         console.log('activateToken', arguments);
         var elem = this.childs[name];
         elem.on('click', function(evt, data) {console.log(name + ' clicked => ' + callback); rpcServer[callback](callback);});
     }
 
+    // deactivate a Token => remove click-handler
     deactivateToken(name) {
         console.log('deactivateToken', arguments);
         var elem = this.childs[name];
         elem.removeAllEventListeners();
     }
 
+    // add a looping pulsing animation to a Token
     highlightToken(name) {
         console.log('highlight ', arguments);
         var token = this.childs[name];
         var tween = createjs.Tween.get(token, {loop:true});
         tween.to({scaleX:1.2, scaleY:1.2, alpha:0.5}, 300,  createjs.Ease.bounceOut)
-             //.to({scaleX:0.9, scaleY:0.9, alpha:1}, 500,  createjs.Ease.bounceOut)
              .to({scaleX:1, scaleY:1, alpha:1}, 1000,  createjs.Ease.bounceOut);
-             //.to({scaleX:0.9, scaleY:0.9}, 1000)
-             //.to({scaleX:1, scaleY:1}, 1000)
     }
 
+    // stop the highlighting animation
     unhighlightToken(name) {
         console.log(name);
         var token = this.childs[name];
         var tween = createjs.Tween.get(token, {override: true});
         tween.to({scaleX:1, scaleY:1, alpha:1}, 300);
-        //var tween = createjs.Tween.get(token);
-        //createjs.Tween.removeTweens(token);
-
     }
 
+    // move a token along the points contained in path
     moveToken(name, path) {
         console.log(arguments);
         var callback = 'move_complete_' + name;
@@ -232,23 +249,24 @@ Fragole.GameBoard = class GameBoard {
 
 }
 
+//
 function init() {
-
-  //gameboard.setBackgroundColor('#2F3F3F');
-
     rpc = new Eureca.Client();
 
+    // call the ready function on the server-sice
     rpc.ready(function (serverProxy) {
         serverProxy.ready();
         rpcServer = serverProxy;
         gameboard.connectRpc(rpcServer);
     });
 
+    // setup the gameboard
     var gameboard = new Fragole.GameBoard('board');
 
+    // functions that are exposed for the server via RPC
     rpc.exports = {
         setBackgroundColor : function(color) { gameboard.setBackgroundColor(color); },
-        setBackgroundImage : function(img_src) { gameboard.setBackgroundImage(img_src)},
+        setBackgroundImage : function(img_src) { gameboard.setBackgroundImage(img_src);},
         addDomContent :    function(src, target, content_id) { gameboard.addDomContent(src, target, content_id);},
         removeDomContent : function(target, fade) { gameboard.removeDomContent(target, fade);},
         emptyDomContent : function(target) { gameboard.emptyDomContent(target);},

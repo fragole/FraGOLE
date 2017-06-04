@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T10:51:10+02:00
+ * @Last modified time: 2017-06-04T19:29:35+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -12,6 +12,7 @@
 var Token = require('./Token.js').Token;
 var templates = require('../FragoleTemplates.js');
 
+// Displays a Waypoint on the client-side
 class Waypoint extends Token {
     constructor (id, category, x, y, template=templates.WAYPOINT_DEFAULT) {
         super(id, category, x, y, template);
@@ -19,10 +20,9 @@ class Waypoint extends Token {
         this.tokens=[];
     }
 
+    // Events - Triggered by client
     click() {
-        if (this.gameController) {
-            this.gameController.emit('selectWaypoint', this.id, this);
-        }
+        this.gameController.emit('selectWaypoint', this.id, this);
     }
 }
 module.exports.Waypoint = Waypoint;

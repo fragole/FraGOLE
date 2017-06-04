@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T10:51:02+02:00
+ * @Last modified time: 2017-06-04T19:28:26+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -14,8 +14,14 @@ var nomalizeCoordinates = require('../FragoleLib.js').nomalizeCoordinates;
 var templates = require('../FragoleTemplates.js');
 var Lib = require('../FragoleLib.js');
 
+// Base-Clase for Tokens
+// Tokens are shapes or images the are displayed in the clients gameboard
+// canvas
+//
+// category: allows to create logical collections of tokens
+// x,y absolute position on the gameboard
 class Token extends GameItem {
-    constructor (id, category='', x, y, template, drawable=1) {
+    constructor (id, category='', x, y, template) {
         super(id, category);
         this.x = x;
         this.y = y;
@@ -117,14 +123,17 @@ class Token extends GameItem {
     }
 
     // EVENTS
+
     click() {
         this.gameController.emit('click', this.id, this);
     }
 
+    // is called when the animation-tween on the client-side is completed
+    // emits moveComplete & enterWaypoint Events
     moveComplete() {
         this.gameController.rpcServer.disconnect('move_complete_' + this.id);
         this.gameController.emit('moveComplete', this.id, this);
-        this.gameController.emit('enterWaypoint', this.id, this, this.waypoint);
+        this.gameController.emit('enterWaypoint', this.id, this.waypoint, this);
     }
 
 }

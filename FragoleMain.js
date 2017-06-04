@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T11:26:42+02:00
+ * @Last modified time: 2017-06-04T19:28:10+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -229,7 +229,7 @@ STATE_TURN.setHandlers({
         card.owner.removeInventory(card);
     },
 
-    'enterWaypoint': function(src, item, wp) {
+    'enterWaypoint': function(src, wp, item) {
         Lib.probably(80, () => controller.sendPopup({header:'test', msg:'Zufall => A', icon:'cube', players:controller.activePlayer, x:700, y:500, color:'green'}),
                          () => controller.sendPopup({header:'test', msg:'Zufall => B', icon:'cube', players:controller.activePlayer, x:700, y:500, color:'red'}));
     },

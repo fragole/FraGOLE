@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T19:42:34+02:00
+ * @Last modified time: 2017-06-13T21:36:49+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -47,7 +47,8 @@ Fragole.GameBoard = class GameBoard {
         this.stage.setChildIndex(this.background, 0);
         this.childs = {};
 
-        createjs.Ticker.setFPS(60);
+        //createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
+        createjs.Ticker.setFPS(30);
         createjs.Ticker.addEventListener("tick", this.stage);
     }
 
@@ -193,9 +194,16 @@ Fragole.GameBoard = class GameBoard {
         var that = this;
         img.src = img_src;
         img.onload = function () {
-            console.log(that.background);
+            var sf;
+            var matrix = new createjs.Matrix2D();
+            if (img.width >= img.height) {
+               sf = that.board_canvas.width / img.width;
+            } else {
+               sf = that.board_canvas.height / img.height;
+            }
+            matrix.scale(sf,sf);
             that.background.graphics.clear()
-              .beginBitmapFill(img)
+              .beginBitmapFill(img, 'no-repeat', matrix)
               .drawRect(0,0,that.board_canvas.width,that.board_canvas.height);
             that.background.cache(0,0,that.board_canvas.width,that.board_canvas.height);
             that.stage.update();
@@ -221,7 +229,7 @@ Fragole.GameBoard = class GameBoard {
         console.log('highlight ', arguments);
         var token = this.childs[name];
         var tween = createjs.Tween.get(token, {loop:true});
-        tween.to({scaleX:1.2, scaleY:1.2, alpha:0.5}, 300,  createjs.Ease.bounceOut)
+        tween.to({scaleX:1.3, scaleY:1.3, alpha:1}, 300,  createjs.Ease.bounceOut)
              .to({scaleX:1, scaleY:1, alpha:1}, 1000,  createjs.Ease.bounceOut);
     }
 

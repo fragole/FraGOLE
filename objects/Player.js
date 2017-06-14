@@ -4,13 +4,14 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T19:02:10+02:00
+ * @Last modified time: 2017-06-14T19:52:27+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
-var GameObject = require('./GameObject.js').GameObject;
-var Collection = require('./Collection.js').Collection;
+const GameObject = require('./GameObject.js').GameObject;
+const Collection = require('./Collection.js').Collection;
+const PlayerModel = require('../model/player.js').PlayerModel;
 
 // logical representation of a Player
 // has an Inventory => Collection of GameObject
@@ -24,6 +25,12 @@ class Player extends GameObject {
         this.inventory = new Collection();
         this.inventory.owner = this;
         this.skip_turns = 0;
+    }
+
+    init(name, session) {
+        this.name = name;
+        this.session = session;
+        this.storage = new PlayerModel(name);
     }
 
     // add a GameObject to the Players inventory

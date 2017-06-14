@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T19:42:56+02:00
+ * @Last modified time: 2017-06-14T21:38:27+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -18,6 +18,7 @@ var http = require('http');
 var Eureca = require('eureca.io');
 var pug = require('pug');
 var path = require('path');
+const PlayerModel = require('./model/player.js').PlayerModel;
 
 var sessions = new Map();
 var globalGame;
@@ -58,6 +59,16 @@ class SERVER {
             response.render('index', {player: playername});
         });
 
+        app.get('/profile/:player_name', function( request, response) {
+            var player_name = request.params.player_name;
+            var player_storage = new PlayerModel(player_name);
+            player_storage.refresh(() => {
+                var context = {player_name : player_name,
+                    statistics : player_storage.statistics,
+                    badges: player_storage.badges};
+                response.render('player_profile', context);
+            });
+        });
         // rpcServer
         this.connections = {};
         var connections = this.connections;
@@ -112,7 +123,6 @@ class SERVER {
         globalGame = game;
     }
 }
-
 
 // handle rpc-sessions
 function ready() {

@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T11:40:44+02:00
+ * @Last modified time: 2017-06-06T19:15:00+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -44,6 +44,7 @@ class Dice extends Component {
         this.remove(players);
         this.remove(players, this.context.content_id + '_result');
     }
+
 
     // EVENTS
 

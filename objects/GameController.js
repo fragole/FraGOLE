@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T12:04:53+02:00
+ * @Last modified time: 2017-06-14T19:52:00+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -70,7 +70,7 @@ class GameController extends GameObject {
         for (let p of this.players.iterator()) {
             p = p[ITEM];
             if (p.name == name) {
-                p.session=clientProxy; // update rpc-session
+                p.init(name, clientProxy);
                 this.emit('joinPlayer', p);
                 return p;
             }
@@ -81,8 +81,7 @@ class GameController extends GameObject {
         } catch(e) { player = undefined; }
 
         if (player) {
-            player.name = name;
-            player.session = clientProxy;
+            player.init(name, clientProxy);
             player.joined = true;
             this.joinedPlayers.push(player);
             this.emit('joinPlayer', player);

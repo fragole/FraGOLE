@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T10:53:26+02:00
+ * @Last modified time: 2017-06-13T19:36:00+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -41,33 +41,55 @@ function connectWaypoints( wpList, bothWays=false ) {
 module.exports.connectWaypoints = connectWaypoints;
 
 function getWaypointsAtRange(root, depth) {
-    var distance = {};
+    var curr_depth = 0;
+    var unvisited_childs = {};
     var visited = new Set();
-    var queue =  [];
-    var res = {};
-    queue.push(root);
-    visited.add(root);
-    distance[root.id] = 0;
-    depth += 1;
-    while (queue.length) {
-        var current = queue.pop();
-        for (let next of current.next) {
-            if(!visited.has(next)) {
-                var dist;
-                queue.push(next);
-                visited.add(next);
-                dist = distance[current.id] + 1;
-                distance[next.id] = dist;
+    var curr_wp = root;
+    var temp_wp;
+    var curr_path = [root];
+    var res = new Set();
 
-                if (res[dist]) {
-                    res[dist].push(next);
-                } else {
-                    res[dist] = [next];
-                }
+    while (curr_depth>=0) {
+        visited.add(curr_wp.id);
+        if (unvisited_childs[curr_wp.id] instanceof Array) {
+            if(curr_depth == depth) {
+                res.add(curr_wp);  // add wp to result
             }
+            if (curr_depth == depth || curr_wp.next == [] || unvisited_childs[curr_wp.id].length == 0) {
+                temp_wp = curr_path.pop(); // back-track
+                if( temp_wp == curr_wp) {
+                    //console.log('backtrack on self');
+                    continue;
+                }
+                if(!temp_wp) {
+                    ///console.log('cant backtrack');
+                    break;
+                }
+                curr_wp = temp_wp;
+                curr_depth--;
+                //console.log('backtrack', curr_wp.id, curr_depth);
+            } else {
+                // forward to next unvisited child node
+                temp_wp = unvisited_childs[curr_wp.id].pop();
+                if(!temp_wp || visited.has(temp_wp.id)) {
+                    //console.log('cont     ', curr_wp.id, curr_depth);
+                    continue;
+                }
+                curr_wp = temp_wp;
+                curr_depth++;
+                //console.log('forward  ', curr_wp.id, curr_depth);
+            }
+        } else {
+            // init unvisited child nodes
+            unvisited_childs[curr_wp.id] = curr_wp.next.slice();
+            //console.log('init     ', curr_wp.id);
+            continue;
         }
+        // add node to the current path
+        //console.log('push     ', curr_wp.id, curr_depth);
+        curr_path.push(curr_wp);
     }
-    return res[depth-1];
+    return res;
 }
 module.exports.getWaypointsAtRange = getWaypointsAtRange;
 
@@ -76,14 +98,15 @@ module.exports.getWaypointsAtRange = getWaypointsAtRange;
 function getPath(wpStart, wpEnd) { // length) {
     var path= [wpStart],
         queue = [],
-        res = [];
+        res = [],
+        min_path = null;
 
     queue.push(path);
     while(queue.length) {
         var curr_path = queue.pop();
         var last_node = curr_path[curr_path.length-1];
         if (last_node == wpEnd) { //&& curr_path.length == length) {
-            return curr_path;
+            res.push(curr_path);
         }
         for (let next of last_node.next) {
             if(curr_path.indexOf(next) < 0) {
@@ -91,7 +114,13 @@ function getPath(wpStart, wpEnd) { // length) {
             }
         }
     }
-    return res;
+
+    for (let p of res) {
+        if(!min_path || p.length < min_path.length) {
+            min_path = p;
+        }
+    }
+    return min_path;
 }
 module.exports.getPath = getPath;
 
@@ -137,10 +166,16 @@ connectWaypoints([wp7, wp5, wp1]);
 connectWaypoints([wp2, wp5]);
 connectWaypoints([wp9, wp5]);
 
-//for (let wp of getWaypointsAtRange(wp1, 2)) {
+//for (let wp of wp5.next) {
 //    console.log(wp.id);
 //}
 
+for (let wp of naiveWaypoints(wp1, 2)) {
+    console.log(wp.id);
+}
+
+*/
+/*
 for (let pth of getPath(wp1, wp3, 3)) {
     console.log('next');
     for (let wp of pth) {

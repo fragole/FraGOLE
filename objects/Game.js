@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T11:47:38+02:00
+ * @Last modified time: 2017-06-06T11:59:56+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -41,11 +41,11 @@ class Game {
         return this;
     }
 
-    // assign alle GameObject to the game
+    // assign GameObject to the game
     // GameController-Instance will be connected to everyone
-    setItems (items) {
-        this.items = items;
+    addItems (items) {
         for (let item in items) {
+            this[item] = items[item];
             items[item].gameController = this.gameController;
         }
     }
@@ -53,12 +53,12 @@ class Game {
     // draw the initial gameboard => Waypoints and PlayerTokens will be drawn
     // XXX: this may need some work / consideration
     setupBoard() {
-        for (let i in this.items) {
-            var item = this.items[i];
-            if (item instanceof Waypoint) {
+        for (let i in this) {
+            var item = this[i];
+            if (item.constructor.name == 'Waypoint') {
                 item.draw();
             }
-            if (item instanceof Player && item.joined) {
+            if (item.constructor.name == 'Player' && item.joined) {
                 for (let i of item.inventory.iterator()) {
                     if (i[ITEM] instanceof PlayerToken) {
                         i[ITEM].draw();

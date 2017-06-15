@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-14T21:38:27+02:00
+ * @Last modified time: 2017-06-15T19:40:24+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -132,7 +132,7 @@ function ready() {
     try {
         [playerName, clientProxy] = sessions.get(clientIp);
 
-        if(player = globalGame.gameController.joinPlayer(playerName, clientProxy)) {
+        if(player = globalGame.gameControllers[0].joinPlayer(playerName, clientProxy)) {
             console.log('Player No.', player.number, ' joined:', player.name);
             clientProxy.setBackgroundImage('/assets/background.jpg');
         } else {

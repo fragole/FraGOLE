@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-14T21:40:00+02:00
+ * @Last modified time: 2017-06-15T19:56:59+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -30,7 +30,7 @@ var controller = new GameController('game_controller1', 1, server);
 
 
 game.setName('TestGame')
-    .setController(controller);
+    .addController(controller);
 server.setGame(game);
 server.start(80);
 
@@ -102,8 +102,8 @@ items.card_stack.addCards([
 items.card_stack.shuffle();
 
 // add (potential) players to the gameController
-game.gameController.addPlayer(items.player1)
-               .addPlayer(items.player2);
+game.gameControllers[0].addPlayer(items.player1)
+                       .addPlayer(items.player2);
 
 var lobby = new Lobby(controller);
 
@@ -119,17 +119,16 @@ STATE_INIT.setHandlers({
         items.card_hand1.init(items.player1.inventory);
 
         // init game with all items
-        game.addItems(items);
-        game.addItems(wps);
-        game.addItems(game_items.prompts);
+        controller.addItems(items);
+        controller.addItems(wps);
+        controller.addItems(game_items.prompts);
 
         // connect waypoints - setup paths
         game_items.connectWaypoints();
         items.player_token1.waypoint = wps.start;
         items.player_token2.waypoint = wps.start;
 
-        game.setupBoard();  // Setup the gameboard - draw stuff etc.
-
+        controller.setupBoard();  // Setup the gameboard - draw stuff etc.
         controller.rpcCall(controller.joinedPlayers, ['drawImage', 'test', 'assets/connectors.png', 'back', 0, 0]);
         controller.next_player();
         controller.sendLog('Spiel', {content:'Herzlich Willkommen!'});
@@ -149,16 +148,14 @@ STATE_CHOOSE_ACTION.setHandlers({
                 controller.next_state(STATE_ROLL);
                 break;
             case 'Eine Frage beantworten':
-               controller.sendLog(controller.activePlayer.name, {content:'beantwortet eine Frage', icon:'inverted orange check square'});
+                controller.sendLog(controller.activePlayer.name, {content:'beantwortet eine Frage', icon:'inverted orange check square'});
                 break;
             case 'Eine Karte ziehen':
-               controller.sendLog(controller.activePlayer.name, {content:'zieht eine Karte', icon:'inverted orange check square'});
-               break;
+                controller.sendLog(controller.activePlayer.name, {content:'zieht eine Karte', icon:'inverted orange check square'});
+                break;
             default:
-               break;
+                break;
         }
-
-
     },
 });
 

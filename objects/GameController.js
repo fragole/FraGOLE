@@ -4,16 +4,19 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-14T19:52:00+02:00
+ * @Last modified time: 2017-06-15T19:56:50+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
-var GameObject = require('./GameObject.js').GameObject;
-var Collection = require('./Collection.js').Collection;
-var GameState = require('./GameState.js').GameState;
-var templates = require('../FragoleTemplates.js');
-var Lib = require('../FragoleLib.js');
+const GameObject = require('./GameObject.js').GameObject,
+    Collection = require('./Collection.js').Collection,
+    GameState = require('./GameState.js').GameState,
+    templates = require('../FragoleTemplates.js'),
+    Player = require('./Player.js').Player,
+    PlayerToken = require('./PlayerToken.js').PlayerToken,
+    Waypoint = require('./Waypoint.js').Waypoint,
+    Lib = require('../FragoleLib.js');
 
 const ID = 0;
 const ITEM = 1;
@@ -37,6 +40,7 @@ class GameController extends GameObject {
         this.activePlayer = undefined;
         this.currentState = new GameState('NULL');
         this.playersIterator = this.players.iterator();
+        this.items = {};
 
         // connect chat to rpcServer
         this.rpcServer.connect('send_chat', this.sendChat, this);
@@ -60,6 +64,34 @@ class GameController extends GameObject {
     addPlayer(player) {
         this.players.addItem(player);
         return this;
+    }
+
+    // assign GameObject to the game
+    // GameController-Instance will be connected to everyone
+    addItems (items) {
+        for (let item in items) {
+            this.items[item] = items[item];
+            items[item].gameController = this;
+        }
+    }
+
+    // draw the initial gameboard => Waypoints and PlayerTokens will be drawn
+    setupBoard() {
+        for (let i in this.items) {
+            var item = this.items[i];
+            switch(item.constructor.name) {
+                case 'Waypoint':
+                    item.draw();
+                    break;
+                case 'PlayerToken':
+                    if (item.owner.joined) {
+                        item.draw();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     // called when a new Player joins

@@ -4,15 +4,10 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-06T11:59:56+02:00
+ * @Last modified time: 2017-06-15T19:33:21+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
-
-var Player = require('./Player.js').Player,
-    PlayerToken = require('./PlayerToken.js').PlayerToken,
-    Waypoint = require('./Waypoint.js').Waypoint;
-
 const ID = 0;
 const ITEM = 1;
 
@@ -23,14 +18,13 @@ const ITEM = 1;
 // handled by GameController)
 class Game {
     constructor () {
-        this.items = {};
-        this.gameController = undefined;
+        this.gameControllers = [];
     }
 
     // assign a GameController-Instance
     // chainable
-    setController(gameController) {
-        this.gameController = gameController;
+    addController(gameController) {
+        this.gameControllers.push(gameController);
         return this;
     }
 
@@ -39,33 +33,6 @@ class Game {
     setName(name)  {
         this.name = name;
         return this;
-    }
-
-    // assign GameObject to the game
-    // GameController-Instance will be connected to everyone
-    addItems (items) {
-        for (let item in items) {
-            this[item] = items[item];
-            items[item].gameController = this.gameController;
-        }
-    }
-
-    // draw the initial gameboard => Waypoints and PlayerTokens will be drawn
-    // XXX: this may need some work / consideration
-    setupBoard() {
-        for (let i in this) {
-            var item = this[i];
-            if (item.constructor.name == 'Waypoint') {
-                item.draw();
-            }
-            if (item.constructor.name == 'Player' && item.joined) {
-                for (let i of item.inventory.iterator()) {
-                    if (i[ITEM] instanceof PlayerToken) {
-                        i[ITEM].draw();
-                    }
-                }
-            }
-        }
     }
 }
 module.exports.Game = Game;

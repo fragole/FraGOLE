@@ -1,0 +1,43 @@
+# @Author: Michael Bauer
+# @Date:   2017-05-06T20:27:13+02:00
+# @Email:  mb@bauercloud.de
+# @Project: Fragole - FrAmework for Gamified Online Learning Environments
+# @Last modified by:   Michael Bauer
+# @Last modified time: 2017-06-15T19:56:17+02:00
+# @License: MIT
+# @Copyright: Michael Bauer
+
+
+
+{
+    "env": {
+        "es6": true,
+        "node": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "sourceType": "module"
+    },
+    "rules": {
+        "no-console": 0,
+        "no-cond-assign": 0,
+        "no-unused-vars": 0,
+        "indent": [
+            "error",
+            4,
+            { "SwitchCase": 1 }
+        ],
+        "linebreak-style": [
+            "error",
+            "windows"
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "always"
+        ]
+    }
+}

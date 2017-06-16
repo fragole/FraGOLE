@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T19:16:17+02:00
+ * @Last modified time: 2017-06-16T23:52:33+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -83,7 +83,7 @@ class Question extends Prompt {
     // EVENTS
 
     // gets called when an answer button is clicked
-    select(option) {
+    select(option, clientId) {
         var selection = this.context.actions[option];
         this.context.selection = option;
         if (selection.correct) {
@@ -95,7 +95,7 @@ class Question extends Prompt {
     }
 
     // get called when the OK-button of the result-display is clicked
-    finished() {
+    finished(clientId) {
         this.gameController.rpcServer.disconnect('question_' + this.id + '_finished');
         this.gameController.emit('questionFinished', this.id, this);
     }

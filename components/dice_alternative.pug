@@ -9,7 +9,7 @@ unless result
                 p Klicke "Würfeln" um zu würfeln.
                 br
             div(class="actions")
-                div(class="ui green ok inverted button" onClick="rpcServer['roll_" + id + "']('" + id + "');")
+                div(class="ui green ok inverted button" onClick="rpcServer['roll_" + id + "'](gameboard.clientId);")
                     i(class="checkmark icon")
                     | Würfeln
             script.

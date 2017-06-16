@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-13T21:36:49+02:00
+ * @Last modified time: 2017-06-16T23:54:36+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -30,6 +30,7 @@ var rpc, rpcServer, gameboard;
 Fragole.GameBoard = class GameBoard {
     constructor (id) {
         this.id = id;
+        this.client_id = undefined;
         this.rpcServer = undefined;
         this.board_div = $('#' + id + '_div');
         this.board_canvas = $('#' + id + '_canvas')[0];
@@ -54,6 +55,10 @@ Fragole.GameBoard = class GameBoard {
 
     connectRpc(rpcServer) {
         this.rpcServer = rpcServer;
+    }
+
+    setClientId(clientId) {
+        this.clientId = clientId;
     }
 
     // Wrapper for easelJS Graphic.drawX methods
@@ -214,7 +219,7 @@ Fragole.GameBoard = class GameBoard {
     activateToken(name, callback) {
         console.log('activateToken', arguments);
         var elem = this.childs[name];
-        elem.on('click', function(evt, data) {console.log(name + ' clicked => ' + callback); rpcServer[callback](callback);});
+        elem.on('click', function(evt, data) {console.log(name + ' clicked => ' + callback); rpcServer[callback](gameboard.clientId);});
     }
 
     // deactivate a Token => remove click-handler
@@ -251,7 +256,7 @@ Fragole.GameBoard = class GameBoard {
             console.log(path[i]);
             tween = tween.to(path[i], 1000);
         }
-        tween.call(function(name) { rpcServer[callback](); });
+        tween.call(function(name) { rpcServer[callback](gameboard.clientId); });
     }
 
 
@@ -269,10 +274,11 @@ function init() {
     });
 
     // setup the gameboard
-    var gameboard = new Fragole.GameBoard('board');
+    gameboard = new Fragole.GameBoard('board');
 
     // functions that are exposed for the server via RPC
     rpc.exports = {
+        setClientId : function(clientId) { gameboard.setClientId(clientId); },
         setBackgroundColor : function(color) { gameboard.setBackgroundColor(color); },
         setBackgroundImage : function(img_src) { gameboard.setBackgroundImage(img_src);},
         addDomContent :    function(src, target, content_id) { gameboard.addDomContent(src, target, content_id);},

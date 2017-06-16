@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-15T19:56:59+02:00
+ * @Last modified time: 2017-06-16T23:54:56+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -13,8 +13,8 @@ const FragoleServer = require('./FragoleServer.js'),
     Lib = require('./FragoleLib.js'),
     {Game, GameController, GameState, Player, PlayerToken, Collection,
      Waypoint, Dice, Statistic, PlayerStatistic, Rating, PlayerRating,
-     Progress, PlayerProgress, Prompt, Card, CardStack, CardHand} = require('./objects/FragoleObjects.js'),
-    Prompts = require('./content/Prompts.js'),
+     Progress, PlayerProgress, Prompt, Card, CardStack, CardHand, Button} = require('./objects/FragoleObjects.js'),
+    prompts = require('./content/Prompts.js'),
     game_items = require('./content/game_items.js'),
     Lobby = require('./FragoleLobby.js'),
     Templates = require('./FragoleTemplates.js');
@@ -40,6 +40,8 @@ var STATE_ROLL = new GameState('STATE_ROLL');
 var STATE_SELECT_WAYPOINT = new GameState('STATE_SELECT_WAYPOINT');
 var STATE_ENTER_WAYPOINT = new GameState('STATE_ENTER_WAYPOINT');
 var STATE_CHOOSE_ACTION = new GameState('STATE_CHOOSE_ACTION');
+var STATE_QUESTION = new GameState('STATE_QUESTION');
+var STATE_DRAW_CARD = new GameState('DRAW_CARD');
 
 // *****************************************************************************
 // collection of all game items
@@ -55,18 +57,18 @@ var items = {
     // dice
     dice: new Dice('dice', 6, Templates.DICE_ALTERNATIVE),
     // statistics
-    stat1: new Statistic('stat1', 100, 300, 'Zähler', 0, 'travel'),
-    player_stat1: new PlayerStatistic('player_stat1', 'Punkte', 0, 'trophy'),
-    rating1: new Rating('rating1', 100, 400, 'heart', 'WERTUNG', 3, 10),
-    player_rating1: new PlayerRating('player_rating1', 'star', 'WERTUNG', 0, 10),
-    progress1: new Progress('progress1', 100, 470, 'blue', 'FORTSCHRITT', 0, 10),
-    player_progress1: new PlayerProgress('player_progress1', 'red', 'FORTSCHRITT', 0, 10),
+    global_risk: new Progress('global_risk', 330, 200, 'blue', 'RISIKO', 0, 100),
 
-    // prompts
-    question1: Prompts.question1,
+    player1_points: new PlayerStatistic('player1_points', 'PUNKTE', 0, 'trophy'),
+    player1_money: new PlayerStatistic('player1_money', 'GELD', 0, 'euro'),
+    player1_risk: new PlayerProgress('player1_risk', 'blue', 'EIGENES RISIKO', 0, 100),
+    player2_points: new PlayerStatistic('player2_points', 'PUNKTE', 0, 'trophy'),
+    player2_money: new PlayerStatistic('player2_money', 'GELD', 0, 'euro'),
+    player2_risk: new PlayerProgress('player2_risk', 'blue', 'EIGENES RISIKO', 0, 100),
 
-    card_stack: new CardStack('card_stack', 500, 400, 'Karten'),
-    card1: new Card('card1', 'Karte 1', 'dies ist eine erste Testkarte', 'assets/card1.jpg', function(context) {
+    card_stack_good: new CardStack('card_stack_good', 1100, 20, 'Karten'),
+    card_stack_bad: new CardStack('card_stack_bad', 1100, 250, 'Risiko'),
+    card1: new Card('card1', 'Karte 1', 'dies ist eine erste Testkarte', 'assets/card1.jpg', (context) => {
         context.gameController.activePlayer.inc('points');
     }),
     card2: new Card('card2', 'Karte 2', 'dies ist eine zweite Testkarte', 'assets/card2.jpg'),
@@ -80,6 +82,9 @@ var items = {
     card10: new Card('card10', 'Karte 10', 'dies ist eine zehnte Testkarte', 'assets/card3.jpg'),
 
     card_hand1: new CardHand('card_hand1'),
+    card_hand2: new CardHand('card_hand2'),
+
+    btn_end_turn : new Button('btn_end_turn', 10, 10, 'Spielzug beenden', 'green'),
 };
 
 
@@ -88,18 +93,11 @@ var items = {
 // Set position for dice-roll result
 items.dice.template.result_x(25).result_y(25);
 
-
-items.player1.addInventory(items.player_rating1);
-items.player1.addInventory(items.player_progress1);
-
-
-items.player2.addInventory(items.player_token2);
-
-items.card_stack.addCards([
+items.card_stack_good.addCards([
     items.card1, items.card2, items.card3,
     items.card4, items.card5, items.card6,
     items.card7, items.card8, items.card9,]);
-items.card_stack.shuffle();
+items.card_stack_good.shuffle();
 
 // add (potential) players to the gameController
 game.gameControllers[0].addPlayer(items.player1)
@@ -112,10 +110,18 @@ var lobby = new Lobby(controller);
 // STATE_INIT event-handlers
 STATE_INIT.setHandlers({
 
-    'enter': function () {
+    'enter':  () => {
         var wps = game_items.waypoints;
         // assign player_tokens etc. to players
         items.player1.addInventory(items.player_token1);
+        items.player1.addInventory(items.player1_points);
+        items.player1.addInventory(items.player1_money);
+        items.player1.addInventory(items.player1_risk);
+        items.player1.addInventory(items.card_hand1);
+
+        items.player2.addInventory(items.player_token2);
+        items.player2.addInventory(items.card_hand2);
+
         items.card_hand1.init(items.player1.inventory);
 
         // init game with all items
@@ -123,12 +129,24 @@ STATE_INIT.setHandlers({
         controller.addItems(wps);
         controller.addItems(game_items.prompts);
 
+        // setup player stats
+        items.player1.subscribe('points', items.player1_points);
+        items.player1.subscribe('money', items.player1_money);
+        items.player1.subscribe('risk', items.player1_risk);
+
+        items.player1.set('points', 0);
+        items.player1.set('money', 100);
+        items.player1.set('risk', 0);
+
+
         // connect waypoints - setup paths
         game_items.connectWaypoints();
         items.player_token1.waypoint = wps.start;
         items.player_token2.waypoint = wps.start;
 
         controller.setupBoard();  // Setup the gameboard - draw stuff etc.
+        items.btn_end_turn.draw(controller.joinedPlayers);
+        items.btn_end_turn.deactivate(controller.joinedPlayers);
         controller.rpcCall(controller.joinedPlayers, ['drawImage', 'test', 'assets/connectors.png', 'back', 0, 0]);
         controller.next_player();
         controller.sendLog('Spiel', {content:'Herzlich Willkommen!'});
@@ -136,9 +154,18 @@ STATE_INIT.setHandlers({
     },
 });
 
+controller.on('click', function click(id, item) {
+    if(id == 'btn_end_turn') {
+        item.deactivate(controller.activePlayer);
+        controller.next_player();
+        controller.next_state(STATE_CHOOSE_ACTION);
+    }
+});
+
 STATE_CHOOSE_ACTION.setHandlers({
     'enter' : () => {
         game_items.prompts.choose_action.show(controller.activePlayer);
+        items.btn_end_turn.activate(controller.activePlayer);
     },
 
     'prompt': (src, option, prompt) => {
@@ -149,6 +176,7 @@ STATE_CHOOSE_ACTION.setHandlers({
                 break;
             case 'Eine Frage beantworten':
                 controller.sendLog(controller.activePlayer.name, {content:'beantwortet eine Frage', icon:'inverted orange check square'});
+                controller.next_state(STATE_QUESTION);
                 break;
             case 'Eine Karte ziehen':
                 controller.sendLog(controller.activePlayer.name, {content:'zieht eine Karte', icon:'inverted orange check square'});
@@ -160,7 +188,7 @@ STATE_CHOOSE_ACTION.setHandlers({
 });
 
 STATE_ROLL.setHandlers({
-    'enter': function() {
+    'enter': () => {
         items.dice.roll();
         controller.activePlayer.storage.setBadge('Aller anfang ist schwer',
             () => controller.sendPopup({
@@ -170,7 +198,7 @@ STATE_ROLL.setHandlers({
                 players:controller.activePlayer, x:10, y:10, color:'yellow'}));
     },
 
-    'roll' : function (src, dice) {
+    'roll' : (src, dice) => {
         items.dice.rollResult(controller.activePlayer);
 
         controller.activePlayer.storage.incStatistic('Geworfene Würfel');
@@ -190,7 +218,7 @@ STATE_ROLL.setHandlers({
 });
 
 STATE_SELECT_WAYPOINT.setHandlers({
-    'enter': function () {
+    'enter': function enter()  {
         this.set('playertoken', controller.activePlayer.getInventory({category:'spielfiguren'})[0]);
         this.set('wps', Lib.getWaypointsAtRange(this.get('playertoken').waypoint, controller.get('roll_result')));
 
@@ -200,34 +228,49 @@ STATE_SELECT_WAYPOINT.setHandlers({
         }
     },
 
-    'selectWaypoint': function(src, item) {
+    'selectWaypoint': function selectWaypoint (src, item)  {
         this.get('playertoken').moveToWaypoint(item);
         items.dice.reset(controller.activePlayer);
         controller.sendLog(controller.activePlayer.name, {content:'zieht zu ' + item.id +'!', icon:'inverted yellow location arrow'});
+        controller.next_state(STATE_ENTER_WAYPOINT);
+    },
+
+    'exit': function exit() {
         for (let wp of this.get('wps')) {
             wp.unhighlight(controller.activePlayer);
             wp.deactivate(controller.activePlayer);
         }
-        controller.next_state(STATE_ENTER_WAYPOINT);
     },
 });
 
 STATE_ENTER_WAYPOINT.setHandlers({
-    'enterWaypoint' : function (src, wp, item) {
+    'enterWaypoint' : (src, wp, item) => {
         // handle waypoint events
-        controller.next_state(STATE_CHOOSE_ACTION);
     },
 });
 
+STATE_QUESTION.setHandlers({
+    'enter': function enter() {
+        game_items.prompts.question1.show(controller.activePlayer);
+    },
 
+    'questionWrong': function(id, option, value, question) {
+        game_items.prompts.question1.showResult(controller.activePlayer);
+    },
+
+    'questionCorrect': function(id, option, value, question) {
+        controller.activePlayer.inc('points', value);
+        game_items.prompts.question1.showResult(controller.activePlayer);
+    },
+});
 
 // *****************************************************************************
 
 // *****************************************************************************
 // Game-Lobby
-controller.on( 'joinPlayer', function (player) { lobby.joinPlayer(player); } );
+controller.on( 'joinPlayer', (player) => { lobby.joinPlayer(player); } );
 
-lobby.on('allPlayersReady', function () {
+lobby.on('allPlayersReady', () => {
     lobby.quit();
     console.log('all players ready');
     controller.next_state(STATE_INIT);

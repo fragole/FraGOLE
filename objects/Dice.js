@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-06T19:15:00+02:00
+ * @Last modified time: 2017-06-16T23:51:42+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -50,7 +50,7 @@ class Dice extends Component {
 
     // The die was rolled by the client
     // calculate result and emit 'roll' envent => to be dispached by an Eventhandler
-    roll() {
+    roll(clientId) {
         this.result = Math.floor(Math.random() * this.sides + 1);
         this.context = {id: this.id, content_id: this.content_id + '_result', result: this.result};
         this.gameController.emit('roll', this.id, this);

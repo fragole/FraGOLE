@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-15T19:56:50+02:00
+ * @Last modified time: 2017-06-16T23:37:12+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -36,6 +36,7 @@ class GameController extends GameObject {
         this.rpcServer = rpcServer;
         this.minPlayers = minPlayers;
         this.players = new Collection();
+        this.playersId = {};
         this.joinedPlayers = [];
         this.activePlayer = undefined;
         this.currentState = new GameState('NULL');
@@ -79,6 +80,9 @@ class GameController extends GameObject {
     setupBoard() {
         for (let i in this.items) {
             var item = this.items[i];
+            if (item.supress_setup) {
+                continue;
+            }
             switch(item.constructor.name) {
                 case 'Waypoint':
                     item.draw();
@@ -88,6 +92,17 @@ class GameController extends GameObject {
                         item.draw();
                     }
                     break;
+                case 'PlayerStatistic':
+                case 'CardHand':
+                    if (item.owner && item.owner.joined) {
+                        item.draw(item.owner);
+                    }
+                    break;
+                case 'Statistic':
+                case 'Progress':
+                case 'CardStack':
+                    item.draw();
+                    break;
                 default:
                     break;
             }
@@ -95,8 +110,9 @@ class GameController extends GameObject {
     }
 
     // called when a new Player joins
-    joinPlayer(name, clientProxy) {
+    joinPlayer(name, connection) {
         var player;
+        var clientProxy = connection.clientProxy;
 
         // check if this player has already joined XXX check client-ip
         for (let p of this.players.iterator()) {
@@ -110,12 +126,15 @@ class GameController extends GameObject {
 
         try {
             player = this.playersIterator.next().value[ITEM];
-        } catch(e) { player = undefined; }
+        } catch(e) {
+            player = undefined;
+        }
 
         if (player) {
             player.init(name, clientProxy);
             player.joined = true;
             this.joinedPlayers.push(player);
+            this.playersId[connection.id] = player;
             this.emit('joinPlayer', player);
             return player;
         }

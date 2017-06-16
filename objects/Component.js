@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T11:37:26+02:00
+ * @Last modified time: 2017-06-16T23:42:17+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -18,6 +18,7 @@ class Component extends GameItem {
         this.template = new template();
         this.context = {};
         this.context.id = id;
+        this.supress_setup = false; // set true to supress drawing by setupBoard
     }
 
     // draw a Component to the client document
@@ -88,7 +89,8 @@ class Component extends GameItem {
     // EVENTS - these are normaly triggerd by the client
 
     // component was clicked => send event
-    click() {
+    click(clientId) {
+        //console.log(this.gameController.playersId[clientId]);
         this.gameController.emit('click', this.id, this);
     }
 

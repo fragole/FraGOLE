@@ -1,3 +1,16 @@
+/**
+ * @Author: Michael Bauer
+ * @Date:   2017-05-20T11:36:24+02:00
+ * @Email:  mb@bauercloud.de
+ * @Project: Fragole - FrAmework for Gamified Online Learning Environments
+ * @Last modified by:   Michael Bauer
+ * @Last modified time: 2017-06-16T20:41:20+02:00
+ * @License: MIT
+ * @Copyright: Michael Bauer
+ */
+
+
+
 var Prompt = require('../objects/FragoleObjects.js').Prompt;
 var Question = require('../objects/FragoleObjects.js').Question;
 

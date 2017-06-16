@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-06T19:12:56+02:00
+ * @Last modified time: 2017-06-16T20:41:52+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -166,6 +166,13 @@ var prompts = {
             'Würfeln':{color:'olive', icon:'cube'},
             'Eine Frage beantworten':{color:'green', icon:'help'},
             'Eine Karte ziehen':{color:'teal',  icon:'clone'},
+        }),
+    question1: new Question('guestion1', 'Frage',
+        '<p>Was ist richtig?',
+        '',
+        {
+            '1 + 1 = 2':{correct:true, value:10},
+            '1 + 1 = 3':{correct:false, value:0},
         }),
 };
 

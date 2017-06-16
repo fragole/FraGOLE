@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T11:41:24+02:00
+ * @Last modified time: 2017-06-16T18:11:08+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -35,4 +35,5 @@ module.exports= {
     Card:             require('./Cards.js').Card,
     CardStack:        require('./Cards.js').CardStack,
     CardHand:         require('./Cards.js').CardHand,
+    Button:           require('./Button.js').Button,
 };

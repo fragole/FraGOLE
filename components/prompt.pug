@@ -11,11 +11,11 @@ div( id=content_id class="ui small modal")
   div(class="actions")
     each action, label in actions
       if action.icon
-        div(class="ui ok labeled icon fluid " + action.color + " button" onClick="rpcServer['prompt_" + id + "']('" + label + "');" )
+        div(class="ui ok labeled icon fluid " + action.color + " button" onClick="rpcServer['prompt_" + id + "']('" + label + "', gameboard.clientId);" )
           i(class="ui icon " + action.icon)
           |#{label}
       else
-        div(class="ui ok fluid " + action.color + " button" onClick="rpcServer['prompt_" + id + "']('" + label + "');") #{label}
+        div(class="ui ok fluid " + action.color + " button" onClick="rpcServer['prompt_" + id + "']('" + label + "', gameboard.clientId);") #{label}
   script.
     function afterAddDomContent() {
       $('##{content_id}')

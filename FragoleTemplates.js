@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T19:48:24+02:00
+ * @Last modified time: 2017-06-16T18:09:24+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -287,6 +287,12 @@ class CARD_HAND_DEFAULT extends ComponentTemplate {
     }
 }
 
+class BUTTON_DEFAULT extends ComponentTemplate {
+    constructor () {
+        super('./components/button.pug', 'board_div');
+    }
+}
+
 module.exports = {
     ShapeTemplate: ShapeTemplate,
     ImageTemplate: ImageTemplate,
@@ -308,5 +314,6 @@ module.exports = {
     CARD_STACK_DEFAULT: CARD_STACK_DEFAULT,
     CARD_DEFAULT: CARD_DEFAULT,
     CARD_HAND_DEFAULT: CARD_HAND_DEFAULT,
+    BUTTON_DEFAULT: BUTTON_DEFAULT,
     shapes: {CIRCLE : CIRCLE},
 };

@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-15T19:40:24+02:00
+ * @Last modified time: 2017-06-16T23:39:58+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -73,7 +73,7 @@ class SERVER {
         this.connections = {};
         var connections = this.connections;
 
-        this.eurecaServer = new Eureca.Server({allow:['setBackgroundColor', 'setBackgroundImage', 'addDomContent', 'removeDomContent', 'emptyDomContent',
+        this.eurecaServer = new Eureca.Server({allow:['setClientId', 'setBackgroundColor', 'setBackgroundImage', 'addDomContent', 'removeDomContent', 'emptyDomContent',
             'drawShape', 'drawImage', 'activateToken', 'deactivateToken', 'moveToken', 'highlightToken', 'unhighlightToken']});
 
         this.eurecaServer.attach(this.server);
@@ -85,8 +85,9 @@ class SERVER {
             var session;
             var clientIp = localIpHelper(connection.eureca.remoteAddress.ip);
             if (session = sessions.get(clientIp)) {
-                sessions.set(clientIp, [session[0], connection.clientProxy]);
+                sessions.set(clientIp, [session[0], connection]);
             }
+            connection.clientProxy.setClientId(connection.id);
         });
 
         this.connect('ready', ready);
@@ -126,15 +127,15 @@ class SERVER {
 
 // handle rpc-sessions
 function ready() {
-    var player, playerName, clientProxy;
+    var player, playerName, connection;
     var clientIp = localIpHelper(this.connection.eureca.remoteAddress.ip);
 
     try {
-        [playerName, clientProxy] = sessions.get(clientIp);
+        [playerName, connection] = sessions.get(clientIp);
 
-        if(player = globalGame.gameControllers[0].joinPlayer(playerName, clientProxy)) {
+        if(player = globalGame.gameControllers[0].joinPlayer(playerName, connection)) {
             console.log('Player No.', player.number, ' joined:', player.name);
-            clientProxy.setBackgroundImage('/assets/background.jpg');
+            connection.clientProxy.setBackgroundImage('/assets/background.jpg');
         } else {
             console.log('Max Players already joined!');
         }

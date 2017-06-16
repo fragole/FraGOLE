@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T11:26:02+02:00
+ * @Last modified time: 2017-06-16T23:51:25+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -49,7 +49,7 @@ class Card extends Component {
 
     // play the card => emit corresponding event
     // the card-action must be executed by an event-handler
-    play() {
+    play(clientId) {
         if (this.gameController) {
             this.gameController.emit('playCard', this.id, this);
         }
@@ -114,12 +114,12 @@ class CardStack extends Component {
     }
 
     // EVENTS
-    click() {
-        this.drawCard();
+    click(clientId) {
+        this.drawCard(clientId);
     }
 
     // draw a card from the stack (it will be removed)
-    drawCard() {
+    drawCard(clientId) {
         var card = this.cards.deleteItem(this.stack.pop());
         if (this.gameController) {
             this.gameController.emit('drawCard', this.id, card, this);

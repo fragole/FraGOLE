@@ -1,0 +1,55 @@
+html
+
+  head
+    title Fragole - FRAmework for Gamified Online Learning Environments
+    link(rel='stylesheet', href='/semantic.min.css')
+
+  body
+      br
+      br
+      .ui.grid
+        .two.wide.column
+        .three.wide.column
+          .ui.card
+            .image
+              img(src='/assets/tom.jpg')
+            .content
+              a.header #{player_name}
+              .meta
+                span.date Profil angelegt 2017
+              .description
+                | Hier könnte eine Beschreibung stehen
+            .extra.content
+              a
+                i.user.icon
+                | Hier könnte eine weitere Information stehen
+        .one.wide.column
+        .seven.wide.column
+          .ui.header Statistiken
+          br
+          table.ui.very.basic.collapsing.celled.table
+            thead
+              tr
+                th Name
+                th Wert
+            tbody
+              each value, key in statistics
+                tr
+                  td #{key}
+                  td #{value}
+          br
+          br
+          .ui.header Badges
+          br
+          table.ui.very.basic.collapsing.celled.table
+            thead
+              tr
+                th Name
+                th erhalten am
+            tbody
+              each value, key in badges
+                tr
+                  td #{key}
+                  td #{value}
+
+        .one.wide.column

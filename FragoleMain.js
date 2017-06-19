@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-16T23:54:56+02:00
+ * @Last modified time: 2017-06-19T15:48:36+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -69,7 +69,7 @@ var items = {
     card_stack_good: new CardStack('card_stack_good', 1100, 20, 'Karten'),
     card_stack_bad: new CardStack('card_stack_bad', 1100, 250, 'Risiko'),
     card1: new Card('card1', 'Karte 1', 'dies ist eine erste Testkarte', 'assets/card1.jpg', (context) => {
-        context.gameController.activePlayer.inc('points');
+        context.activePlayer.inc('points');
     }),
     card2: new Card('card2', 'Karte 2', 'dies ist eine zweite Testkarte', 'assets/card2.jpg'),
     card3: new Card('card3', 'Karte 3', 'dies ist eine dritte Testkarte', 'assets/card3.jpg'),
@@ -129,6 +129,8 @@ STATE_INIT.setHandlers({
         controller.addItems(wps);
         controller.addItems(game_items.prompts);
 
+        controller.subscribe('global_risk', items.global_risk);
+        controller.set('global_risk', 0);
         // setup player stats
         items.player1.subscribe('points', items.player1_points);
         items.player1.subscribe('money', items.player1_money);
@@ -137,7 +139,7 @@ STATE_INIT.setHandlers({
         items.player1.set('points', 0);
         items.player1.set('money', 100);
         items.player1.set('risk', 0);
-
+        items.player2.set('path', wps.start.category);
 
         // connect waypoints - setup paths
         game_items.connectWaypoints();
@@ -162,6 +164,11 @@ controller.on('click', function click(id, item) {
     }
 });
 
+controller.on('playCard', function playCard(src, card) {
+    card.action(controller);
+    card.owner.removeInventory(card);
+});
+
 STATE_CHOOSE_ACTION.setHandlers({
     'enter' : () => {
         game_items.prompts.choose_action.show(controller.activePlayer);
@@ -180,6 +187,7 @@ STATE_CHOOSE_ACTION.setHandlers({
                 break;
             case 'Eine Karte ziehen':
                 controller.sendLog(controller.activePlayer.name, {content:'zieht eine Karte', icon:'inverted orange check square'});
+                controller.next_state(STATE_DRAW_CARD);
                 break;
             default:
                 break;
@@ -245,7 +253,65 @@ STATE_SELECT_WAYPOINT.setHandlers({
 
 STATE_ENTER_WAYPOINT.setHandlers({
     'enterWaypoint' : (src, wp, item) => {
+        var risk = 0, color, icon, header;
+        var global_risk = controller.get('global_risk');
+        if(wp.category != controller.activePlayer.get('path')) {
+            // different path entered
+            switch(wp.category) {
+                case 'path1':
+                    risk = global_risk + 0;
+                    controller.activePlayer.session.setBackgroundImage('/assets/path.jpg');
+                    break;
+                case 'path2':
+                case 'path3':
+                    risk = global_risk + 40;
+                    controller.activePlayer.session.setBackgroundImage('/assets/bridge.jpg');
+                    break;
+                case 'path4':
+                case 'path5':
+                    risk = global_risk + 20;
+                    controller.activePlayer.session.setBackgroundImage('/assets/background.jpg');
+                    break;
+                default:
+                    break;
+            }
+
+            if (risk <= 15) {
+                header = 'HINWEIS:';
+                color = 'green';
+                icon = 'smile';
+            }  else if (risk <= 30) {
+                header = 'ACHTUNG';
+                color = 'yellow';
+                icon = 'meh';
+            } else {
+                header = 'GEFAHR:';
+                color = 'red';
+                icon = 'frown';
+            }
+            Lib.probably(risk, () => controller.sendPopup({header:'Schlimme Dinge!', msg:'Ziehe eine Risiko-Karte', icon:'lightning', players:controller.activePlayer, x:200, y:10, color:'red'}),
+                               () => controller.sendPopup({header:header, msg:'Dein Risiko beträgt: ' + risk, icon:icon, players:controller.activePlayer, x:200, y:10, color:color}));
+            controller.activePlayer.set('risk', risk);
+            controller.activePlayer.set('path', controller.set('path', wp.category));
+        }
         // handle waypoint events
+    },
+});
+
+STATE_DRAW_CARD.setHandlers({
+    'enter': function enter() {
+        items.card_stack_good.highlight(controller.activePlayer);
+        items.card_stack_good.activate(controller.activePlayer);
+    },
+
+    'drawCard': function drawCard(src, card, stack) {
+        console.log('STATE_TURN drawCard', card.id);
+        card.draw(controller.activePlayer);
+        controller.activePlayer.addInventory(card);
+        items.card_hand1.activate();
+        items.card_stack_good.unhighlight(controller.activePlayer);
+        items.card_stack_good.deactivate(controller.activePlayer);
+
     },
 });
 

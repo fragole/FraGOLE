@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-16T23:53:04+02:00
+ * @Last modified time: 2017-06-17T19:25:29+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -131,9 +131,11 @@ class Token extends GameItem {
     // is called when the animation-tween on the client-side is completed
     // emits moveComplete & enterWaypoint Events
     moveComplete(clientId) {
-        this.gameController.rpcServer.disconnect('move_complete_' + this.id);
-        this.gameController.emit('moveComplete', this.id, this);
-        this.gameController.emit('enterWaypoint', this.id, this.waypoint, this);
+        if(this.gameController.playersId[clientId] == this.gameController.activePlayer) {
+            this.gameController.emit('moveComplete', this.id, this);
+            this.gameController.emit('enterWaypoint', this.id, this.waypoint, this);
+            //this.gameController.rpcServer.disconnect('move_complete_' + this.id);
+        }
     }
 
 }

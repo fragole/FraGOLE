@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-16T23:54:36+02:00
+ * @Last modified time: 2017-06-17T20:34:51+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -206,6 +206,7 @@ Fragole.GameBoard = class GameBoard {
             } else {
                sf = that.board_canvas.height / img.height;
             }
+            console.log('scale', sf);
             matrix.scale(sf,sf);
             that.background.graphics.clear()
               .beginBitmapFill(img, 'no-repeat', matrix)

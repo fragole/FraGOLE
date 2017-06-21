@@ -4,12 +4,12 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T16:53:28+02:00
+ * @Last modified time: 2017-06-21T19:44:39+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
-var GameObject = require('./GameObject.js').GameObject;
+const GameObject = require('./GameObject.js').GameObject;
 
 // GameState is a Object representing a State of the FSM
 // Eventhandlers can be declared as follows:

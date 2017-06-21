@@ -4,15 +4,14 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-17T19:25:29+02:00
+ * @Last modified time: 2017-06-21T19:44:24+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
 var GameItem = require('./GameObject.js').GameItem;
-var nomalizeCoordinates = require('../FragoleLib.js').nomalizeCoordinates;
-var templates = require('../FragoleTemplates.js');
-var Lib = require('../FragoleLib.js');
+var templates = require('../lib/FragoleTemplates.js');
+var Lib = require('../lib/FragoleLib.js');
 
 // Base-Clase for Tokens
 // Tokens are shapes or images the are displayed in the clients gameboard
@@ -46,10 +45,10 @@ class Token extends GameItem {
                     this.gameController.emit('passWaypoint', this.id, this, wp);
                 }
                 step++;
-                path.push(nomalizeCoordinates(this, p_tpl._x, p_tpl._y));
+                path.push(Lib.normalizeCoordinates(this, p_tpl._x, p_tpl._y));
             }
         } else {
-            path.push(nomalizeCoordinates(this, wp_tpl._x, wp_tpl._y));
+            path.push(Lib.normalizeCoordinates(this, wp_tpl._x, wp_tpl._y));
         }
 
 

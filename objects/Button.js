@@ -4,12 +4,12 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-16T19:06:23+02:00
+ * @Last modified time: 2017-06-21T19:39:20+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 const Component = require('./Component').Component,
-    templates = require('../FragoleTemplates.js');
+    templates = require('../lib/FragoleTemplates.js');
 
 class Button extends Component {
     constructor(id, x, y, label, color, icon, template=templates.BUTTON_DEFAULT) {

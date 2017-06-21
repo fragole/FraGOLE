@@ -4,13 +4,13 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T19:23:44+02:00
+ * @Last modified time: 2017-06-21T19:42:26+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
 var Component = require('./Component').Component;
-var templates = require('../FragoleTemplates.js');
+var templates = require('../lib/FragoleTemplates.js');
 
 // A numeric representation of a Statistic (Points, etc) which can be drawn to
 // the gameboard

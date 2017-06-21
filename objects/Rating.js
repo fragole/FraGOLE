@@ -4,13 +4,13 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T19:18:03+02:00
+ * @Last modified time: 2017-06-21T19:42:19+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
 var Statistic = require('./Statistic.js').Statistic;
-var templates = require('../FragoleTemplates.js');
+var templates = require('../lib/FragoleTemplates.js');
 
 // a rating-bar with stars or hearts that can be drawn to  the gameboard
 class Rating extends Statistic {

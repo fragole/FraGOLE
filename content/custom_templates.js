@@ -4,12 +4,12 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-06T10:51:06+02:00
+ * @Last modified time: 2017-06-21T19:46:51+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
-var Templates = require('../FragoleTemplates.js');
+var Templates = require('../lib/FragoleTemplates.js');
 
 class WAYPOINT_GREEN extends Templates.ShapeTemplate {
     constructor () {

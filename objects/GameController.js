@@ -4,19 +4,19 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-16T23:37:12+02:00
+ * @Last modified time: 2017-06-21T19:41:34+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
-const GameObject = require('./GameObject.js').GameObject,
-    Collection = require('./Collection.js').Collection,
-    GameState = require('./GameState.js').GameState,
-    templates = require('../FragoleTemplates.js'),
-    Player = require('./Player.js').Player,
-    PlayerToken = require('./PlayerToken.js').PlayerToken,
-    Waypoint = require('./Waypoint.js').Waypoint,
-    Lib = require('../FragoleLib.js');
+const GameObject = require('./GameObject.js').GameObject;
+const Collection = require('./Collection.js').Collection;
+const GameState = require('./GameState.js').GameState;
+const templates = require('../lib/FragoleTemplates.js');
+const Player = require('./Player.js').Player;
+const PlayerToken = require('./PlayerToken.js').PlayerToken;
+const Waypoint = require('./Waypoint.js').Waypoint;
+const Lib = require('../lib/FragoleLib.js');
 
 const ID = 0;
 const ITEM = 1;

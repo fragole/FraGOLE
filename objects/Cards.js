@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-16T23:51:25+02:00
+ * @Last modified time: 2017-06-21T19:39:28+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -12,7 +12,7 @@
 
 var Component = require('./Component').Component;
 var Collection = require('./Collection').Collection;
-var templates = require('../FragoleTemplates.js');
+var templates = require('../lib/FragoleTemplates.js');
 
 // Basic card object
 // the presentation of 'label', 'text' and 'image' is determined by the template

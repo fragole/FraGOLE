@@ -4,30 +4,28 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-19T15:48:36+02:00
+ * @Last modified time: 2017-06-21T19:52:25+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
-const FragoleServer = require('./FragoleServer.js'),
-    Lib = require('./FragoleLib.js'),
-    {Game, GameController, GameState, Player, PlayerToken, Collection,
-     Waypoint, Dice, Statistic, PlayerStatistic, Rating, PlayerRating,
-     Progress, PlayerProgress, Prompt, Card, CardStack, CardHand, Button} = require('./objects/FragoleObjects.js'),
-    prompts = require('./content/Prompts.js'),
-    game_items = require('./content/game_items.js'),
-    Lobby = require('./FragoleLobby.js'),
-    Templates = require('./FragoleTemplates.js');
+const FragoleServer = require('./lib/FragoleServer.js');
+const Lib = require('./lib/FragoleLib.js');
+const {Game, GameController, GameState, Player, PlayerToken, Collection,
+       Waypoint, Dice, Statistic, PlayerStatistic, Rating, PlayerRating,
+       Progress, PlayerProgress, Prompt, Card, CardStack, CardHand, Button} = require('./objects/FragoleObjects.js');
+const prompts = require('./content/Prompts.js');
+const game_items = require('./content/game_items.js');
+const Lobby = require('./lib/FragoleLobby.js');
+const Templates = require('./lib/FragoleTemplates.js');
 
-
-var server = new FragoleServer.SERVER();
-var sessions = FragoleServer.sessions;
+let server = new FragoleServer.SERVER();
+let sessions = FragoleServer.sessions;
 
 // ****************************************************************************
 // Game definition
-var game = new Game();
-var controller = new GameController('game_controller1', 1, server);
-
+let game = new Game();
+let controller = new GameController('game_controller1', 1, server);
 
 game.setName('TestGame')
     .addController(controller);
@@ -35,17 +33,17 @@ server.setGame(game);
 server.start(80);
 
 // STATES
-var STATE_INIT = new GameState('STATE_INIT');
-var STATE_ROLL = new GameState('STATE_ROLL');
-var STATE_SELECT_WAYPOINT = new GameState('STATE_SELECT_WAYPOINT');
-var STATE_ENTER_WAYPOINT = new GameState('STATE_ENTER_WAYPOINT');
-var STATE_CHOOSE_ACTION = new GameState('STATE_CHOOSE_ACTION');
-var STATE_QUESTION = new GameState('STATE_QUESTION');
-var STATE_DRAW_CARD = new GameState('DRAW_CARD');
+let STATE_INIT = new GameState('STATE_INIT');
+let STATE_ROLL = new GameState('STATE_ROLL');
+let STATE_SELECT_WAYPOINT = new GameState('STATE_SELECT_WAYPOINT');
+let STATE_ENTER_WAYPOINT = new GameState('STATE_ENTER_WAYPOINT');
+let STATE_CHOOSE_ACTION = new GameState('STATE_CHOOSE_ACTION');
+let STATE_QUESTION = new GameState('STATE_QUESTION');
+let STATE_DRAW_CARD = new GameState('DRAW_CARD');
 
 // *****************************************************************************
 // collection of all game items
-var items = {
+let items = {
     // Players
     player1: new Player('player1'),
     player2: new Player('player2'),
@@ -68,10 +66,13 @@ var items = {
 
     card_stack_good: new CardStack('card_stack_good', 1100, 20, 'Karten'),
     card_stack_bad: new CardStack('card_stack_bad', 1100, 250, 'Risiko'),
-    card1: new Card('card1', 'Karte 1', 'dies ist eine erste Testkarte', 'assets/card1.jpg', (context) => {
-        context.activePlayer.inc('points');
+    card1: new Card('card1', 'Abkürzung', 'Du hast eine Abkürzung gefunden!', 'assets/card1.jpg', (context) => {
+        let wp = new Waypoint('wpak', 'path1', 130, 295);
+        context.addItems([wp]);
+        wp.draw();
+
     }),
-    card2: new Card('card2', 'Karte 2', 'dies ist eine zweite Testkarte', 'assets/card2.jpg'),
+    /*card2: new Card('card2', 'Karte 2', 'dies ist eine zweite Testkarte', 'assets/card2.jpg'),
     card3: new Card('card3', 'Karte 3', 'dies ist eine dritte Testkarte', 'assets/card3.jpg'),
     card4: new Card('card4', 'Karte 4', 'dies ist eine vierte Testkarte', 'assets/card3.jpg'),
     card5: new Card('card5', 'Karte 5', 'dies ist eine fünfte Testkarte', 'assets/card3.jpg'),
@@ -80,7 +81,7 @@ var items = {
     card8: new Card('card8', 'Karte 8', 'dies ist eine achte Testkarte', 'assets/card3.jpg'),
     card9: new Card('card9', 'Karte 9', 'dies ist eine neunte Testkarte', 'assets/card3.jpg'),
     card10: new Card('card10', 'Karte 10', 'dies ist eine zehnte Testkarte', 'assets/card3.jpg'),
-
+    */
     card_hand1: new CardHand('card_hand1'),
     card_hand2: new CardHand('card_hand2'),
 
@@ -93,10 +94,12 @@ var items = {
 // Set position for dice-roll result
 items.dice.template.result_x(25).result_y(25);
 
-items.card_stack_good.addCards([
-    items.card1, items.card2, items.card3,
-    items.card4, items.card5, items.card6,
-    items.card7, items.card8, items.card9,]);
+items.card_stack_good.addCards(items.card1);
+
+//items.card_stack_good.addCards([
+//    items.card1, items.card2, items.card3,
+//    items.card4, items.card5, items.card6,
+//    items.card7, items.card8, items.card9,]);
 items.card_stack_good.shuffle();
 
 // add (potential) players to the gameController
@@ -311,7 +314,6 @@ STATE_DRAW_CARD.setHandlers({
         items.card_hand1.activate();
         items.card_stack_good.unhighlight(controller.activePlayer);
         items.card_stack_good.deactivate(controller.activePlayer);
-
     },
 });
 

@@ -4,13 +4,13 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-16T20:41:52+02:00
+ * @Last modified time: 2017-06-21T19:45:43+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
-var Lib = require('../FragoleLib.js');
-var Waypoint = require('../Objects/FragoleObjects.js').Waypoint;
+var Lib = require('../lib/FragoleLib.js');
+var Waypoint = require('../objects/FragoleObjects.js').Waypoint;
 var Prompt = require('../objects/FragoleObjects.js').Prompt;
 var Question = require('../objects/FragoleObjects.js').Question;
 var CustomTemplates = require('./custom_templates.js');
@@ -153,14 +153,11 @@ function connectWaypoints () {
     Lib.connectWaypoints([waypoints.camp2, waypoints.wp211], true);
     Lib.connectWaypoints([waypoints.bigcamp2, waypoints.wp401], true);
     Lib.connectWaypoints([waypoints.wp405, waypoints.camp3], true);
-
-
-
 }
 
 var prompts = {
     choose_action : new Prompt('choose_action', 'Du bist dran!',
-        '<p>Du kannst eine von folgenden Aktionen ausfürhen:</p>',
+        '<p>Du kannst eine von folgenden Aktionen ausführen:</p>',
         null,
         {
             'Würfeln':{color:'olive', icon:'cube'},
@@ -168,7 +165,7 @@ var prompts = {
             'Eine Karte ziehen':{color:'teal',  icon:'clone'},
         }),
     question1: new Question('guestion1', 'Frage',
-        '<p>Was ist richtig?',
+        '<p>Was ist richtig?</p><iframe width="560" height="315" src="https://www.youtube.com/embed/pk1h4cyowqg" frameborder="0" allowfullscreen></iframe>',
         '',
         {
             '1 + 1 = 2':{correct:true, value:10},

@@ -4,13 +4,13 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T19:03:34+02:00
+ * @Last modified time: 2017-06-21T19:44:42+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
 var Token = require('./Token.js').Token;
-var templates = require('../FragoleTemplates.js');
+var templates = require('../lib/FragoleTemplates.js');
 
 // client-side PlayerToken
 class PlayerToken extends Token {

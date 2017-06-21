@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-19T15:48:31+02:00
+ * @Last modified time: 2017-06-21T19:42:12+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -12,7 +12,7 @@
 
 
 var Component = require('./Component').Component;
-var templates = require('../FragoleTemplates.js');
+var templates = require('../lib/FragoleTemplates.js');
 
 // Implements a clients-side prompt with multiple options
 // header: header-text

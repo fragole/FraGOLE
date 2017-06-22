@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-21T19:52:25+02:00
+ * @Last modified time: 2017-06-22T18:35:59+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -19,7 +19,7 @@ const game_items = require('./content/game_items.js');
 const Lobby = require('./lib/FragoleLobby.js');
 const Templates = require('./lib/FragoleTemplates.js');
 
-let server = new FragoleServer.SERVER();
+let server = new FragoleServer.Server();
 let sessions = FragoleServer.sessions;
 
 // ****************************************************************************

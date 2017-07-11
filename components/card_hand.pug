@@ -1,5 +1,5 @@
-div(id=content_id class="three wide column")
-  figure(id=content_id class="hand hand-spread")
+div(id=contentId class="three wide column")
+  figure(id=contentId class="hand hand-spread")
     img(src=image)
     img(src=image)
     img(src=image)
@@ -7,16 +7,16 @@ div(id=content_id class="three wide column")
     img(src=image)
     script.
       function afterAddDomContent() {
-          $('#modal_#{content_id}')
+          $('#modal_#{contentId}')
             .modal('setting', 'transition', 'horizontal flip')
             .modal('setting', 'detachable', 'false');
-          $('##{content_id}').on('click', function() {
-            $('#modal_#{content_id}')
+          $('##{contentId}').on('click', function() {
+            $('#modal_#{contentId}')
               .modal('refresh')
               .modal('show');
           });
       }
-  div(id="modal_" + content_id class="ui centered basic modal")
+  div(id="modal_" + contentId class="ui centered basic modal")
     div(class="ui cards")
       each card in cards
         if (cards.length <= 3)

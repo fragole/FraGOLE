@@ -1,6 +1,6 @@
-div(id=content_id style="position:absolute; top:" + y +"px; left:"+ x +"px;")
+div(id=contentId style="position:absolute; top:" + y +"px; left:"+ x +"px;")
   .ui.header #{label}
-  figure(id=content_id + "_inner" class="stack stack-spread" )
+  figure(id=contentId + "_inner" class="stack stack-spread" )
     img(src=image)
     img(src=image)
     img(src=image)
@@ -9,13 +9,13 @@ div(id=content_id style="position:absolute; top:" + y +"px; left:"+ x +"px;")
   script
     |function afterAddDomContent() {
     if (highlight == 'on')
-        |    $('##{content_id}_inner' )
+        |    $('##{contentId}_inner' )
         |        .transition('set looping')
         |        .transition('jiggle', '2000ms');
     if (highlight == 'off')
-        |    $('##{content_id}_inner').transition('remove looping');
+        |    $('##{contentId}_inner').transition('remove looping');
     if (activate == 'on')
-        |    $('##{content_id}_inner').on('click', function() {rpcServer['click_#{id}'](gameboard.clientId)});
+        |    $('##{contentId}_inner').on('click', function() {rpcServer['click_#{id}'](gameboard.clientId)});
     if (activate == 'off')
-        |    $('##{content_id}_inner').off('click');
+        |    $('##{contentId}_inner').off('click');
     |}

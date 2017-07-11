@@ -1,4 +1,4 @@
-div(id=content_id class="ui centered basic modal")
+div(id=contentId class="ui centered basic modal")
   div(class="ui one column stackable center aligned page grid")
     div(class="column twelve wide")
       include ./card_content.pug
@@ -8,7 +8,7 @@ div(id=content_id class="ui centered basic modal")
           |super
   script.
     function afterAddDomContent() {
-      $('##{content_id}')
+      $('##{contentId}')
         .modal('setting', 'transition', 'horizontal flip')
         .modal('show');
     }

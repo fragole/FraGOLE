@@ -24,7 +24,7 @@ class Player extends GameObject {
         this.name = undefined;    // will be set by GameController.joinPlayer
         this.inventory = new Collection();
         this.inventory.owner = this;
-        this.skip_turns = 0;
+        this.skipTurns = 0;
     }
 
     init(name, session) {

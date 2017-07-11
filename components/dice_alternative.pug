@@ -1,5 +1,5 @@
 unless result
-  div(id=content_id class="ui centered basic modal")
+  div(id=contentId class="ui centered basic modal")
     div(class="ui one column stackable center aligned page grid")
         div(class="column twelve wide")
             div(class="ui inverted icon header")
@@ -14,12 +14,12 @@ unless result
                     | Würfeln
             script.
                 function afterAddDomContent() {
-                    $('##{content_id}')
+                    $('##{contentId}')
                         .modal('setting', 'closable', false)
                         .modal('show');
                 }
 else
-    div(id=content_id class="ui segment" style="position:absolute; top:" + y +"px; right:"+ x +"px;")
+    div(id=contentId class="ui segment" style="position:absolute; top:" + y +"px; right:"+ x +"px;")
         div(class="content")
           div(class="center")
             div(class="ui icon header")

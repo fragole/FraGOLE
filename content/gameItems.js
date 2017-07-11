@@ -4,19 +4,19 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-21T19:45:43+02:00
+ * @Last modified time: 2017-07-11T20:55:29+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
-var Lib = require('../lib/FragoleLib.js');
-var Waypoint = require('../objects/FragoleObjects.js').Waypoint;
-var Prompt = require('../objects/FragoleObjects.js').Prompt;
-var Question = require('../objects/FragoleObjects.js').Question;
-var CustomTemplates = require('./custom_templates.js');
+const Lib = require('../lib/FragoleLib.js');
+const Waypoint = require('../objects/FragoleObjects.js').Waypoint;
+const Prompt = require('../objects/FragoleObjects.js').Prompt;
+const Question = require('../objects/FragoleObjects.js').Question;
+const CustomTemplates = require('./custom_templates.js');
 
  // Waypoints
-var waypoints = {
+let waypoints = {
     start: new Waypoint('start', 'path1', 65, 650, CustomTemplates.WAYPOINT_GREEN),
     wp2: new Waypoint('wp2', 'path1', 35, 590, CustomTemplates.WAYPOINT_SMALL_WHITE),
     wp3: new Waypoint('wp3', 'path1', 32, 540, CustomTemplates.WAYPOINT_SMALL_WHITE),
@@ -126,10 +126,10 @@ var waypoints = {
 };
 
 function connectWaypoints () {
-    var paths = {};
+    let paths = {};
 
     for (let k in waypoints) {
-        var wp= waypoints[k];
+        let wp= waypoints[k];
         if (paths[wp.category] instanceof Array) {
             paths[wp.category].push(wp);
         } else {
@@ -155,7 +155,7 @@ function connectWaypoints () {
     Lib.connectWaypoints([waypoints.wp405, waypoints.camp3], true);
 }
 
-var prompts = {
+let prompts = {
     choose_action : new Prompt('choose_action', 'Du bist dran!',
         '<p>Du kannst eine von folgenden Aktionen ausführen:</p>',
         null,

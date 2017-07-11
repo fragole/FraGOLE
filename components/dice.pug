@@ -1,4 +1,4 @@
-div(id=content_id class="ui centered basic modal")
+div(id=contentId class="ui centered basic modal")
     div(class="ui one column stackable center aligned page grid")
         div(class="column twelve wide")
             unless result
@@ -14,7 +14,7 @@ div(id=content_id class="ui centered basic modal")
                         | Würfeln
                 script.
                     function afterAddDomContent() {
-                        $('##{content_id}')
+                        $('##{contentId}')
                             .modal('setting', 'closable', false)
                             .modal('show');
                     }
@@ -31,6 +31,6 @@ div(id=content_id class="ui centered basic modal")
                         | fein
                 script.
                     function afterAddDomContent() {
-                        $('##{content_id}')
+                        $('##{contentId}')
                             .modal('show');
                     }

@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-22T18:32:15+02:00
+ * @Last modified time: 2017-07-01T15:22:00+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -130,7 +130,7 @@ STATE_INIT.setHandlers({
         game.setupBoard();  // Setup the gameboard - draw stuff etc.
 
         controller.rpcCall(controller.joinedPlayers, ['drawImage', 'test', 'assets/Items/Colored/genericItem_color_035.png', 'back', 50, 50]);
-        controller.next_player();
+        controller.nextPlayer();
         controller.sendLog('Spiel', {content:'Herzlich Willkommen!'});
         items.player_token1.waypoint = items.wp1;
         items.player_token2.waypoint = items.wp1;
@@ -172,7 +172,7 @@ STATE_INIT.setHandlers({
     },
 
     'questionFinished': function(src, item) {
-        controller.next_state(STATE_TURN);
+        controller.nextState(STATE_TURN);
     }
 
 });
@@ -237,7 +237,7 @@ STATE_TURN.setHandlers({
     },
 
     'moveComplete': function(src, item) {
-        controller.next_state(STATE_TURN);
+        controller.nextState(STATE_TURN);
     },
 
     'watchdog': function() {
@@ -247,11 +247,11 @@ STATE_TURN.setHandlers({
             wp.unhighlight(this.get('player'));
             wp.deactivate(this.get('player'));
         }
-        controller.next_state(STATE_TURN);
+        controller.nextState(STATE_TURN);
     },
 
     'exit': function() {
-        controller.next_player();
+        controller.nextPlayer();
     }
 
 });
@@ -265,5 +265,5 @@ controller.on( 'joinPlayer', function (player) { lobby.joinPlayer(player); } );
 lobby.on('allPlayersReady', function () {
     lobby.quit();
     console.log('all players ready');
-    controller.next_state(STATE_INIT);
+    controller.nextState(STATE_INIT);
 });

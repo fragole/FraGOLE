@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-16T18:11:08+02:00
+ * @Last modified time: 2017-07-11T20:24:52+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */

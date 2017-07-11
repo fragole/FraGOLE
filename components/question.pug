@@ -1,5 +1,5 @@
 unless selection
-  div( id=content_id class="ui small modal")
+  div( id=contentId class="ui small modal")
     div(class="header") #{header}
     if image
       div(class="image content")
@@ -19,12 +19,12 @@ unless selection
           div(class="ui ok fluid " + action.color + " button" onClick="rpcServer['question_" + id + "']('" + label + "', gameboard.clientId);") #{label}
     script.
       function afterAddDomContent() {
-        $('##{content_id}')
+        $('##{contentId}')
           .modal('setting', 'closable', false)
           .modal('show');
       }
 else
-  div( id=content_id class="ui small modal")
+  div( id=contentId class="ui small modal")
     if correct
       div(class="header") Richtig!
       div(class="content")
@@ -42,7 +42,7 @@ else
           |OK
     script.
       function afterAddDomContent() {
-        $('##{content_id}')
+        $('##{contentId}')
           .modal('setting', 'closable', false)
           .modal('show');
       }

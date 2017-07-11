@@ -22,7 +22,7 @@ var templates = require('../lib/FragoleTemplates.js');
 class Prompt extends Component {
     constructor(id, header, content, image, actions={'Ok':{color:'blue', icon:'checkmark'}, 'Abbrechen':{color:'red', icon:'remove'}}, template=templates.PROMPT_DEFAULT) {
         super(id, template);
-        this.context.content_id = 'prompt_' + id;
+        this.context.contentId = 'prompt_' + id;
         this.context.header = header;
         this.context.content = content;
         this.context.image = image;
@@ -55,7 +55,7 @@ module.exports.Prompt = Prompt;
 class Question extends Prompt {
     constructor(id, header, content, image, actions={}, template=templates.QUESTION_DEFAULT) {
         super(id, header, content, image, actions, template);
-        this.context.content_id = 'question_' + id;
+        this.context.contentId = 'question_' + id;
     }
 
     // display question to client(s)

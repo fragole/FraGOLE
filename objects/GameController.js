@@ -4,11 +4,12 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-21T19:41:34+02:00
+ * @Last modified time: 2017-07-11T19:26:57+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
+/** @module GameController */
 const GameObject = require('./GameObject.js').GameObject;
 const Collection = require('./Collection.js').Collection;
 const GameState = require('./GameState.js').GameState;
@@ -21,17 +22,22 @@ const Lib = require('../lib/FragoleLib.js');
 const ID = 0;
 const ITEM = 1;
 
-// GameController
-// * handles the Games State-Machine
-// * emits events (to it self and to the current GameState)
-// * handles RPC-Calls to the clients
-// * Provides client-chat, messaging and logging
-// * Watchdog-Timer may be used to handle client inactivity
-// args:
-// minPlayers: minimum players to start the game
-// rpcServer: an FragoleServer-Instance
+/** Class GameController
+* @extends GameObject
+* handles the Games State-Machine
+* emits events (to it self and to the current GameState)
+* handles RPC-Calls to the clients
+* Provides client-chat, messaging and logging
+* Watchdog-Timer may be used to handle client inactivity
+*/
 class GameController extends GameObject {
-    constructor(id, minPlayers=1, rpcServer=undefined) {
+    /**
+    * Create a GameController instance
+    * @param {string} id - unique id of the gamecontroller
+    * @param {number} minPlayers - minimum players to start the game
+    * @param {FragoleServer} rpcServer - an FragoleServer-Instance
+    */
+    constructor (id, minPlayers=1, rpcServer=undefined) {
         super(id);
         this.rpcServer = rpcServer;
         this.minPlayers = minPlayers;
@@ -61,14 +67,20 @@ class GameController extends GameObject {
         this.watchdogTimer = null;
     }
 
-    // add a Player to the Game
-    addPlayer(player) {
+    /**
+    * add a Player to the Game
+    * @param {Player} player - an instance of Player
+    */
+    addPlayer (player) {
         this.players.addItem(player);
         return this;
     }
 
-    // assign GameObject to the game
-    // GameController-Instance will be connected to everyone
+    /**
+    * add GameObjects to the game
+    * GameController-Instance will also be connected to each ojbect (=> object.gameController)
+    * @param {Array<GameItem>} items - an array of GameItem-Objects
+    */
     addItems (items) {
         for (let item in items) {
             this.items[item] = items[item];
@@ -76,11 +88,14 @@ class GameController extends GameObject {
         }
     }
 
-    // draw the initial gameboard => Waypoints and PlayerTokens will be drawn
-    setupBoard() {
+    /**
+    * draw the initial gameboard. Object added via addItems will be drawn.
+    * if object.supressSetup is true, this object will be skipped
+    */
+    setupBoard () {
         for (let i in this.items) {
-            var item = this.items[i];
-            if (item.supress_setup) {
+            let item = this.items[i];
+            if (item.supressSetup) {
                 continue;
             }
             switch(item.constructor.name) {
@@ -110,14 +125,14 @@ class GameController extends GameObject {
     }
 
     // called when a new Player joins
-    joinPlayer(name, connection) {
-        var player;
-        var clientProxy = connection.clientProxy;
+    joinPlayer (name, connection) {
+        let player;
+        let clientProxy = connection.clientProxy;
 
         // check if this player has already joined XXX check client-ip
         for (let p of this.players.iterator()) {
             p = p[ITEM];
-            if (p.name == name) {
+            if (p.name === name) {
                 p.init(name, clientProxy);
                 this.emit('joinPlayer', p);
                 return p;
@@ -141,60 +156,82 @@ class GameController extends GameObject {
         return undefined;
     }
 
-    // advance the FSM to state:
-    // exit() of old state is called
-    // state is changed
-    // enter() of new state is called
-    next_state(state) {
+    /**
+    * advance the FSM to state:
+    * exit() of old state is called
+    * state is changed
+    * enter() of new state is called
+    * @param {GameState} state - the state to which should be switched
+    */
+    nextState (state) {
         this.currentState.exit();
         this.currentState=state;
         state.enter();
     }
 
-    // pass the turn to the next player
-    // you may set Player.skip_turns to a positiv number => this player will be
-    // skipped until Player.skip_turns <= 0;
-    next_player() {
-        var currentIdx;
-        var playerCount = this.joinedPlayers.length;
+    /**
+    * pass the turn to the next player
+    * you may set Player.skipTurns to a positive number => this player will be
+    * skipped until Player.skipTurns <= 0 (it's decremented each time it would be the players turn)
+    */
+    nextPlayer () {
+        let currentIdx;
+        let playerCount = this.joinedPlayers.length;
 
         if (!this.activePlayer) {
             this.activePlayer = this.joinedPlayers[0];
         } else {
             currentIdx = this.joinedPlayers.indexOf(this.activePlayer);
             this.activePlayer = this.joinedPlayers[++currentIdx % playerCount];
-            if (this.activePlayer.skip_turns != 0) {
-                this.activePlayer.skip_turns -= 1;
+            if (this.activePlayer.skipTurns !== 0) {
+                this.activePlayer.skipTurns -= 1;
                 this.next_player();
             }
         }
         return this.activePlayer;
     }
 
-    // send a chat msg to all players
+    /**
+    * send a chat msg to all players
+    * the message-object looks like this: {msg: 'content'}
+    * @param {Player} player - the player who is sending the message
+    * @param {Object} msg - Object containing the message
+    */
     // XXX: add msg.players like in sendPopup
-    sendChat(player, msg) {
-        var msg_id = '#chat_msg_' + (++this.chatCnt);
-        var cmd = (['addDomContent',
-            this.chatMsg.content({player: player, msg: msg, msg_id: msg_id}),
+    sendChat (player, msg) {
+        let msgId = '#chat_msg_' + (++this.chatCnt);
+        let cmd = (['addDomContent',
+            this.chatMsg.content({player: player, msg: msg, msgId: msgId}),
             '#' + this.chatMsg.parent,
-            msg_id]);
+            msgId]);
         this.rpcListOrAll(null, cmd);
     }
 
-    // send a log msg to all players
-    // XXX: add msg.players like in sendPopup
-    sendLog(src, msg) {
-        var msg_id = '#log_msg_' + (++this.logCnt);
-        var cmd = (['addDomContent',
-            this.logMsg.content({src: src, msg: msg.content, icon:msg.icon, msg_id: msg_id}),
+    /**
+    * send a log message to all players
+    * the message-object looks like this: {msg: 'content', icon: 'icon'}
+    * @param {string} src - the source of the message
+    * @param {Object} msg - Object containing the message
+    */
+    // TODO: add msg.players like in sendPopup
+    sendLog (src, msg) {
+        let msgId = '#log_msg_' + (++this.logCnt);
+        let cmd = (['addDomContent',
+            this.logMsg.content({src: src, msg: msg.content, icon:msg.icon, msgId: msgId}),
             '#' + this.logMsg.parent,
-            msg_id]);
+            msgId]);
         this.rpcListOrAll(null, cmd);
     }
 
-    // send a popup-msgs to msg.players
-    sendPopup(msg) {
+    /**
+    * send a popup message to specified players
+    * the message-object looks like this:
+    * {msg: 'content', color: 'color', icon: 'icon', x: pos_x, y: pos_y,
+       players: arrayOfPlayers}
+    * @param {string} src - the source of the message
+    * @param {Object} msg - Object containing the message
+    */
+    sendPopup (msg) {
         this.popupContext= Lib.mergeDicts({header: msg.header,
             msg: msg.msg,
             color:msg.color,
@@ -203,17 +240,19 @@ class GameController extends GameObject {
             y:msg.y},
              this.popupMsg.context);
 
-        var cmd = (['addDomContent',
+        let cmd = (['addDomContent',
             this.popupMsg.content(this.popupContext),
             '#' + this.popupMsg.parent,
             '#popup_msg']);
         this.rpcListOrAll(msg.players, cmd);
     }
 
-    // return owner(s) of an object
-    // if owner is specified return list of all players
-    // item: GameObject
-    getOwner(item) {
+    /**
+    * return owner(s) of an object
+    * if owner is not specified return list of all players
+    * @param {GameObject} item - find owners of this object
+    */
+    getOwner (item) {
         if(item.owner) {
             return item.owner;
         } else {
@@ -221,11 +260,12 @@ class GameController extends GameObject {
         }
     }
 
-    // send a RPC-Call to clients specified by 'players' or to all connected
-    // clients
-    // players: Player-Instance or Array of Players
-    // cmd: a valid RPC-Cmd (see client-API)
-    rpcListOrAll(players, cmd) {
+    /**
+    * send a RPC-Call to clients specified by 'players' or to all connected clients
+    * @param {Player | Array<Player>} players - Player-Instance or Array of Players
+    * @param {Object} cmd - a valid RPC-Cmd (see client-API)
+    */
+    rpcListOrAll (players, cmd) {
         if (players) {
             this.rpcCall(players, cmd);
         } else {
@@ -233,11 +273,14 @@ class GameController extends GameObject {
         }
     }
 
-    // send a RPC-Call to clients specified by 'players' or to the ovner of 'item'
-    // players: Player-Instance or Array of Players
-    // item: GameObject
-    // cmd: a valid RPC-Cmd (see client-API)
-    rpcListOrOwner(players, item, cmd) {
+    /**
+    * send a RPC-Call to clients specified by 'players' or to the ovner of 'item'.
+    * Precedence: players over item
+    * @param {Player | Array<Player>} players - Player-Instance or Array of Players
+    * @param {GameObject} - send to owner of this object
+    * @param {Object} cmd - a valid RPC-Cmd (see client-API)
+    */
+    rpcListOrOwner (players, item, cmd) {
         if (players) {
             this.rpcCall(players, cmd);
         } else {
@@ -245,9 +288,9 @@ class GameController extends GameObject {
         }
     }
 
-    rpcCall(players, args) {
-        var func = args[0],
-            _args = Array.prototype.slice.call(args, 1);
+    rpcCall (players, args) {
+        let func = args[0];
+        let _args = Array.prototype.slice.call(args, 1);
         if(players instanceof Array) {  // list of players
             for(let player of players) {
                 if(player.session) {
@@ -259,17 +302,22 @@ class GameController extends GameObject {
         }
     }
 
-    // emit an event to the GameController itself
-    // and to the current GameState
-    // reset the Watchdog-Timer
-    emit() {
+    /**
+    * emit an event to the GameController itself
+    * and to the current GameState
+    * reset the Watchdog-Timer
+    */
+    emit () {
         this.setWatchdog(); // any event passed through here resets wd
         this.currentState.emit(...arguments);
         super.emit(...arguments);
     }
 
-    // set or reset the watchdog-timer
-    setWatchdog(time=undefined) {
+    /**
+    * set or reset the watchdog-timer
+    * @param {number} time - wotchdog-interval in seconds
+    */
+    setWatchdog (time=undefined) {
         if (time) {
             this.watchdogSecs = time;
         }
@@ -279,7 +327,7 @@ class GameController extends GameObject {
 
     // called when the watchdog-timer fires
     // context == this
-    watchdog(context) {
+    watchdog (context) {
         context.emit('watchdog');
     }
 }

@@ -4,16 +4,23 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-04T12:07:41+02:00
+ * @Last modified time: 2017-07-11T19:26:30+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
+/** @module GameObject */
 const EventEmitter = require('events');
 
-// Base-Class for all GameObject
+/** Base-Class for everything
+* @extends EventEmitter
+*/
 class GameObject extends EventEmitter {
-    constructor(id) {
+    /**
+      creates a GameObject
+      @param {string} id - unique identifier of the object
+    */
+    constructor (id) {
         super();
         this.id = id;
         this.gameController = undefined;
@@ -22,43 +29,62 @@ class GameObject extends EventEmitter {
         this.subscribers = {};
     }
 
-    // assign custom vars
-    set(name, value) {
+    /**
+    * assign custom-vars to the object or change the value of existing ones. This can be used to store values at runtime.
+    * When a custom-var is set in this way, the update()-method of all subscribers of this object is called.
+    * @param {string} name - the name (key) of the custom-var
+    * @param {string | number | Object} value - the value to be set
+    */
+    set (name, value) {
         this.vars[name] = value;
         if(this.subscribers[name] instanceof Array) {
-            for(let item_players of this.subscribers[name]) {
-                var item, players;
-                [item, players] = item_players;
+            for(let itemPlayers of this.subscribers[name]) {
+                let item;
+                let players;
+                [item, players] = itemPlayers;
                 item.update(value, players);
             }
         }
     }
 
-    // increment a custom-var
-    // name: name of the var
-    // offset: amount to increment
-    inc(name, offset=1) {
-        var value = this.vars[name] + offset;
+    /**
+    * increment a custom-var of this object. Updates subscribing objects
+    * Note: the incremented var must be a number
+    * @param {string} name - name of the var to be incremented
+    * @param {number} offset: amount to increment (negative number = decrement)
+    */
+    inc (name, offset=1) {
+        let value = this.vars[name] + offset;
         this.set(name, value);
     }
 
-    // decrement a custom-var
-    // name: name of the var
-    // offset: amount to decrement
-    dec(name, offset=1) {
-        var value = this.vars[name] - offset;
+    /**
+    * decrement a custom-var of this object. Updates subscribing objects
+    * Note: the custom-var must be a number
+    * @param {string} name - name of the var to be decremented
+    * @param {number} offset: amount to decrement (negative number = increment)
+    */
+    dec (name, offset=1) {
+        let value = this.vars[name] - offset;
         this.set(name, value);
     }
 
-    // get the value of a custom-var
-    // name: name of the var
-    get(name) {
+    /** get the value of a custom-var
+    * @param {string} name - name of the var
+    */
+    get (name) {
         return this.vars[name];
     }
 
-    // subscribe to a var of this object
-    // func will be called when set() for this var is called
-    subscribe(name, item, players=undefined) {
+    /**
+    * Subscribe to a custom-var of this object.
+    * The update-method of the subscribing object will be called when set-method
+    * of the sucbribed object is invoced
+    * @param {string} name - name of the subscribers
+    * @param {GameObject} item - the subscribing Object
+    * @param {Array<Player>} players - (optional) an Array of players (this can be used within the upadte-method)
+    */
+    subscribe (name, item, players=undefined) {
         if(this.subscribers[name] instanceof Array) {
             this.subscribers[name].push([item, players]);
         } else {
@@ -66,14 +92,25 @@ class GameObject extends EventEmitter {
         }
     }
 
-    // clear all custom-vars of ths object
-    clearCustVars() {
+    /**
+    * clear all custom-vars of the object
+    */
+    clearCustVars () {
         this.custVars = {};
         this.subscribers = {};
     }
 }
 
+/**
+ GameItem Base-Class
+ @extends GameObject
+*/
 class GameItem extends GameObject {
+    /**
+    * create a new GameItem
+    * @param {string} id - unique identifier
+    * @param {string} category - (optional) category-text
+    */
     constructor (id, category='') {
         super(id, category);
         this.category=category;

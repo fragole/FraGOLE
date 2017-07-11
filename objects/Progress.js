@@ -17,7 +17,7 @@ var templates = require('../lib/FragoleTemplates.js');
 class Progress extends Statistic {
     constructor(id, x, y, color, label, value, max, template=templates.PROGRESS_DEFAULT) {
         super(id, x, y, label, value, null, null, template);
-        this.context.content_id = 'progress_' + id;
+        this.context.contentId = 'progress_' + id;
         this.context.color = color;
         this.context.max = max;
     }
@@ -36,7 +36,7 @@ class PlayerProgress extends Progress {
         var cmd = ['addDomContent',
             this.template.content(this.context),
             '#' + this.template.parent,
-            '#' + this.context.content_id
+            '#' + this.context.contentId
         ];
         this.gameController.rpcListOrOwner(players, this, cmd);
     }

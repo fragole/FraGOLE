@@ -151,13 +151,13 @@ Fragole.GameBoard = class GameBoard {
     //
     // src: html-code of the object that should be added
     // target: parent object => src will be appended to this
-    // content_id: id of the new DOM object
-    addDomContent(src, target, content_id) {
-        if ($(content_id).length) { // update existing content
-            console.log('update ' + content_id + ' in ' + target);
-            $(content_id).replaceWith(src);
+    // contentId: id of the new DOM object
+    addDomContent(src, target, contentId) {
+        if ($(contentId).length) { // update existing content
+            console.log('update ' + contentId + ' in ' + target);
+            $(contentId).replaceWith(src);
         } else {
-            console.log('add ' + content_id + ' to ' + target);
+            console.log('add ' + contentId + ' to ' + target);
             $(target).append(src);
         }
 
@@ -282,7 +282,7 @@ function init() {
         setClientId : function(clientId) { gameboard.setClientId(clientId); },
         setBackgroundColor : function(color) { gameboard.setBackgroundColor(color); },
         setBackgroundImage : function(img_src) { gameboard.setBackgroundImage(img_src);},
-        addDomContent :    function(src, target, content_id) { gameboard.addDomContent(src, target, content_id);},
+        addDomContent :    function(src, target, contentId) { gameboard.addDomContent(src, target, contentId);},
         removeDomContent : function(target, fade) { gameboard.removeDomContent(target, fade);},
         emptyDomContent : function(target) { gameboard.emptyDomContent(target);},
         drawShape : function(name, type, fill, stroke, layer, pos_x, pos_y) { gameboard.drawShape(...arguments);},

@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-11T21:00:09+02:00
+ * @Last modified time: 2017-07-13T19:42:57+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -91,7 +91,7 @@ let items = {
 //<Lib.connectWaypoints([items.wp4, items.wp6, items.wp8, items.wp9]);
 
 // Set position for dice-roll result
-items.dice.template.result_x(25).result_y(25);
+items.dice.template.resultX(25).resultY(25);
 
 items.cardStackGood.addCards(items.card1);
 
@@ -158,7 +158,7 @@ STATE_INIT.setHandlers({
     },
 });
 
-controller.on('click', function click (id, item) {
+controller.on('click', function click(id, item) {
     if(id === 'btnEndTurn') {
         item.deactivate(controller.activePlayer);
         controller.nextPlayer();
@@ -166,18 +166,18 @@ controller.on('click', function click (id, item) {
     }
 });
 
-controller.on('playCard', function playCard (src, card) {
+controller.on('playCard', function playCard(src, card) {
     card.action(controller);
     card.owner.removeInventory(card);
 });
 
 STATE_CHOOSE_ACTION.setHandlers({
-    enter () {
-        gameItems.prompts.choose_action.show(controller.activePlayer);
+    enter() {
+        gameItems.prompts.chooseAction.show(controller.activePlayer);
         items.btnEndTurn.activate(controller.activePlayer);
     },
 
-    prompt (src, option, prompt) {
+    prompt(src, option, prompt) {
         switch(option) {
             case 'Würfeln':
                 controller.sendLog(controller.activePlayer.name, {content:'würfelt', icon:'inverted orange check square'});
@@ -198,7 +198,7 @@ STATE_CHOOSE_ACTION.setHandlers({
 });
 
 STATE_ROLL.setHandlers({
-    enter () {
+    enter() {
         items.dice.roll();
         controller.activePlayer.storage.setBadge('Aller anfang ist schwer',
             () => controller.sendPopup({
@@ -208,7 +208,7 @@ STATE_ROLL.setHandlers({
                 players:controller.activePlayer, x:10, y:10, color:'yellow'}));
     },
 
-    roll (src, dice) {
+    roll(src, dice) {
         items.dice.rollResult(controller.activePlayer);
 
         controller.activePlayer.storage.incStatistic('Geworfene Würfel');
@@ -228,7 +228,7 @@ STATE_ROLL.setHandlers({
 });
 
 STATE_SELECT_WAYPOINT.setHandlers({
-    enter () {
+    enter() {
         this.set('playertoken', controller.activePlayer.getInventory({category:'spielfiguren'})[0]);
         this.set('wps', Lib.getWaypointsAtRange(this.get('playertoken').waypoint, controller.get('roll_result')));
 
@@ -238,14 +238,14 @@ STATE_SELECT_WAYPOINT.setHandlers({
         }
     },
 
-    selectWaypoint (src, item)  {
+    selectWaypoint(src, item)  {
         this.get('playertoken').moveToWaypoint(item);
         items.dice.reset(controller.activePlayer);
         controller.sendLog(controller.activePlayer.name, {content:'zieht zu ' + item.id +'!', icon:'inverted yellow location arrow'});
         controller.nextState(STATE_ENTER_WAYPOINT);
     },
 
-    exit () {
+    exit() {
         for (let wp of this.get('wps')) {
             wp.unhighlight(controller.activePlayer);
             wp.deactivate(controller.activePlayer);
@@ -254,7 +254,7 @@ STATE_SELECT_WAYPOINT.setHandlers({
 });
 
 STATE_ENTER_WAYPOINT.setHandlers({
-    enterWaypoint (src, wp, item) {
+    enterWaypoint(src, wp, item) {
         let  color;
         let icon;
         let header;
@@ -305,12 +305,12 @@ STATE_ENTER_WAYPOINT.setHandlers({
 });
 
 STATE_DRAW_CARD.setHandlers({
-    enter () {
+    enter() {
         items.cardStackGood.highlight(controller.activePlayer);
         items.cardStackGood.activate(controller.activePlayer);
     },
 
-    drawCard (src, card, stack) {
+    drawCard(src, card, stack) {
         console.log('STATE_TURN drawCard', card.id);
         card.draw(controller.activePlayer);
         controller.activePlayer.addInventory(card);
@@ -321,15 +321,15 @@ STATE_DRAW_CARD.setHandlers({
 });
 
 STATE_QUESTION.setHandlers({
-    enter () {
+    enter() {
         gameItems.prompts.question1.show(controller.activePlayer);
     },
 
-    questionWrong (id, option, value, question) {
+    questionWrong(id, option, value, question) {
         gameItems.prompts.question1.showResult(controller.activePlayer);
     },
 
-    questionCorrect (id, option, value, question) {
+    questionCorrect(id, option, value, question) {
         controller.activePlayer.inc('points', value);
         gameItems.prompts.question1.showResult(controller.activePlayer);
     },

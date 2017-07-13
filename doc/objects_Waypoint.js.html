@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: objects/Waypoint.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: objects/Waypoint.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @Author: Michael Bauer
+ * @Date:   2017-06-04T10:48:10+02:00
+ * @Email:  mb@bauercloud.de
+ * @Project: Fragole - FrAmework for Gamified Online Learning Environments
+ * @Last modified by:   Michael Bauer
+ * @Last modified time: 2017-07-13T20:02:11+02:00
+ * @License: MIT
+ * @Copyright: Michael Bauer
+ */
+
+/** @module Waypoint */
+const Token = require('./Token.js').Token;
+const templates = require('../lib/FragoleTemplates.js');
+
+/** Class Waypoint
+* @extends {module:Token~Token}
+* Displays a Waypoint on the client-side
+*/
+class Waypoint extends Token {
+    constructor(id, category, x, y, template=templates.WAYPOINT_DEFAULT) {
+        super(id, category, x, y, template);
+        this.next = [];
+        this.tokens=[];
+    }
+
+    // Events - Triggered by client
+    click() {
+        this.gameController.emit('selectWaypoint', this.id, this);
+    }
+}
+module.exports.Waypoint = Waypoint;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Button.html">Button</a></li><li><a href="module-Cards.html">Cards</a></li><li><a href="module-Collection.html">Collection</a></li><li><a href="module-Component.html">Component</a></li><li><a href="module-Dice.html">Dice</a></li><li><a href="module-GameController.html">GameController</a></li><li><a href="module-GameObject.html">GameObject</a></li><li><a href="module-GameState.html">GameState</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerToken.html">PlayerToken</a></li><li><a href="module-Progress.html">Progress</a></li><li><a href="module-Prompt.html">Prompt</a></li><li><a href="module-Rating.html">Rating</a></li><li><a href="module-Statistic.html">Statistic</a></li><li><a href="module-Token.html">Token</a></li><li><a href="module-Waypoint.html">Waypoint</a></li></ul><h3>Classes</h3><ul><li><a href="module-Button-Button.html">Button</a></li><li><a href="module-Cards-Card.html">Card</a></li><li><a href="module-Cards-CardHand.html">CardHand</a></li><li><a href="module-Cards-CardStack.html">CardStack</a></li><li><a href="module-Collection-Collection.html">Collection</a></li><li><a href="module-Component-Component.html">Component</a></li><li><a href="module-Dice-Dice.html">Dice</a></li><li><a href="module-GameController-GameController.html">GameController</a></li><li><a href="module-GameObject-GameItem.html">GameItem</a></li><li><a href="module-GameObject-GameObject.html">GameObject</a></li><li><a href="module-GameState-GameState.html">GameState</a></li><li><a href="module-PlayerToken-PlayerToken.html">PlayerToken</a></li><li><a href="module-Player-Player.html">Player</a></li><li><a href="module-Progress-PlayerProgress.html">PlayerProgress</a></li><li><a href="module-Progress-Progress.html">Progress</a></li><li><a href="module-Prompt-Prompt.html">Prompt</a></li><li><a href="module-Prompt-Question.html">Question</a></li><li><a href="module-Rating-PlayerRating.html">PlayerRating</a></li><li><a href="module-Rating-Rating.html">Rating</a></li><li><a href="module-Statistic-PlayerStatistic.html">PlayerStatistic</a></li><li><a href="module-Statistic-Statistic.html">Statistic</a></li><li><a href="module-Token-Token.html">Token</a></li><li><a href="module-Waypoint-Waypoint.html">Waypoint</a></li></ul><h3>Global</h3><ul><li><a href="global.html#connectWaypoints">connectWaypoints</a></li><li><a href="global.html#db">db</a></li><li><a href="global.html#express">express</a></li><li><a href="global.html#FragoleServer">FragoleServer</a></li><li><a href="global.html#getPath">getPath</a></li><li><a href="global.html#getWaypointsAtRange">getWaypointsAtRange</a></li><li><a href="global.html#ID">ID</a></li><li><a href="global.html#Lib">Lib</a></li><li><a href="global.html#mergeDicts">mergeDicts</a></li><li><a href="global.html#normalizeCoordinates">normalizeCoordinates</a></li><li><a href="global.html#probably">probably</a></li><li><a href="global.html#Prompt">Prompt</a></li><li><a href="global.html#pug">pug</a></li><li><a href="global.html#sqlite">sqlite</a></li><li><a href="global.html#Templates">Templates</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Thu Jul 13 2017 20:08:07 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

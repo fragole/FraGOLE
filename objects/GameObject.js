@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-11T19:26:30+02:00
+ * @Last modified time: 2017-07-13T20:08:01+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -20,7 +20,7 @@ class GameObject extends EventEmitter {
       creates a GameObject
       @param {string} id - unique identifier of the object
     */
-    constructor (id) {
+    constructor(id) {
         super();
         this.id = id;
         this.gameController = undefined;
@@ -35,7 +35,7 @@ class GameObject extends EventEmitter {
     * @param {string} name - the name (key) of the custom-var
     * @param {string | number | Object} value - the value to be set
     */
-    set (name, value) {
+    set(name, value) {
         this.vars[name] = value;
         if(this.subscribers[name] instanceof Array) {
             for(let itemPlayers of this.subscribers[name]) {
@@ -53,7 +53,7 @@ class GameObject extends EventEmitter {
     * @param {string} name - name of the var to be incremented
     * @param {number} offset: amount to increment (negative number = decrement)
     */
-    inc (name, offset=1) {
+    inc(name, offset=1) {
         let value = this.vars[name] + offset;
         this.set(name, value);
     }
@@ -64,7 +64,7 @@ class GameObject extends EventEmitter {
     * @param {string} name - name of the var to be decremented
     * @param {number} offset: amount to decrement (negative number = increment)
     */
-    dec (name, offset=1) {
+    dec(name, offset=1) {
         let value = this.vars[name] - offset;
         this.set(name, value);
     }
@@ -72,7 +72,7 @@ class GameObject extends EventEmitter {
     /** get the value of a custom-var
     * @param {string} name - name of the var
     */
-    get (name) {
+    get(name) {
         return this.vars[name];
     }
 
@@ -84,7 +84,7 @@ class GameObject extends EventEmitter {
     * @param {GameObject} item - the subscribing Object
     * @param {Array<Player>} players - (optional) an Array of players (this can be used within the upadte-method)
     */
-    subscribe (name, item, players=undefined) {
+    subscribe(name, item, players=undefined) {
         if(this.subscribers[name] instanceof Array) {
             this.subscribers[name].push([item, players]);
         } else {
@@ -95,7 +95,7 @@ class GameObject extends EventEmitter {
     /**
     * clear all custom-vars of the object
     */
-    clearCustVars () {
+    clearCustVars() {
         this.custVars = {};
         this.subscribers = {};
     }
@@ -103,7 +103,7 @@ class GameObject extends EventEmitter {
 
 /**
  GameItem Base-Class
- @extends GameObject
+ @extends {module:GameObject~GameObject}
 */
 class GameItem extends GameObject {
     /**
@@ -111,7 +111,7 @@ class GameItem extends GameObject {
     * @param {string} id - unique identifier
     * @param {string} category - (optional) category-text
     */
-    constructor (id, category='') {
+    constructor(id, category='') {
         super(id, category);
         this.category=category;
     }

@@ -4,15 +4,17 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-11T19:45:15+02:00
+ * @Last modified time: 2017-07-13T19:55:22+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
+
+ /** @module Button */
 const Component = require('./Component').Component;
 const templates = require('../lib/FragoleTemplates.js');
 
 /** Class Button
-* @extends Component
+* @extends {module:Component~Component}
 * Create a UI-Button on the client-side
 */
 class Button extends Component {
@@ -25,7 +27,7 @@ class Button extends Component {
     * @param {string} color - (optional) color of the Button
     * @param {string} icon - (optional) icon to display in fron of label
     */
-    constructor (id, x, y, label, color, icon, template=templates.BUTTON_DEFAULT) {
+    constructor(id, x, y, label, color, icon, template=templates.BUTTON_DEFAULT) {
         super(id, template);
         this.context.contentId = 'btn_' + id;
         this.context.x = x;

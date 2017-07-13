@@ -4,18 +4,18 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-11T19:53:00+02:00
+ * @Last modified time: 2017-07-13T19:57:17+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
-
+/** @module Cards */
 const Component = require('./Component').Component;
 const Collection = require('./Collection').Collection;
 const templates = require('../lib/FragoleTemplates.js');
 
 /** Class Card
-* @extends Component
+* @extends {module:Component~Component}
 * Basic card object
 * the presentation of 'label', 'text' and 'image' is determined by the template
 * action: a function that can be executed when the card is played. It may recieve
@@ -29,7 +29,7 @@ class Card extends Component {
     * @param {string} image - (optional) path to an image to display on the cards body
     * @param {Function} action - (optional) assign a function to this card (e.g. to execute when card is played)
     */
-    constructor (id, label, text, image=null, action=undefined, template=templates.CARD_DEFAULT) {
+    constructor(id, label, text, image=null, action=undefined, template=templates.CARD_DEFAULT) {
         super(id, template);
         this.context.contentId = 'card_' + id;
         this.context.label = label;
@@ -45,13 +45,13 @@ class Card extends Component {
     /** activate the card => connect click-handler to the card-action-button
     * visual signalisation must be handled by the template
     */
-    activate () {
+    activate() {
         this.gameController.rpcServer.connect('play_card_' + this.id, this.play, this);
         this.context.active = true;
     }
 
     /** deactivate the card => remove click-handler on the card-action button */
-    deactivate () {
+    deactivate() {
         this.context.active = false;
         this.gameController.disconnect('play_card_' + this.id);
     }
@@ -62,7 +62,7 @@ class Card extends Component {
     * play the card => emit corresponding event
     * the card-action must be executed by an event-handler
     */
-    play (clientId) {
+    play(clientId) {
         if (this.gameController) {
             this.gameController.emit('playCard', this.id, this);
         }
@@ -73,7 +73,7 @@ class Card extends Component {
 * CardStack represents an orderd stack of Card-objects
 * cards may be added to or removed from the stack
 * the stack can also be shuffled
-* @extends Component
+* @extends {module:Component~Component}
 */
 class CardStack extends Component {
     /**
@@ -85,7 +85,7 @@ class CardStack extends Component {
     * @param {string} image - path to an image. Can be used by the template to present the stack on client-side
     */
     // TODO show_cnt: NYI => show number of cards in the stack
-    constructor (id, x, y, label, image=null, showCnt=false, template=templates.CARD_STACK_DEFAULT) {
+    constructor(id, x, y, label, image=null, showCnt=false, template=templates.CARD_STACK_DEFAULT) {
         super(id, template);
         this.context.contentId = 'card_stack_' + id;
         this.context.x = x;
@@ -101,7 +101,7 @@ class CardStack extends Component {
     * add Card(s) to the stack
     * @param {Array<Card> | Card} cards - a single Card-object or an Array of Card-objects
     */
-    addCards (cards) {
+    addCards(cards) {
         if(cards instanceof Array) {
             for(let card of cards) {
                 this.stack.push(card.id);
@@ -117,7 +117,7 @@ class CardStack extends Component {
     * remove Card(s) to the stack
     * @param {Array<Card> | Card} cards - a single Card-object or an Array of Card-objects
     */
-    removeCards (cards) {
+    removeCards(cards) {
         if(cards instanceof Array) {
             for(let card of cards) {
                 this.stack.splice(this.stack.indexOf(card.id), 1);
@@ -133,7 +133,7 @@ class CardStack extends Component {
     * shuffle the stack
     * every card will be moved to a new, random position within the stack
     */
-    shuffle () {
+    shuffle() {
         for (let i = this.stack.length; i; i--) {
             let j = Math.floor(Math.random() * i);
             [this.stack[i - 1], this.stack[j]] = [this.stack[j], this.stack[i - 1]];
@@ -141,14 +141,14 @@ class CardStack extends Component {
     }
 
     // EVENTS
-    click (clientId) {
+    click(clientId) {
         this.drawCard(clientId);
     }
 
     /** draw a card from the stack (it will be removed), the drawn card is
     * returned via a 'drawCard'-Event
     */
-    drawCard (clientId) {
+    drawCard(clientId) {
         let card = this.cards.deleteItem(this.stack.pop());
         if (this.gameController) {
             this.gameController.emit('drawCard', this.id, card, this);
@@ -158,14 +158,14 @@ class CardStack extends Component {
 
 /**
 * Class CardHand
-* @extends Component
+* @extends {module:Component~Component}
 * the hand-cards of a player
 * CardHand sucbscribes to the players inventory => if Cards are added to or
 * removed from the inventory the CardHand updates automatically
 */
 class CardHand extends Component {
     /** create a CardHand Object */
-    constructor (id, template=templates.CARD_HAND_DEFAULT) {
+    constructor(id, template=templates.CARD_HAND_DEFAULT) {
         super(id, template);
         this.context.contentId = 'card_hand_' + id;
         this.context.cards = [];
@@ -175,7 +175,7 @@ class CardHand extends Component {
     * initialise the card hand-cards
     * @param {Collection} collection: a Collection-Object (normally a Player-Inventory)
     */
-    init (collection) {
+    init(collection) {
         this.owner = collection.owner;
         this.collection = collection;
         collection.subscribe(this);
@@ -183,14 +183,14 @@ class CardHand extends Component {
     }
 
     /** this is automatically called when the subcribed collection is changed */
-    update (type, item) {
+    update(type, item) {
         this.context.cards = this.collection.getType(Card);
         this.remove(null, 'modal_' + this.context.contentId); // workaround => modal does not update properly => remove and add again
         this.draw(null, this);
     }
 
     /** active the action-button for all cards in the CardHand */
-    activate () {
+    activate() {
         for(let card of this.context.cards) {
             card.activate();
         }
@@ -199,7 +199,7 @@ class CardHand extends Component {
     }
 
     /** deactive the action-button for all cards in the CardHand */
-    deactivate () {
+    deactivate() {
         for(let card of this.context.cards) {
             card.deactivate();
         }

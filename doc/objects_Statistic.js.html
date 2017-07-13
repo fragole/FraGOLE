@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: objects/Statistic.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: objects/Statistic.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @Author: Michael Bauer
+ * @Date:   2017-06-04T10:48:10+02:00
+ * @Email:  mb@bauercloud.de
+ * @Project: Fragole - FrAmework for Gamified Online Learning Environments
+ * @Last modified by:   Michael Bauer
+ * @Last modified time: 2017-07-13T20:01:18+02:00
+ * @License: MIT
+ * @Copyright: Michael Bauer
+ */
+
+/** @module Statistic */
+const Component = require('./Component').Component;
+const templates = require('../lib/FragoleTemplates.js');
+
+/** Class Statistic
+* @extends {module:Component~Component}
+* A numeric representation of a Statistic (Points, etc) which can be drawn to
+* the gameboard
+* Statistics can subscribe to custom-vars of GameObjects and are automatically
+* when the value of that var changes
+*/
+class Statistic extends Component {
+    /** create a new Statistic
+    * @param {string} id - unique identifier
+    * @param {number} x - the x-Position of the statistic
+    * @param {number} y - the y-Position of the statistic
+    * @param {string} label - a label-text that is displayed below the bar
+    * @param {number} value - the current value of the statistic
+    * @param {string} icon - optional icon to display next to the Statistic
+    * @param {string} img - NYI
+    */
+    constructor(id, x, y, label, value, icon=undefined, img=undefined, template=templates.STATISTIC_DEFAULT) {
+        super(id, template);
+        this.context.contentId = 'stat_' + id;
+        this.context.x = x;
+        this.context.y = y;
+        this.context.label = label;
+        this.context.img = img;
+        this.context.icon = icon;
+        this.context.value = value;
+        this.update.bind(this);
+    }
+
+    // internal helper function
+    mkDrawCmd() {
+        let cmd = ['addDomContent',
+            this.template.content(this.context),
+            '#' + this.template.parent,
+            '#' + this.context.contentId
+        ];
+        return cmd;
+    }
+
+    /** draw the statistic on client(s) */
+    draw(players=undefined) {
+        this.gameController.rpcListOrAll(players, this.mkDrawCmd());
+    }
+
+    /** can be called manually to update the value of the Statistic
+    * or gets called by another GameObject when subscribing to a custom-var of
+    * that GameObject
+    * @param {number} value - the new value
+    */
+    update(value) {
+        this.context.value = value;
+        this.draw();
+    }
+}
+module.exports.Statistic = Statistic;
+
+/** Class PlayerStatistic
+* @extends Statistic
+* same as Statistic but attaches to a players dashboard
+*/
+class PlayerStatistic extends Statistic {
+    constructor(id, label, value, icon=undefined, img=undefined, template=templates.PLAYER_STATISTIC_DEFAULT) {
+        super(id, 0, 0, label, value, icon, img, template);
+    }
+
+    draw(players=undefined) {
+        this.gameController.rpcListOrOwner(players, this, this.mkDrawCmd());
+    }
+
+}
+module.exports.PlayerStatistic = PlayerStatistic;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Button.html">Button</a></li><li><a href="module-Cards.html">Cards</a></li><li><a href="module-Collection.html">Collection</a></li><li><a href="module-Component.html">Component</a></li><li><a href="module-Dice.html">Dice</a></li><li><a href="module-GameController.html">GameController</a></li><li><a href="module-GameObject.html">GameObject</a></li><li><a href="module-GameState.html">GameState</a></li><li><a href="module-Player.html">Player</a></li><li><a href="module-PlayerToken.html">PlayerToken</a></li><li><a href="module-Progress.html">Progress</a></li><li><a href="module-Prompt.html">Prompt</a></li><li><a href="module-Rating.html">Rating</a></li><li><a href="module-Statistic.html">Statistic</a></li><li><a href="module-Token.html">Token</a></li><li><a href="module-Waypoint.html">Waypoint</a></li></ul><h3>Classes</h3><ul><li><a href="module-Button-Button.html">Button</a></li><li><a href="module-Cards-Card.html">Card</a></li><li><a href="module-Cards-CardHand.html">CardHand</a></li><li><a href="module-Cards-CardStack.html">CardStack</a></li><li><a href="module-Collection-Collection.html">Collection</a></li><li><a href="module-Component-Component.html">Component</a></li><li><a href="module-Dice-Dice.html">Dice</a></li><li><a href="module-GameController-GameController.html">GameController</a></li><li><a href="module-GameObject-GameItem.html">GameItem</a></li><li><a href="module-GameObject-GameObject.html">GameObject</a></li><li><a href="module-GameState-GameState.html">GameState</a></li><li><a href="module-PlayerToken-PlayerToken.html">PlayerToken</a></li><li><a href="module-Player-Player.html">Player</a></li><li><a href="module-Progress-PlayerProgress.html">PlayerProgress</a></li><li><a href="module-Progress-Progress.html">Progress</a></li><li><a href="module-Prompt-Prompt.html">Prompt</a></li><li><a href="module-Prompt-Question.html">Question</a></li><li><a href="module-Rating-PlayerRating.html">PlayerRating</a></li><li><a href="module-Rating-Rating.html">Rating</a></li><li><a href="module-Statistic-PlayerStatistic.html">PlayerStatistic</a></li><li><a href="module-Statistic-Statistic.html">Statistic</a></li><li><a href="module-Token-Token.html">Token</a></li><li><a href="module-Waypoint-Waypoint.html">Waypoint</a></li></ul><h3>Global</h3><ul><li><a href="global.html#connectWaypoints">connectWaypoints</a></li><li><a href="global.html#db">db</a></li><li><a href="global.html#express">express</a></li><li><a href="global.html#FragoleServer">FragoleServer</a></li><li><a href="global.html#getPath">getPath</a></li><li><a href="global.html#getWaypointsAtRange">getWaypointsAtRange</a></li><li><a href="global.html#ID">ID</a></li><li><a href="global.html#Lib">Lib</a></li><li><a href="global.html#mergeDicts">mergeDicts</a></li><li><a href="global.html#normalizeCoordinates">normalizeCoordinates</a></li><li><a href="global.html#probably">probably</a></li><li><a href="global.html#Prompt">Prompt</a></li><li><a href="global.html#pug">pug</a></li><li><a href="global.html#sqlite">sqlite</a></li><li><a href="global.html#Templates">Templates</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Thu Jul 13 2017 20:08:07 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

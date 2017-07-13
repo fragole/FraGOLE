@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-11T20:25:48+02:00
+ * @Last modified time: 2017-07-13T18:39:57+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -17,20 +17,20 @@ const ITEM = 1;
 // XXX: rethink if Game- Object is necessary at all (maybe its work could be
 // handled by GameController)
 class Game {
-    constructor () {
+    constructor() {
         this.gameControllers = [];
     }
 
     // assign a GameController-Instance
     // chainable
-    addController (gameController) {
+    addController(gameController) {
         this.gameControllers.push(gameController);
         return this;
     }
 
     // set the name of the game
     // chainable
-    setName (name)  {
+    setName(name)  {
         this.name = name;
         return this;
     }

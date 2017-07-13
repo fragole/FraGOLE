@@ -4,17 +4,29 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-06-21T19:44:42+02:00
+ * @Last modified time: 2017-07-13T18:45:45+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
 
-var Token = require('./Token.js').Token;
-var templates = require('../lib/FragoleTemplates.js');
+/** @module PlayerToken */
+const Token = require('./Token.js').Token;
+const templates = require('../lib/FragoleTemplates.js');
 
-// client-side PlayerToken
+/** Class PlayerToken
+* @extends Token
+* this represents a client-side PlayerToken
+*/
 class PlayerToken extends Token {
-    constructor (id, category, x, y, template=templates.PLAYER_TOKEN_DEFAULT) {
+
+    /**
+    * create a new PlayerToken
+    * @param {string} id - unique identifier
+    * @param {string} category - the category of the items
+    * @param {number} x - current x-Position of the PlayerToken
+    * @param {number} y - current y-Position of the PlayerToken
+    */
+    constructor(id, category, x, y, template=templates.PLAYER_TOKEN_DEFAULT) {
         super(id, category, x, y, template);
     }
 }

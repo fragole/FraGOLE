@@ -7,7 +7,7 @@ div(id="popup_msg" class="ui " + color + " floating icon message" style="positio
     p #{msg}
 script.
   function afterAddDomContent() {
-    $('#popup_msg').transition('#{trans_in}');
-    $('#popup_msg').on('click', function() { $('#popup_msg').transition('#{trans_out}'); });
-    setTimeout(function() {$('#popup_msg').transition('#{trans_out}');}, 5000);
+    $('#popup_msg').transition('#{transIn}');
+    $('#popup_msg').on('click', function() { $('#popup_msg').transition('#{transOut}'); });
+    setTimeout(function() {$('#popup_msg').transition('#{transOut}');}, 5000);
   }

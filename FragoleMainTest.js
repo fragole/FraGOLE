@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-01T15:22:00+02:00
+ * @Last modified time: 2017-07-13T19:45:36+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -94,7 +94,7 @@ Lib.connectWaypoints([items.wp1, items.wp2, items.wp3, items.wp4, items.wp5, ite
 Lib.connectWaypoints([items.wp4, items.wp6, items.wp8, items.wp9]);
 
 // Set position for dice-roll result
-items.dice.template.result_x(25).result_y(25);
+items.dice.template.resultX(25).resultY(25);
 
 // init game with all items
 game.setItems(items);

@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-11T19:26:57+02:00
+ * @Last modified time: 2017-07-13T19:59:19+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -23,7 +23,7 @@ const ID = 0;
 const ITEM = 1;
 
 /** Class GameController
-* @extends GameObject
+* @extends {module:GameObject~GameObject}
 * handles the Games State-Machine
 * emits events (to it self and to the current GameState)
 * handles RPC-Calls to the clients
@@ -37,7 +37,7 @@ class GameController extends GameObject {
     * @param {number} minPlayers - minimum players to start the game
     * @param {FragoleServer} rpcServer - an FragoleServer-Instance
     */
-    constructor (id, minPlayers=1, rpcServer=undefined) {
+    constructor(id, minPlayers=1, rpcServer=undefined) {
         super(id);
         this.rpcServer = rpcServer;
         this.minPlayers = minPlayers;
@@ -71,7 +71,7 @@ class GameController extends GameObject {
     * add a Player to the Game
     * @param {Player} player - an instance of Player
     */
-    addPlayer (player) {
+    addPlayer(player) {
         this.players.addItem(player);
         return this;
     }
@@ -81,7 +81,7 @@ class GameController extends GameObject {
     * GameController-Instance will also be connected to each ojbect (=> object.gameController)
     * @param {Array<GameItem>} items - an array of GameItem-Objects
     */
-    addItems (items) {
+    addItems(items) {
         for (let item in items) {
             this.items[item] = items[item];
             items[item].gameController = this;
@@ -92,7 +92,7 @@ class GameController extends GameObject {
     * draw the initial gameboard. Object added via addItems will be drawn.
     * if object.supressSetup is true, this object will be skipped
     */
-    setupBoard () {
+    setupBoard() {
         for (let i in this.items) {
             let item = this.items[i];
             if (item.supressSetup) {
@@ -125,7 +125,7 @@ class GameController extends GameObject {
     }
 
     // called when a new Player joins
-    joinPlayer (name, connection) {
+    joinPlayer(name, connection) {
         let player;
         let clientProxy = connection.clientProxy;
 
@@ -163,7 +163,7 @@ class GameController extends GameObject {
     * enter() of new state is called
     * @param {GameState} state - the state to which should be switched
     */
-    nextState (state) {
+    nextState(state) {
         this.currentState.exit();
         this.currentState=state;
         state.enter();
@@ -174,7 +174,7 @@ class GameController extends GameObject {
     * you may set Player.skipTurns to a positive number => this player will be
     * skipped until Player.skipTurns <= 0 (it's decremented each time it would be the players turn)
     */
-    nextPlayer () {
+    nextPlayer() {
         let currentIdx;
         let playerCount = this.joinedPlayers.length;
 
@@ -197,8 +197,8 @@ class GameController extends GameObject {
     * @param {Player} player - the player who is sending the message
     * @param {Object} msg - Object containing the message
     */
-    // XXX: add msg.players like in sendPopup
-    sendChat (player, msg) {
+    // TODO: add msg.players like in sendPopup
+    sendChat(player, msg) {
         let msgId = '#chat_msg_' + (++this.chatCnt);
         let cmd = (['addDomContent',
             this.chatMsg.content({player: player, msg: msg, msgId: msgId}),
@@ -214,7 +214,7 @@ class GameController extends GameObject {
     * @param {Object} msg - Object containing the message
     */
     // TODO: add msg.players like in sendPopup
-    sendLog (src, msg) {
+    sendLog(src, msg) {
         let msgId = '#log_msg_' + (++this.logCnt);
         let cmd = (['addDomContent',
             this.logMsg.content({src: src, msg: msg.content, icon:msg.icon, msgId: msgId}),
@@ -231,7 +231,7 @@ class GameController extends GameObject {
     * @param {string} src - the source of the message
     * @param {Object} msg - Object containing the message
     */
-    sendPopup (msg) {
+    sendPopup(msg) {
         this.popupContext= Lib.mergeDicts({header: msg.header,
             msg: msg.msg,
             color:msg.color,
@@ -252,7 +252,7 @@ class GameController extends GameObject {
     * if owner is not specified return list of all players
     * @param {GameObject} item - find owners of this object
     */
-    getOwner (item) {
+    getOwner(item) {
         if(item.owner) {
             return item.owner;
         } else {
@@ -265,7 +265,7 @@ class GameController extends GameObject {
     * @param {Player | Array<Player>} players - Player-Instance or Array of Players
     * @param {Object} cmd - a valid RPC-Cmd (see client-API)
     */
-    rpcListOrAll (players, cmd) {
+    rpcListOrAll(players, cmd) {
         if (players) {
             this.rpcCall(players, cmd);
         } else {
@@ -280,7 +280,7 @@ class GameController extends GameObject {
     * @param {GameObject} - send to owner of this object
     * @param {Object} cmd - a valid RPC-Cmd (see client-API)
     */
-    rpcListOrOwner (players, item, cmd) {
+    rpcListOrOwner(players, item, cmd) {
         if (players) {
             this.rpcCall(players, cmd);
         } else {
@@ -288,7 +288,7 @@ class GameController extends GameObject {
         }
     }
 
-    rpcCall (players, args) {
+    rpcCall(players, args) {
         let func = args[0];
         let _args = Array.prototype.slice.call(args, 1);
         if(players instanceof Array) {  // list of players
@@ -307,7 +307,7 @@ class GameController extends GameObject {
     * and to the current GameState
     * reset the Watchdog-Timer
     */
-    emit () {
+    emit() {
         this.setWatchdog(); // any event passed through here resets wd
         this.currentState.emit(...arguments);
         super.emit(...arguments);
@@ -317,7 +317,7 @@ class GameController extends GameObject {
     * set or reset the watchdog-timer
     * @param {number} time - wotchdog-interval in seconds
     */
-    setWatchdog (time=undefined) {
+    setWatchdog(time=undefined) {
         if (time) {
             this.watchdogSecs = time;
         }
@@ -327,7 +327,7 @@ class GameController extends GameObject {
 
     // called when the watchdog-timer fires
     // context == this
-    watchdog (context) {
+    watchdog(context) {
         context.emit('watchdog');
     }
 }

@@ -4,17 +4,17 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-11T20:24:47+02:00
+ * @Last modified time: 2017-07-13T19:58:52+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
-
+/** @module Dice */
 const Component = require('./Component.js').Component;
 const templates = require('../lib/FragoleTemplates.js');
 
 /**
 * Class Dice
-* @extends Component
+* @extends {module:GameObject~GameObject}
 * Implemnts a N-sided dice
 */
 class Dice extends Component {
@@ -22,7 +22,7 @@ class Dice extends Component {
     * Create a new Dice
     * @param {number} sides - number of sides on the dice
     */
-    constructor (id, sides, template=templates.DICE_DEFAULT) {
+    constructor(id, sides, template=templates.DICE_DEFAULT) {
         super(id, template);
         this.sides = sides;
         this.contentId = 'dice_' + id;
@@ -32,7 +32,7 @@ class Dice extends Component {
     /** draw the dice in the client-DOM
     * @param {Player | Array<Player>} players - Player or List of Clients where the dice should be drawn
     */
-    draw (players=undefined) {
+    draw(players=undefined) {
         this.gameController.rpcServer.connect('roll_' + this.id, this.roll, this);
         super.draw(players);
     }
@@ -42,7 +42,7 @@ class Dice extends Component {
     * @param {Player | Array<Player>} players - Player or List of Clients where the dice should be drawn
     * @param {boolean} reset - true = reset dice afterwards (reomves the displayed result)
     */
-    rollResult (players=undefined, reset=false) {
+    rollResult(players=undefined, reset=false) {
         super.draw(players);
         if (reset) {
             this.reset(players);
@@ -52,7 +52,7 @@ class Dice extends Component {
     /** reset the die => removes the rollResult or the roll-prompt from the
     * Client-DOM
     */
-    reset (players=undefined) {
+    reset(players=undefined) {
         this.context = {id: this.id, contentId: this.contentId};
         this.remove(players);
         this.remove(players, this.context.contentId + '_result');
@@ -64,7 +64,7 @@ class Dice extends Component {
     /** The die was rolled by the client
     * calculate result and emit 'roll' envent => to be dispached by an Eventhandler
     */
-    roll (clientId) {
+    roll(clientId) {
         this.result = Math.floor(Math.random() * this.sides + 1);
         this.context = {id: this.id, contentId: this.contentId + '_result', result: this.result};
         this.gameController.emit('roll', this.id, this);

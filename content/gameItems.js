@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-11T20:55:29+02:00
+ * @Last modified time: 2017-07-13T19:41:32+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -125,7 +125,7 @@ let waypoints = {
     wp405: new Waypoint('wp405', 'path5', 1010, 420, CustomTemplates.WAYPOINT_SMALL_ORANGE),
 };
 
-function connectWaypoints () {
+function connectWaypoints() {
     let paths = {};
 
     for (let k in waypoints) {
@@ -156,7 +156,7 @@ function connectWaypoints () {
 }
 
 let prompts = {
-    choose_action : new Prompt('choose_action', 'Du bist dran!',
+    chooseAction : new Prompt('chooseAction', 'Du bist dran!',
         '<p>Du kannst eine von folgenden Aktionen ausführen:</p>',
         null,
         {

@@ -1,18 +1,19 @@
 {
   "name": "Fragole",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Fragole - FRAmework for Gamified Online Learning Environments",
   "main": "FragoleMain.js",
   "dependencies": {
-    "browserify": "^14.1.0",
     "cookie-parser": "^1.4.3",
     "cookies": "^0.7.0",
     "engine.io": "^2.1.0",
     "eureca.io": "^0.7.1",
     "express": "^4.15.2",
-    "gulp": "^3.9.1",
+    "ink-docstrap": "^1.3.0",
     "jade": "^1.11.0",
     "jquery": "^3.1.1",
+    "jsdoc": "^3.5.2",
+    "mocha": "^3.4.2",
     "pug": "^2.0.0-beta11",
     "semantic-ui-css": "^2.2.10",
     "sqlite3": "^3.1.8"

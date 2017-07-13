@@ -4,18 +4,18 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-11T20:05:45+02:00
+ * @Last modified time: 2017-07-13T19:57:56+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
-
+/** @module Collection */
 const GameObject = require('./GameObject.js').GameObject;
 
 const ID = 0;
 const ITEM = 1;
 
 /** Class Collection
-* @extends GameObject
+* @extends {module:GameObject~GameObject}
 * Collection implements a "container" for all types of GameObjects
 * items: Array of GameObjects
 * Other Objects may subscribe to the Collection (the .update method of those
@@ -27,7 +27,7 @@ class Collection extends GameObject {
     * @param {string} id - unique id of the Collection
     * @param {Array<GameObject>} items - items that should be contained within the Collection
     */
-    constructor (id, items=[]) {
+    constructor(id, items=[]) {
         super(id);
         this.items = new Map();
         items.forEach((item) => { this.set(item.id, item);}, this.items);
@@ -38,7 +38,7 @@ class Collection extends GameObject {
     * Add a GameObject
     * @param {GameObject} item - item that should be added
     */
-    addItem (item) {
+    addItem(item) {
         this.items.set(item.id, item);
         for (let subscriber of this.subscribers) {
             subscriber.update('addItem', item);
@@ -51,7 +51,7 @@ class Collection extends GameObject {
     * @param {string} id - id of the item that should be removed
     * @return {GameObject | null}
     */
-    deleteItem (id) {
+    deleteItem(id) {
         let item = this.items.get(id);
         if (item) {
             this.items.delete(id);
@@ -66,7 +66,7 @@ class Collection extends GameObject {
     * @param {string} id - id of the item that should be removed
     * @return {GameObject}
     */
-    getItem (id) {
+    getItem(id) {
         return this.items.get(id);
     }
 
@@ -74,7 +74,7 @@ class Collection extends GameObject {
     * return all GameObjects of a given 'category'
     * @param {string} category
     */
-    getCategory (category) {
+    getCategory(category) {
         let res = [];
         for(let item of this.iterator()) {
             if (item[ITEM].category === category) {
@@ -88,7 +88,7 @@ class Collection extends GameObject {
     * return all GameObjects of 'type' (e.g. all Card-objects)
     * @param {GameObject} type - GameObject or a Subclass
     */
-    getType (type) {
+    getType(type) {
         let res = [];
         for(let item of this.iterator()) {
             if (item[ITEM] instanceof type) {
@@ -99,7 +99,7 @@ class Collection extends GameObject {
     }
 
     /** return an Iterator of all objects in Collection */
-    iterator () {
+    iterator() {
         return this.items[Symbol.iterator]();
     }
 
@@ -108,14 +108,14 @@ class Collection extends GameObject {
     * .update of subscriber will be called when collection is modified
     * @param {GameObject} subscriber - the subscribing object
     */
-    subscribe (subscriber) {
+    subscribe(subscriber) {
         this.subscribers.push(subscriber);
     }
 
     /** cancel a subscription to the collection
     * @param {GameObject} subscriber - the subscribing object
     */
-    unsubscribe (subscriber) {
+    unsubscribe(subscriber) {
         let itemIdx = this.subscribers.indexOf(subscriber);
         if (itemIdx > -1) {
             this.subscribers.splice(itemIdx, 1);

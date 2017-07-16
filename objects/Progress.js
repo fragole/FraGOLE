@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-13T18:54:36+02:00
+ * @Last modified time: 2017-07-13T20:23:48+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -14,7 +14,7 @@ const Statistic = require('./Statistic.js').Statistic;
 const templates = require('../lib/FragoleTemplates.js');
 
 /** Class Progress
-* @extends Statistic
+* @extends {module:Statistic~Statistic}
 * Implements a client-side progress-bar which can be drawn on the gameboard
 */
 class Progress extends Statistic {

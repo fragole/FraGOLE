@@ -34,7 +34,7 @@ else
       div(class="content")
         div(class="description") richtig wäre gewesen:
         ul
-        each answer in correct_answers
+        each answer in correctAnswers
           li #{answer}
     div(class="actions")
       div(class="ui ok labeled icon green button" onClick="rpcServer['question_" + id + "_finished'](gameboard.clientId);" )

@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-13T19:59:19+02:00
+ * @Last modified time: 2017-08-31T12:31:36+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -116,6 +116,7 @@ class GameController extends GameObject {
                 case 'Statistic':
                 case 'Progress':
                 case 'CardStack':
+                case 'Button':
                     item.draw();
                     break;
                 default:
@@ -164,9 +165,9 @@ class GameController extends GameObject {
     * @param {GameState} state - the state to which should be switched
     */
     nextState(state) {
-        this.currentState.exit();
+        this.currentState.exit(this);
         this.currentState=state;
-        state.enter();
+        state.enter(this);
     }
 
     /**

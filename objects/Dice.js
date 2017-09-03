@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-13T19:58:52+02:00
+ * @Last modified time: 2017-08-31T12:38:37+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -67,7 +67,7 @@ class Dice extends Component {
     roll(clientId) {
         this.result = Math.floor(Math.random() * this.sides + 1);
         this.context = {id: this.id, contentId: this.contentId + '_result', result: this.result};
-        this.gameController.emit('roll', this.id, this);
+        this.gameController.emit('roll', this.id, this, clientId);
     }
 
 }

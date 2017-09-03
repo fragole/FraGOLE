@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-13T19:59:42+02:00
+ * @Last modified time: 2017-08-31T11:27:08+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -42,10 +42,18 @@ class Player extends GameObject {
         this.storage = new PlayerModel(name);
     }
 
-    /** add a GameObject to the Players inventory */
+    /** add a GameObject to the Players inventory
+    * chainable
+    */
     addInventory(item) {
         this.inventory.addItem(item);
         item.owner = this;
+        return this;
+    }
+
+    addInventoryEx(items) {
+        items.forEach((item) => this.addInventory(item));
+        return this;
     }
 
     /** get a Item / List of Items from the players inventory
@@ -63,6 +71,7 @@ class Player extends GameObject {
     removeInventory(item) {
         this.inventory.deleteItem(item.id);
         item.owner = undefined;
+        return this;
     }
 
 }

@@ -1,4 +1,14 @@
-if activate == 'on'
-  div(id=contentId class="ui " +  color + " button" onClick="rpcServer.click_" + id + "(gameboard.clientId);"  style="position:absolute; top:" + y + "; left:" + x + ";") #{label}
+if icon
+  if activate == 'on'
+    button(id=contentId class="ui  " +  color +  " labeled icon button" onClick="rpcServer.click_" + id + "(gameboard.clientId);"  style="position:absolute; top:" + y + "; left:" + x + ";")
+      i(class=icon + " icon")
+      | #{label}
+  else
+    button(id=contentId class="ui disabled  " +  color +  " labeled icon button" style="position:absolute; top:" + y + "; left:" + x + ";")
+      i(class=icon + " icon")
+      | #{label}
 else
-  div(id=contentId class="ui disabled " +  color + " button" style="position:absolute; top:" + y + "; left:" + x + ";") #{label}
+  if activate == 'on'
+    div(id=contentId class="ui " +  color + " button" onClick="rpcServer.click_" + id + "(gameboard.clientId);"  style="position:absolute; top:" + y + "; left:" + x + ";") #{label}
+  else
+    div(id=contentId class="ui disabled " +  color + " button" style="position:absolute; top:" + y + "; left:" + x + ";") #{label}

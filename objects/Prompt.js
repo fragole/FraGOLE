@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-18T19:17:10+02:00
+ * @Last modified time: 2017-09-03T10:22:41+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -46,8 +46,8 @@ class Prompt extends Component {
     /** this is called when an option-button is pressed on client-side
     * emit event with the slected options
     */
-    select(option) {
-        this.gameController.emit('prompt', this.id, option, this);
+    select(option, clientId) {
+        this.gameController.emit('prompt', this.id, option, this, clientId);
         this.gameController.rpcServer.disconnect('prompt_' + this.id);
     }
 }
@@ -99,9 +99,9 @@ class Question extends Prompt {
         let selection = this.context.actions[option];
         this.context.selection = option;
         if (selection.correct) {
-            this.gameController.emit('questionCorrect', this.id, option, selection.value, this);
+            this.gameController.emit('questionCorrect', this.id, option, selection.value, this, clientId);
         } else {
-            this.gameController.emit('questionWrong', this.id, option, selection.value, this);
+            this.gameController.emit('questionWrong', this.id, option, selection.value, this, clientId);
         }
         this.gameController.rpcServer.disconnect('question_' + this.id);
     }

@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-13T19:57:17+02:00
+ * @Last modified time: 2017-09-03T06:46:05+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -151,7 +151,7 @@ class CardStack extends Component {
     drawCard(clientId) {
         let card = this.cards.deleteItem(this.stack.pop());
         if (this.gameController) {
-            this.gameController.emit('drawCard', this.id, card, this);
+            this.gameController.emit('drawCard', this.id, card, this, clientId);
         }
     }
 }

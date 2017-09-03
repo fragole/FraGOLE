@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-13T20:25:10+02:00
+ * @Last modified time: 2017-09-03T14:40:20+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -152,6 +152,7 @@ STATE_INIT.setHandlers({
         items.btnEndTurn.draw(controller.joinedPlayers);
         items.btnEndTurn.deactivate(controller.joinedPlayers);
         controller.rpcCall(controller.joinedPlayers, ['drawImage', 'test', 'assets/connectors.png', 'back', 0, 0]);
+        controller.joinedPlayers.forEach((player) => { player.session.setBackgroundImage('/assets/base.jpg'); });
         controller.nextPlayer();
         controller.sendLog('Spiel', {content:'Herzlich Willkommen!'});
         controller.nextState(STATE_CHOOSE_ACTION);

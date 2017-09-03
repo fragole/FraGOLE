@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-13T19:59:32+02:00
+ * @Last modified time: 2017-08-31T11:09:39+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -35,15 +35,15 @@ class GameState extends GameObject {
 
     // EVENTS - these are triggered via GameController.next_state(GameState)
     /** triggers automatically when the State is entered */
-    enter() {
+    enter(controller) {
         console.log(this.id + ' ENTER');
-        this.emit('enter');
+        this.emit('enter', controller);
     }
 
     /** triggers automatically when the State is exited */
-    exit() {
+    exit(controller) {
         console.log(this.id + ' EXIT');
-        this.emit('exit');
+        this.emit('exit', controller);
     }
 }
 exports.GameState = GameState;

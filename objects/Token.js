@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-07-13T20:06:43+02:00
+ * @Last modified time: 2017-09-03T06:19:53+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -34,6 +34,7 @@ class Token extends GameItem {
         this.y = y;
         this.template = new Template().x(x).y(y);
         this.waypoint = undefined;
+        this.movePending = false;
     }
 
     /** move token to a waypoint
@@ -65,6 +66,7 @@ class Token extends GameItem {
 
         let cmd =['moveToken', this.id, path];
         this.waypoint = waypoint;
+        this.movePending = true;
         this.gameController.rpcServer.connect('move_complete_' + this.id, this.moveComplete, this);
         this.gameController.rpcListOrAll(players, cmd);
     }
@@ -150,12 +152,12 @@ class Token extends GameItem {
     */
     moveComplete(clientId) {
         // ensure that moveComplete is only triggered once
-        if(this.gameController.playersId[clientId] === this.gameController.activePlayer) {
-            this.gameController.emit('moveComplete', this.id, this);
-            this.gameController.emit('enterWaypoint', this.id, this.waypoint, this);
-            //this.gameController.rpcServer.disconnect('move_complete_' + this.id);
+        //if(this.gameController.playersId[clientId] === this.gameController.activePlayer) {
+        if(this.movePending === true) {
+            this.gameController.emit('moveComplete', this.id, this, clientId);
+            this.gameController.emit('enterWaypoint', this.id, this.waypoint, this, clientId);
+            this.movePending = false;
         }
     }
-
 }
 module.exports.Token = Token;

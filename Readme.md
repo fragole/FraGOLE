@@ -13,11 +13,6 @@ FragoleMain.js
 
 # Acknowledgements
 
-Image sources:
-- http://triphackr.com/from-gorak-shep-to-everest-base-camp/
-- http://wallpprs.com
-- http://www.travelmyne.com/south-america/argentina/patagonia-argentina
-
 FraGOLE uses public domain game assets by https://kenney.nl/
 
 # License

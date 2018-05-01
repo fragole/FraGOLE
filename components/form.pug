@@ -1,0 +1,20 @@
+div( id=contentId class="ui small modal")
+  .header #{header}
+  .content
+    form( class="ui form" id="form")
+      div !{content}
+  .actions
+      div(class="ui ok green button" onClick="rpcServer['form_" + id + "'](submit(), gameboard.clientId);") #{postBtn}
+      div(class="ui ok red button" onClick="rpcServer['form_" + id + "'](cancel(), gameboard.clientId);") #{cancelBtn}
+  script.
+    function afterAddDomContent() {
+      $('##{contentId}')
+        .modal('setting', 'closable', false)
+        .modal('show');
+    }
+    function submit() {
+      return ['submit', $('form').serializeArray()];
+    }
+    function cancel() {
+      return ['cancel'];
+    }

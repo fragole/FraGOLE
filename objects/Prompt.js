@@ -113,3 +113,39 @@ class Question extends Prompt {
     }
 }
 module.exports.Question = Question;
+
+class Form extends Component {
+    /**
+    * @param {string} header - header-text
+    * @param {string} content - content of the form => HTML (just the part between <form> & </form>)
+    * @param {string} postBtn - text of the button that submits the form
+    * @param {string} cancelBtn - test oft the button that cancels te form
+    */
+    constructor(id, header, content, postBtn = 'ok', cancelBtn = 'abbrechen', template = templates.FORM_DEFAULT) {
+        super(id, template);
+        this.context.contentId = 'form_' + id;
+        this.context.header = header;
+        this.context.content = content;
+        this.context.postBtn = postBtn;
+        this.context.cancelBtn = cancelBtn;
+    }
+
+    /** display question to client(s) */
+    show(players = undefined) {
+        this.gameController.rpcServer.connect('form_' + this.id, this.post, this);
+        this.draw(players);
+    }
+
+    // EVENTS
+
+    /** gets called wenn the submit button is clicke */
+    post(data, clientId) {
+        if (data[0] === 'submit') { 
+            this.gameController.emit('formPost', this.id, data[1], this, clientId);
+        } else {
+            this.gameController.emit('formCancel', this.id, [], this, clientId);
+        }    
+        this.gameController.rpcServer.disconnect('form_' + this.id);
+    }
+}
+module.exports.Form = Form;

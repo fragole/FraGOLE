@@ -36,4 +36,5 @@ module.exports= {
     CardStack:        require('./Cards.js').CardStack,
     CardHand:         require('./Cards.js').CardHand,
     Button:           require('./Button.js').Button,
+    Form:             require('./Prompt.js').Form,
 };

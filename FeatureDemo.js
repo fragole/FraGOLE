@@ -4,7 +4,7 @@
  * @Email:  mb@bauercloud.de
  * @Project: Fragole - FrAmework for Gamified Online Learning Environments
  * @Last modified by:   Michael Bauer
- * @Last modified time: 2017-09-04T17:24:22+02:00
+ * @Last modified time: 2017-10-22T08:53:45+02:00
  * @License: MIT
  * @Copyright: Michael Bauer
  */
@@ -13,7 +13,8 @@ const FragoleServer = require('./lib/FragoleServer.js');
 const Lib = require('./lib/FragoleLib.js');
 const {Game, GameController, GameState, Player, PlayerToken, Collection,
         Waypoint, Dice, Statistic, PlayerStatistic, Rating, PlayerRating,
-        Progress, PlayerProgress, Prompt, Question, Card, CardStack, CardHand, Button} = require('./objects/FragoleObjects.js');
+        Progress, PlayerProgress, Prompt, Question, Card, CardStack, CardHand, Button,
+        Form} = require('./objects/FragoleObjects.js');
 const Lobby = require('./lib/FragoleLobby.js');
 const Templates = require('./lib/FragoleTemplates.js');
 
@@ -82,7 +83,8 @@ let buttons = {
     btnPopup: new Button('btnPopup', 10, 260, 'Ein Popup anzeigen', 'teal'),
     btnProgressUp: new Button('btnProgressUp', 10, 300, 'FORTSCHRITT', 'black', 'add circle'),
     btnProgressDown: new Button('btnProgressDown', 10, 340, 'FORTSCHRITT', 'black', 'minus circle'),
-    btnSwitchState: new Button('btnSwitchState', 10, 400, 'State umschalten', 'yellow', 'refresh')
+    btnSwitchState: new Button('btnSwitchState', 10, 400, 'State umschalten', 'yellow', 'refresh'),
+    btnForm: new Button('btnForm',  10, 440, 'Formular anzeigen', 'red')
 };
 
 let cards = {
@@ -108,7 +110,7 @@ let prompts = {
             'Option 4':{color:'blue',  icon:''}
         }),
 
-    question: new Question('guestion1', 'Frage',
+    question: new Question('question1', 'Frage',
         '<p>Was ist richtig?',
         '',
         {
@@ -116,6 +118,31 @@ let prompts = {
             '1 + 1 = 3':{correct:false, value:0},
         }),
 };
+
+const form = new Form('form1', 'Formular', `
+    <div class="field">
+        <label>Feld1</label>
+        <input name="form_feld1" placeholder="Feld1" type="text">
+    </div>
+    <div class="field">
+        <label>Feld2</label>
+        <input name="form_feld2" placeholder="Feld2" type="text">
+    </div>
+    <div class="field">
+        <div class="ui checkbox">
+        <input name="checkbox" type="checkbox">
+        <label>Check?</label>
+        </div>
+    </div>
+    <div class="field">
+      <label>Select</label>
+      <select name="select" class="ui fluid dropdown">
+        <option value="">Bitte wählen</option>
+        <option value="a">A</option>
+        <option value="b">B</option>
+        <option value="c">C</option>
+      </select>
+    </div>`);
 
 cards.cardStack.addCards(cards.card);
 
@@ -139,6 +166,7 @@ STATE_INIT.setHandlers({
         src.addItems(buttons);
         src.addItems(cards);
         src.addItems(prompts);
+        src.addItems({form});
 
         // init player inventories
         let items = src.items;
@@ -197,6 +225,7 @@ STATE_1.setHandlers({
         src.items.btnProgressUp.deactivate();
         src.items.btnProgressDown.deactivate();
         src.items.cardStack.activate();
+        src.items.btnForm.activate()
     },
 
     click: (id, item, clientId) => {
@@ -224,6 +253,9 @@ STATE_1.setHandlers({
             case 'btnSwitchState':
                 controller.nextState(STATE_2);
                 break;
+            case 'btnForm':
+                controller.items.form.show(player);
+                break; 
             default:
                 break;
         }
@@ -262,6 +294,10 @@ STATE_1.setHandlers({
         item.gameController.sendLog(item.owner.name, {content:'erreicht ' + wp.id +'!', icon:'inverted yellow location arrow'});
     },
 
+    passWaypoint: (id, item, wp) => {
+        item.gameController.sendLog(item.owner.name, {content:'zieht über ' + wp.id +'!', icon:'inverted green location arrow'});
+    },
+
     drawCard: (id, card, stack, clientId) => {
         if (card) {
             let player = card.gameController.playersId[clientId];
@@ -284,6 +320,17 @@ STATE_1.setHandlers({
     prompt: (id, option, prompt, clientId) => {
         let player = prompt.gameController.playersId[clientId];
         prompt.gameController.sendLog(player.name, {content:'hat ' + option + ' gewählt!', icon:'inverted orange check square'});
+    },
+
+    formPost: (id, data, form, clientId) => {
+        let player = form.gameController.playersId[clientId];
+        form.gameController.sendLog(player.name, {content:'hat Daten im Formular eingegeben', icon:'inverted blue edit outline'});
+        console.log(data);
+    },
+    
+    formCancel: (id, data, form, clientId) => {
+        let player = form.gameController.playersId[clientId];
+        form.gameController.sendLog(player.name, {content:'hat die Formulareingabe abgebrochen', icon:'inverted red edit outline'});
     },
 
     exit: (src) => {
